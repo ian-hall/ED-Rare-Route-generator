@@ -42,8 +42,8 @@ class EDRareRoute(object):
         '''   
         population = []
         validSystems = [system for system in self.__Route]
-        popSize = 15
-        maxGens = 25
+        popSize = 30
+        maxGens = 15
         routeLength = self.__Route.__len__()
 
 
@@ -56,7 +56,7 @@ class EDRareRoute(object):
                 while tempSystemList.count(tempSystem) != 0:
                     tempSystem = random.randrange(0,validSystems.__len__())
                 tempSystemList.append(tempSystem)
-            population.append(RouteOrder(tempSystemList, self.__Route, self.Best_Sellers, self.SellersPerStation))
+            population.append(RouteOrder(tempSystemList, self.__Route, self.Best_Sellers, self.SellersPerStation, self.TotalSupply))
 
         return self.__GeneticRouteStart(population, maxGens, validSystems)
 
@@ -155,7 +155,7 @@ class EDRareRoute(object):
 
 
         #print("\n\t***Child created***\n",EDRareRoute(newRoute))
-        return RouteOrder(newOrder,self.__Route, self.Best_Sellers, self.SellersPerStation)
+        return RouteOrder(newOrder,self.__Route, self.Best_Sellers, self.SellersPerStation, self.TotalSupply)
 
     def __RouteMutate(self, child):
         newOrder = [var for var in child.Order]
@@ -166,7 +166,7 @@ class EDRareRoute(object):
         temp = newOrder[swap1]
         newOrder[swap1] = newOrder[swap2]
         newOrder[swap2] = temp
-        return RouteOrder(newOrder,self.__Route, self.Best_Sellers, self.SellersPerStation)
+        return RouteOrder(newOrder,self.__Route, self.Best_Sellers, self.SellersPerStation, self.TotalSupply)
 
     def __CalcSellers(self):
         sellingDistance = 140
@@ -233,7 +233,7 @@ class RouteOrder(object):
     The list of ints represents an order for the systems, with the 
     ints themselves being the index of the system in the list of systems.
     '''
-    def __init__(self, indexList: [], systems: [], sellLocs: [], sellersPerStation: {}):
+    def __init__(self, indexList: [], systems: [], sellLocs: [], sellersPerStation: {}, itemSupply):
         '''
         sellLocs members will always be length 2
         '''
@@ -241,7 +241,8 @@ class RouteOrder(object):
         self.__Systems = systems
         self.__SellLocs = sellLocs
         self.SellersPerStation = sellersPerStation
-
+        self.Supply = itemSupply
+        self.BestSellers = None
         self.Value = self.__CalcValue()
 
     def __CalcValue(self):
@@ -264,7 +265,9 @@ class RouteOrder(object):
         for index in self.Order:
             orderedSystems.append(self.__Systems[index])
 
-        pairValue = -10
+        routeLength = orderedSystems.__len__()
+
+        pairValue = 0.01
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
@@ -299,8 +302,8 @@ class RouteOrder(object):
                 #print("1: ",numBefore1)
                         
                 numBefore2 = 0
-                for i in range(loc1Index,loc2Index + orderedSystems.__len__()):
-                    if indexForSystemsSellingLoc2.count(i % orderedSystems.__len__()) != 0:
+                for i in range(loc1Index,loc2Index + routeLength):
+                    if indexForSystemsSellingLoc2.count(i % routeLength) != 0:
                         numBefore2 += 1
                 #print("2: ",numBefore2)
             else:
@@ -311,32 +314,50 @@ class RouteOrder(object):
                 #print("2: ",numBefore2)
                         
                 numBefore1 = 0
-                for i in range(loc2Index,loc1Index + orderedSystems.__len__()):
-                    if indexForSystemsSellingLoc1.count(i % orderedSystems.__len__()) != 0:
+                for i in range(loc2Index,loc1Index + routeLength):
+                    if indexForSystemsSellingLoc1.count(i % routeLength) != 0:
                         numBefore1 += 1
                 #print("1: ",numBefore1)
                
             # if the total number before each = len-2 or len then we have a good one... should treat each the same
             # as far as value goes len-2 means we have a rather evenly spaced loop, len means we have grouped systems
-            if (numBefore1 == numBefore2) or math.fabs(numBefore1-numBefore2) == 1:
-                pairValue = 50
+            if routeLength % 2 == 0:
+                if (numBefore1 == numBefore2):
+                    pairValue = 50
+                    self.BestSellers = sellerPair                 
+                else:
+                    if (numBefore1 + numBefore2) < pairValue:
+                        pairValue = pairValue
+                    else:
+                        pairValue = (numBefore1 + numBefore2)
+                        self.BestSellers = sellerPair
             else:
-                pairValue = pairValue if (numBefore1 + numBefore2) < pairValue else (numBefore1 + numBefore2)
+                if math.fabs(numBefore1 - numBefore2) <= 1:
+                    pairValue = 50
+                    self.BestSellers = sellerPair
+                else:
+                    if (numBefore1 + numBefore2) < pairValue:
+                        pairValue = pairValue
+                    else:
+                        pairValue = (numBefore1 + numBefore2)
+                        self.BestSellers = sellerPair
 
-            # now we check how far apart the sellers are and adjust the pairValue
-            #if jumpsBetween < (orderedSystems.__len__() / 2):
-            #    pairValue *= 0.5
-            #elif jumpsBetween > (orderedSystems.__len__() / 2):
-            #    pairValue *= 0.5
-        magicNumber = 10000
+        # magicnumber is set to assume a length of 120ly between systems on average
+        # if the total distance is larger than this we are going to weigh the total 
+        # value lower
+        magicNumber = routeLength * 100
         totalDistance = 0
-        for i in range(0,orderedSystems.__len__()):
+        for i in range(0,routeLength):
             currentSystem = orderedSystems[i]
-            nextSystem = orderedSystems[(i+1)%orderedSystems.__len__()]
+            nextSystem = orderedSystems[(i+1)%routeLength]
             totalDistance += currentSystem.System_Distances[nextSystem.Index]
 
         #Less total distance needs to give a higher value
-        weightedDistance = magicNumber - totalDistance
-        totalValue = pairValue * (weightedDistance / 100)
+        weightedDistance = -1
+        if totalDistance >= magicNumber:
+            weightedDistance = 0.25
+        else:
+            weightedDistance = magicNumber - totalDistance
+        totalValue = pairValue * self.Supply * weightedDistance
 
         return totalValue
