@@ -251,9 +251,8 @@ class RouteOrder(object):
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
 
-        TODO: Take into account total supply of the route, need to pass it in above
-            Also need to take into account routes that do not have evenly spaced if even, or a difference of 1 of odd, 
-            stations between the designated sellers.
+        TODO: Take into account the individual jump lengths between station, currently just taking into account 
+                total distance of the route
         '''
         totalValue = 0.01
         #if comboswithsystems.len is 1 then we have a maybe good thing
@@ -353,11 +352,7 @@ class RouteOrder(object):
             totalDistance += currentSystem.System_Distances[nextSystem.Index]
 
         #Less total distance needs to give a higher value
-        weightedDistance = -1
-        if totalDistance >= magicNumber:
-            weightedDistance = 0.25
-        else:
-            weightedDistance = magicNumber - totalDistance
+        weightedDistance = magicNumber/totalDistance
         totalValue = pairValue * self.Supply * weightedDistance
 
         return totalValue

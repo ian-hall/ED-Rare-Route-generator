@@ -30,7 +30,7 @@ Last 3 columns are garbage also
 cleanedCSV = []
 allSystems = []
 
-'''
+
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -59,7 +59,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-
+'''
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
@@ -83,11 +83,11 @@ totalSellers = 2
 maxStationDistance = 5000
 popSize = 50
 gens = 20
-routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
+#routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
 
-print("\t****GOOD ROUTES MAYBE??****")
-for route in routes:
-    print(route)
+#print("\t****GOOD ROUTES MAYBE??****")
+#for route in routes:
+#    print(route)
 
 #Yaso-Kondi loop
 #Indices based on my ed.csv file (its old)
@@ -100,9 +100,9 @@ ykLoopList.append(allSystems[12])
 ykLoopList.append(allSystems[31])
 ykLoopList.append(allSystems[34])
 ykLoopList.append(allSystems[91])
-#ykLoop = EDRareRoute(ykLoopList)
-#print("YK Loop")
-#print(ykLoop)
+ykLoop = EDRareRoute(ykLoopList)
+print("YK Loop")
+print(ykLoop)
 #tempRoute = ykLoop.GetRoute()
 
 #print("\n\nShortest Paths")
