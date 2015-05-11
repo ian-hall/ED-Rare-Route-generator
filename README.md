@@ -7,9 +7,6 @@ generate some possible rare trade routes. Uses genetic algorithms to calculate t
 I still have a lot of work to do on this as it is:
 <ul>
   <li>
-  Update the fitness value for route orders to take into account odd/even length routes
-  </li>
-  <li>
   Better quantify the fitness value of route orders, currently there is only small variations between the values of good routes
   </li>
   <li>
