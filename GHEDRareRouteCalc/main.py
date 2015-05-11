@@ -78,7 +78,7 @@ for i in range(1,cleanedCSV.__len__()-1):
     tempSystem.append(tempDistances)
     allSystems.append(EDSystem(tempSystem))
 
-testSize = 5
+testSize = 4
 totalSellers = 2
 maxStationDistance = 5000
 popSize = 50

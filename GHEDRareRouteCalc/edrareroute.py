@@ -20,10 +20,11 @@ class EDRareRoute(object):
             raise Exception("Error: Route must be 4 - 12 in length")
             
         #self.__Station_Distances = self.__DistancesBetweenSystems()
-        self.SellersPerStation = {}
-        self.TotalSupply = sum([val.Max_Supply for val in self.__Route])
-        self.Best_Sellers = self.__CalcSellers()
+        self.Sellers_Per_Station = {}
+        self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
+        self.Possible_Sell_Points = self.__CalcSellers()
         self.Best_Order = []
+        self.Best_Sell_Points = []
         self.Fitness_Values = self.__Fitness()
 
     def GetRoute(self):
@@ -43,7 +44,7 @@ class EDRareRoute(object):
         population = []
         validSystems = [system for system in self.__Route]
         popSize = 30
-        maxGens = 15
+        maxGens = 25
         routeLength = self.__Route.__len__()
 
 
@@ -56,7 +57,7 @@ class EDRareRoute(object):
                 while tempSystemList.count(tempSystem) != 0:
                     tempSystem = random.randrange(0,validSystems.__len__())
                 tempSystemList.append(tempSystem)
-            population.append(RouteOrder(tempSystemList, self.__Route, self.Best_Sellers, self.SellersPerStation, self.TotalSupply))
+            population.append(RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply))
 
         return self.__GeneticRouteStart(population, maxGens, validSystems)
 
@@ -90,6 +91,7 @@ class EDRareRoute(object):
             currentPopulation = nextPopulation
 
         self.Best_Order = bestRoute.Order
+        self.Best_Sell_Points = bestRoute.Best_Sellers
         return bestRoute.Value
 
     def __GetRouteParents(self, population):
@@ -155,7 +157,7 @@ class EDRareRoute(object):
 
 
         #print("\n\t***Child created***\n",EDRareRoute(newRoute))
-        return RouteOrder(newOrder,self.__Route, self.Best_Sellers, self.SellersPerStation, self.TotalSupply)
+        return RouteOrder(newOrder,self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
 
     def __RouteMutate(self, child):
         newOrder = [var for var in child.Order]
@@ -166,17 +168,17 @@ class EDRareRoute(object):
         temp = newOrder[swap1]
         newOrder[swap1] = newOrder[swap2]
         newOrder[swap2] = temp
-        return RouteOrder(newOrder,self.__Route, self.Best_Sellers, self.SellersPerStation, self.TotalSupply)
+        return RouteOrder(newOrder,self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
 
     def __CalcSellers(self):
         sellingDistance = 140
-        self.SellersPerStation = {}
+        self.Sellers_Per_Station = {}
         for system in self.__Route:
             tempSellers = []
             for distToCheck in self.__Route:
                 if system.System_Distances[distToCheck.Index] >= sellingDistance:
                     tempSellers.append(distToCheck)
-            self.SellersPerStation[system] = tempSellers
+            self.Sellers_Per_Station[system] = tempSellers
 
         combosWithAllSystems = []
         for combo in itertools.combinations(self.__Route,2):
@@ -185,7 +187,7 @@ class EDRareRoute(object):
                 continue
             sellersPerCombo = []
             for obj in combo:
-                sellersPerCombo += [val for val in self.SellersPerStation[obj]]
+                sellersPerCombo += [val for val in self.Sellers_Per_Station[obj]]
             if set(sellersPerCombo) == set(self.__Route):
                 combosWithAllSystems.append(combo)
 
@@ -194,10 +196,10 @@ class EDRareRoute(object):
         while combosWithAllSystems.__len__ != 0:
             combosToRemove = []
             for combo in combosWithAllSystems:
-                numSellers = self.SellersPerStation[combo[0]].__len__()
+                numSellers = self.Sellers_Per_Station[combo[0]].__len__()
                 badCombo = False
                 for system in combo:
-                    numToCheck = self.SellersPerStation[system].__len__()
+                    numToCheck = self.Sellers_Per_Station[system].__len__()
                     leftOver = math.fabs(numSellers - numToCheck)
                     if leftOver > maxDifference:
                         badCombo = True
@@ -224,6 +226,9 @@ class EDRareRoute(object):
         strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Values))
         for index in self.Best_Order:
             strList.append('{0}\n'.format(self.__Route[index]))
+        strList.append("\n\tSell rares at:\n")
+        for seller in self.Best_Sell_Points:
+            strList.append('{0}\n'.format(seller))
         strList.append("\tEnd Rare Route!!!\n")
         return ''.join(strList)
 
@@ -240,9 +245,9 @@ class RouteOrder(object):
         self.Order = indexList
         self.__Systems = systems
         self.__SellLocs = sellLocs
-        self.SellersPerStation = sellersPerStation
+        self.Route_Sellers = sellersPerStation
         self.Supply = itemSupply
-        self.BestSellers = None
+        self.Best_Sellers = None
         self.Value = self.__CalcValue()
 
     def __CalcValue(self):
@@ -282,9 +287,9 @@ class RouteOrder(object):
 
             indexForSystemsSellingLoc1 = []
             indexForSystemsSellingLoc2 = []
-            for system in self.SellersPerStation[loc1]:
+            for system in self.Route_Sellers[loc1]:
                 indexForSystemsSellingLoc1.append(orderedSystems.index(system))
-            for system in self.SellersPerStation[loc2]:
+            for system in self.Route_Sellers[loc2]:
                 indexForSystemsSellingLoc2.append(orderedSystems.index(system))
 
             # At this point we have the location of the sellers in the route
@@ -323,23 +328,23 @@ class RouteOrder(object):
             if routeLength % 2 == 0:
                 if (numBefore1 == numBefore2):
                     pairValue = 50
-                    self.BestSellers = sellerPair                 
+                    self.Best_Sellers = sellerPair                 
                 else:
                     if (numBefore1 + numBefore2) < pairValue:
                         pairValue = pairValue
                     else:
                         pairValue = (numBefore1 + numBefore2)
-                        self.BestSellers = sellerPair
+                        self.Best_Sellers = sellerPair
             else:
                 if math.fabs(numBefore1 - numBefore2) <= 1:
                     pairValue = 50
-                    self.BestSellers = sellerPair
+                    self.Best_Sellers = sellerPair
                 else:
                     if (numBefore1 + numBefore2) < pairValue:
                         pairValue = pairValue
                     else:
                         pairValue = (numBefore1 + numBefore2)
-                        self.BestSellers = sellerPair
+                        self.Best_Sellers = sellerPair
 
         # magicnumber is set to assume a length of 120ly between systems on average
         # if the total distance is larger than this we are going to weigh the total 
