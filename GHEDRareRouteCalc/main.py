@@ -30,7 +30,7 @@ Last 3 columns are garbage also
 cleanedCSV = []
 allSystems = []
 
-
+'''
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -59,7 +59,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-'''
+
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
@@ -78,19 +78,20 @@ for i in range(1,cleanedCSV.__len__()-1):
     tempSystem.append(tempDistances)
     allSystems.append(EDSystem(tempSystem))
 
-testSize = 4
+testSize = 8
 totalSellers = 2
 maxStationDistance = 5000
 popSize = 50
-gens = 20
-#routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
+gens = 100
+routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
 
-#print("\t****GOOD ROUTES MAYBE??****")
-#for route in routes:
-#    print(route)
+print("\t****GOOD ROUTES MAYBE??****")
+for route in routes:
+    print(route)
 
 #Yaso-Kondi loop
 #Indices based on my ed.csv file (its old)
+'''
 ykLoopList = []
 ykLoopList.append(allSystems[104])
 ykLoopList.append(allSystems[79])
@@ -103,30 +104,6 @@ ykLoopList.append(allSystems[91])
 ykLoop = EDRareRoute(ykLoopList)
 print("YK Loop")
 print(ykLoop)
-#tempRoute = ykLoop.GetRoute()
-
-#print("\n\nShortest Paths")
-#tempRoute = ykLoop.GetRoute()
-#for system in tempRoute:
-#    vertices = [system]
-#    edges = []
-
-#    while set(vertices) != set(tempRoute):
-#        nextMinEdge = sys.maxsize
-#        vertexToAdd = None
-#        lastVertex = vertices[-1]
-#        for newVertex in tempRoute:
-#            if lastVertex.System_Distances[newVertex.Index] < nextMinEdge and vertices.count(newVertex) == 0:
-#                nextMinEdge = lastVertex.System_Distances[newVertex.Index]
-#                vertexToAdd = newVertex        
-#        vertices.append(vertexToAdd)
-#        edges.append(EDSystemPair(lastVertex,vertexToAdd,nextMinEdge))
-#    #Need to add the distance from last to first
-#    edges.append(EDSystemPair(vertices[-1],vertices[0],vertices[-1].System_Distances[vertices[0].Index]))
-
-#    print("\t***")
-#    for edge in edges:
-#        print(edge)
-#    print("Total Distance: ",sum([edge.Distance for edge in edges]))
+'''
 
 input("dont close omg")

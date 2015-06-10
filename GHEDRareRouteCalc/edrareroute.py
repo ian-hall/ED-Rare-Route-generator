@@ -230,13 +230,16 @@ class EDRareRoute(object):
 
     def __str__(self):
         strList = []
-        strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Values))
-        for index in self.Best_Order:
-            strList.append('{0}\n'.format(self.__Route[index]))
-        strList.append("\n\tSell rares at:\n")
-        for seller in self.Best_Sell_Points:
-            strList.append('{0}\n'.format(seller))
-        strList.append("\tEnd Rare Route!!!\n")
+        if self.Best_Sell_Points != None:
+            strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Values))
+            for index in self.Best_Order:
+                strList.append('{0}\n'.format(self.__Route[index]))
+            strList.append("\n\tSell rares at:\n")
+            for seller in self.Best_Sell_Points:
+                strList.append('{0}\n'.format(seller))
+            strList.append("\tEnd Rare Route!!!\n")
+        else:
+            strList.append("\nFound a route with value:{0}, but it is no good".format(self.Fitness_Values))
         return ''.join(strList)
 
 class RouteOrder(object):
@@ -265,6 +268,9 @@ class RouteOrder(object):
 
         TODO: Take into account the individual jump lengths between station, currently just taking into account 
                 total distance of the route
+              This means:
+                    We want a route that all jumps are less than somewhere around 100LY or
+                    We want a route with 2 jumps over 150LY, the rest under 30LY
         '''
         totalValue = 0.01
         #if comboswithsystems.len is 1 then we have a maybe good thing
