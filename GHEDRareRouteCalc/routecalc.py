@@ -150,6 +150,11 @@ class RouteCalc(object):
 
     @classmethod
     def __Mutate(self,route: EDRareRoute, validSystems: []):
+        '''
+        TODO: Modify to allow more types of mutation:
+                    Chance to simply shuffle around the systems... maybe if a sufficiently high value is already found?
+                    Chance to replace X number of systems instead of just 1
+        '''
         tempRoute = route.GetRoute()
         systemToChange = random.randrange(0,tempRoute.__len__())
         newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 

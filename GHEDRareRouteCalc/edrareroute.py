@@ -9,10 +9,7 @@ import operator
 
 class EDRareRoute(object):
     '''
-    TODO: Take into account sellers when printing the route
-        Change Best_Sellers to All_Sellers
-        put Best_Sellers in the RouteOrder object
-        Take into account stations with multiple rares
+    TODO: Take into account stations with multiple rares
     '''
     def __init__(self,systemList: []):
         self.__Route = [val for val in systemList]
@@ -39,7 +36,10 @@ class EDRareRoute(object):
         Need to weight that values such that routes accounting for all systems
         are worth more.
 
-        Changing this to a genetic type thing. Population is a list of edsystems
+
+        TODO: Remove this second genetic algorithm and account for it in the main routecalc class
+              Basically just want to create a new RouteOrder with the current EDRareRoute and return the value,
+              Let the main genetic worry about finding the best order
         '''   
         population = []
         validSystems = [system for system in self.__Route]
@@ -47,7 +47,7 @@ class EDRareRoute(object):
         maxGens = 25
         routeLength = self.__Route.__len__()
 
-
+        '''
         for i in range(0,popSize):
             tempSystemList = []
             for j in range(0,routeLength):
@@ -60,6 +60,13 @@ class EDRareRoute(object):
             population.append(RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply))
 
         return self.__GeneticRouteStart(population, maxGens, validSystems)
+        '''
+        tempSystemList = [ i for i in range(0,validSystems.__len__()) ]
+
+        currentRoute = RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
+        self.Best_Order = currentRoute.Order
+        self.Best_Sell_Points = currentRoute.Best_Sellers
+        return currentRoute.Value
 
     def __GeneticRouteStart(self, startingPop: [], maxGenerations: int, validSystems: []):
         currentGen = 0
@@ -75,7 +82,7 @@ class EDRareRoute(object):
             #Getting the best route in the current population
             '''
             We get a list of orders for the current route.
-            We want to find which, our of those orders, is the best
+            We want to find which, out of those orders, is the best
             '''
             currentBest = max(currentPopulation,key=operator.attrgetter('Value'))
             if currentBest.Value > bestRoute.Value:

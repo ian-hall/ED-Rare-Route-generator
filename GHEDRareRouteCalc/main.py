@@ -94,10 +94,10 @@ gens = 20
 ykLoopList = []
 ykLoopList.append(allSystems[104])
 ykLoopList.append(allSystems[79])
-ykLoopList.append(allSystems[7])
 ykLoopList.append(allSystems[20])
-ykLoopList.append(allSystems[12])
+ykLoopList.append(allSystems[7])
 ykLoopList.append(allSystems[31])
+ykLoopList.append(allSystems[12])
 ykLoopList.append(allSystems[34])
 ykLoopList.append(allSystems[91])
 ykLoop = EDRareRoute(ykLoopList)
