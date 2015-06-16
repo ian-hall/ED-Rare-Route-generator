@@ -8,9 +8,6 @@ import sys
 import operator
 
 class EDRareRoute(object):
-    '''
-    TODO: Take into account stations with multiple rares
-    '''
     def __init__(self,systemList: []):
         self.__Route = [val for val in systemList]
         if self.__Route.__len__() > 14 or self.__Route.__len__() < 4:
@@ -29,17 +26,14 @@ class EDRareRoute(object):
 
     def __Fitness(self):
         '''
-        So far: Have a list of distances from one system to all others in the route.
-                Have potential combo of systems that account for selling goods from
-                    all systems.
-        We want total supply for the run to be about 10 per system
-        Need to weight that values such that routes accounting for all systems
-        are worth more.
-
-
-        TODO: Remove this second genetic algorithm and account for it in the main routecalc class
-              Basically just want to create a new RouteOrder with the current EDRareRoute and return the value,
-              Let the main genetic worry about finding the best order
+        Takes into account:
+            total supply of the route
+            total distance of the route
+            number of systems that are valid selling points
+        TODO:
+            see RouteOrder class
+            maybe replace this whole thing with RouteOrder since
+                i'm not doing another genetic thing here
         '''   
         population = []
         validSystems = [system for system in self.__Route]

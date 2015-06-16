@@ -123,8 +123,6 @@ class RouteCalc(object):
         if random.randrange(0,sys.maxsize)%2 == 0:
             for i in range(0,pivot):
                 newRoute.append(route1[i])
-            #for i in range(pivot,route1.__len__()):
-            #    newRoute.append(route2[i])
             for i in range(0,route2.__len__()):
                 toAdd = route2[i]
                 while newRoute.count(toAdd) != 0 and newRoute.__len__() != route2.__len__():
@@ -135,8 +133,6 @@ class RouteCalc(object):
         else:
             for i in range(0,pivot):
                 newRoute.append(route2[i])
-            #for i in range(pivot,route1.__len__()):
-            #    newRoute.append(route1[i])
             for i in range(0,route1.__len__()):
                 toAdd = route1[i]
                 while newRoute.count(toAdd) != 0 and newRoute.__len__() != route1.__len__():

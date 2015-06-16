@@ -10,22 +10,67 @@ import random
 import itertools
 import sys
 import math
+import re
 
-'''
-0 - Max Cap
-1 - Supply Rate
-2 - Cost
-3 - Item
-4 - Distance
-5 - Station
-6 - System
-7 on - distance to other systems
 
-first/last line: headings
+def __ValidateLine(currentLine, lineNum):
+    '''
+    0 - Max Cap
+    1 - Supply Rate
+    2 - Cost
+    3 - Item
+    4 - Distance
+    5 - Station
+    6 - System
+    7 on - distance to other systems
 
-Last 3 columns are garbage also
+    first/last line: headings
 
-'''
+    Last 3 columns are garbage also
+
+    '''
+    supplyCap       = currentLine[0]
+    avgSupply       = currentLine[1]
+    itemCost        = currentLine[2]
+    itemName        = currentLine[3]
+    distToStation   = currentLine[4]
+    stationName     = currentLine[5]
+    systemName      = currentLine[6]
+    index           = lineNum-1
+    distToOthers    = []
+    for j in range(7,headers.__len__()-3):
+        distToOthers.append(currentLine[j])
+        
+    if supplyCap == 'ND':
+        supplyCap = 1
+    else:
+        tempMax = supplyCap.split('-')
+        for i in range(0,tempMax.__len__()):
+            tempMax[i] = int(re.sub("[^0-9]", "", tempMax[i]))
+        supplyCap = sum(tempMax)/len(tempMax)
+
+    if avgSupply == 'ND':
+        avgSupply = 1
+    else:
+        tempSupply = avgSupply.split('-')
+        for i in range(0,tempSupply.__len__()):
+            tempSupply[i] = float(re.sub("[^0-9]", "", tempSupply[i]))
+        avgSupply = sum(tempSupply)/len(tempSupply)
+
+    itemCost = int(re.sub("[^0-9]", "", itemCost))
+
+    #If it contains ly, convert to ls by 31,557,600 * x
+    multFactor = 1;
+    if 'ly' in distToStation:
+        multFactor = 31557600
+    distToStation = float(re.sub("[^0-9.]", "", distToStation)) * multFactor
+
+    for i in range(0,distToOthers.__len__()):
+        distToOthers[i] = float(distToOthers[i])
+
+    return EDSystem(supplyCap, avgSupply, itemCost, itemName,
+                    distToStation, stationName, systemName, index,
+                    distToOthers)
 
 cleanedCSV = []
 allSystems = []
@@ -63,7 +108,7 @@ for line in reader:
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
-    
+    '''
     tempSystem = []
     tempDistances = []
     tempSystem.append(cleanedCSV[i][0])
@@ -84,19 +129,11 @@ for i in range(1,cleanedCSV.__len__()-1):
         allSystems.append(EDSystem(tempSystem))
     
     '''
-    supplyCap       = cleanedCSV[i][0]
-    avgSupply       = cleanedCSV[i][1]
-    itemCost        = cleanedCSV[i][2]
-    itemName        = cleanedCSV[i][3]
-    distToStation   = cleanedCSV[i][4]
-    stationName     = cleanedCSV[i][5]
-    systemName      = cleanedCSV[i][6]
-    index           = i+1
-    distToOthers    = []
-    for j in range(7,headers.__len__()-3):
-        distToOthers.append(cleanedCSV[i][j])
-    '''
 
+    currentSystem = __ValidateLine(cleanedCSV[i],i)   
+    #exclude permit systems because they aren't great anyway
+    if not "permit" in currentSystem.System_Name:
+        allSystems.append(currentSystem)
 
 '''
 TODO: Allow users to enter the values for size/station distance.
@@ -130,4 +167,4 @@ print("YK Loop")
 print(ykLoop)
 '''
 
-input("dont close omg")
+input("enter to close")
