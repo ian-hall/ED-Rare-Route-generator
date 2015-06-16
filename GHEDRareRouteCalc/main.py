@@ -63,6 +63,7 @@ for line in reader:
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
+    
     tempSystem = []
     tempDistances = []
     tempSystem.append(cleanedCSV[i][0])
@@ -73,19 +74,42 @@ for i in range(1,cleanedCSV.__len__()-1):
     tempSystem.append(cleanedCSV[i][5])
     tempSystem.append(cleanedCSV[i][6])
     tempSystem.append(i-1)
+    
     for j in range (7,headers.__len__()-3):
         tempDistances.append(cleanedCSV[i][j])
     tempSystem.append(tempDistances)
-    allSystems.append(EDSystem(tempSystem))
 
-testSize = 8
+    #Exclude permit systems, they are bad anyway
+    if not "permit" in tempSystem[6]:
+        allSystems.append(EDSystem(tempSystem))
+    
+    '''
+    supplyCap       = cleanedCSV[i][0]
+    avgSupply       = cleanedCSV[i][1]
+    itemCost        = cleanedCSV[i][2]
+    itemName        = cleanedCSV[i][3]
+    distToStation   = cleanedCSV[i][4]
+    stationName     = cleanedCSV[i][5]
+    systemName      = cleanedCSV[i][6]
+    index           = i+1
+    distToOthers    = []
+    for j in range(7,headers.__len__()-3):
+        distToOthers.append(cleanedCSV[i][j])
+    '''
+
+
+'''
+TODO: Allow users to enter the values for size/station distance.
+'''
+
+testSize = 4
 totalSellers = 2
 maxStationDistance = 5000
-popSize = 50
+popSize = 65
 gens = 100
 routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
 
-print("\t****GOOD ROUTES MAYBE??****")
+print("\t****possible routes****")
 for route in routes:
     print(route)
 

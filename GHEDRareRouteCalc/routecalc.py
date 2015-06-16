@@ -51,7 +51,7 @@ class RouteCalc(object):
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
-        possibleRoutes = [currentPopulation[0]]
+        possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Values'))]
 
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
         #Than our current best

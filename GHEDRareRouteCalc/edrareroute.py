@@ -178,7 +178,7 @@ class EDRareRoute(object):
         return RouteOrder(newOrder,self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
 
     def __CalcSellers(self):
-        sellingDistance = 140
+        sellingDistance = 160
         self.Sellers_Per_Station = {}
         for system in self.__Route:
             tempSellers = []
@@ -230,7 +230,7 @@ class EDRareRoute(object):
 
     def __str__(self):
         strList = []
-        if self.Best_Sell_Points != None:
+        if self.Best_Sell_Points:
             strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Values))
             for index in self.Best_Order:
                 strList.append('{0}\n'.format(self.__Route[index]))
@@ -270,7 +270,8 @@ class RouteOrder(object):
                 total distance of the route
               This means:
                     We want a route that all jumps are less than somewhere around 100LY or
-                    We want a route with 2 jumps over 150LY, the rest under 30LY
+                    We want a route with 2 jumps over 160LY, the rest under 30LY
+                            Should be the same value as in the CalcSellers method
         '''
         totalValue = 0.01
         #if comboswithsystems.len is 1 then we have a maybe good thing
@@ -359,7 +360,7 @@ class RouteOrder(object):
                         pairValue = (numBefore1 + numBefore2)
                         self.Best_Sellers = sellerPair
 
-        # magicnumber is set to assume a length of 120ly between systems on average
+        # magicnumber is set to assume a length of 100ly between systems on average
         # if the total distance is larger than this we are going to weigh the total 
         # value lower
         magicNumber = routeLength * 100
