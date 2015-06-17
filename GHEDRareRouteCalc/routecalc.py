@@ -125,9 +125,10 @@ class RouteCalc(object):
                 newRoute.append(route1[i])
             for i in range(0,route2.__len__()):
                 toAdd = route2[i]
-                while newRoute.count(toAdd) != 0 and newRoute.__len__() != route2.__len__():
-                    i += 1
-                    toAdd = route2[i]
+                if newRoute.count(toAdd) != 0:  #and newRoute.__len__() != route2.__len__():
+                    continue
+                    #i += 1
+                    #toAdd = route2[i]
                 if newRoute.__len__() != route2.__len__():
                     newRoute.append(toAdd)
         else:
@@ -135,9 +136,10 @@ class RouteCalc(object):
                 newRoute.append(route2[i])
             for i in range(0,route1.__len__()):
                 toAdd = route1[i]
-                while newRoute.count(toAdd) != 0 and newRoute.__len__() != route1.__len__():
-                    i += 1
-                    toAdd = route1[i]
+                if newRoute.count(toAdd) != 0: #and newRoute.__len__() != route1.__len__():
+                    continue
+                    #i += 1
+                    #toAdd = route1[i]
                 if newRoute.__len__() != route1.__len__():
                     newRoute.append(toAdd)
 

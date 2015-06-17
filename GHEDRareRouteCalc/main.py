@@ -1,4 +1,4 @@
-__author__ = 'Ian'
+﻿__author__ = 'Ian'
 from edsystem import EDSystem
 from edrareroute import EDRareRoute
 from routecalc import RouteCalc
@@ -139,11 +139,11 @@ for i in range(1,cleanedCSV.__len__()-1):
 TODO: Allow users to enter the values for size/station distance.
 '''
 
-testSize = 4
+testSize = 8
 totalSellers = 2
 maxStationDistance = 5000
-popSize = 65
-gens = 100
+popSize = 100
+gens = 10000
 routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
 
 print("\t****possible routes****")
@@ -151,7 +151,7 @@ for route in routes:
     print(route)
 
 #Yaso-Kondi loop
-#Indices based on my ed.csv file (its old)
+#Indices based on my ed.csv file with permit systems included
 '''
 ykLoopList = []
 ykLoopList.append(allSystems[104])

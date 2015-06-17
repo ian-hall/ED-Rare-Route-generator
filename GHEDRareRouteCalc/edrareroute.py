@@ -1,4 +1,4 @@
-from edsystem import EDSystem
+﻿from edsystem import EDSystem
 from EDSystemPair import EDSystemPair
 import random
 import collections
@@ -35,13 +35,14 @@ class EDRareRoute(object):
             maybe replace this whole thing with RouteOrder since
                 i'm not doing another genetic thing here
         '''   
+        '''
         population = []
         validSystems = [system for system in self.__Route]
         popSize = 30
         maxGens = 25
         routeLength = self.__Route.__len__()
 
-        '''
+        
         for i in range(0,popSize):
             tempSystemList = []
             for j in range(0,routeLength):
@@ -55,7 +56,7 @@ class EDRareRoute(object):
 
         return self.__GeneticRouteStart(population, maxGens, validSystems)
         '''
-        tempSystemList = [ i for i in range(0,validSystems.__len__()) ]
+        tempSystemList = [ i for i in range(0,self.__Route.__len__()) ]
 
         currentRoute = RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
         self.Best_Order = currentRoute.Order
@@ -265,11 +266,10 @@ class RouteOrder(object):
               This means:
                     We want a route that all jumps are less than somewhere around 100LY or
                     We want a route with 2 jumps over 160LY, the rest under 30LY
-                            Should be the same value as in the CalcSellers method
+                            the 160ly number is the same value as in the CalcSellers method
         '''
         totalValue = 0.01
-        #if comboswithsystems.len is 1 then we have a maybe good thing
-        # if 0 then we have a bad and maybe just return now a small number
+        #if this group has no valid sellers just return now
         if self.__SellLocs.__len__() == 0:
             return totalValue
 
@@ -354,18 +354,40 @@ class RouteOrder(object):
                         pairValue = (numBefore1 + numBefore2)
                         self.Best_Sellers = sellerPair
 
-        # magicnumber is set to assume a length of 100ly between systems on average
-        # if the total distance is larger than this we are going to weigh the total 
+        # magicnumber is supposed to be an absolute max for distance.... originally 100ly per system
+        # if the total distance is further than this we are going to weigh the total 
         # value lower
         magicNumber = routeLength * 100
         totalDistance = 0
+        jumpsUnder30 = 0
+        jumpsNear100 = 0
+        jumpsOver160 = 0
         for i in range(0,routeLength):
             currentSystem = orderedSystems[i]
             nextSystem = orderedSystems[(i+1)%routeLength]
-            totalDistance += currentSystem.System_Distances[nextSystem.Index]
+            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            totalDistance += jumpDistance
+            if jumpDistance <= 30:
+                jumpsUnder30 += 1
+            elif jumpDistance >= 50 and jumpDistance <= 100:
+                jumpsNear100 += 1
+            elif jumpDistance >= 160:
+                jumpsOver160 += 1  
+
+        routeTypeMult = 0.75
+        
+        #Route has 2 groups systems separated by a long jump
+        #Ideally jumpsOver160 would be variable and equal to the number of sellers,
+        #but I'm just worrying about 2 sellers for now
+        if jumpsOver160 == 2 and (jumpsOver160 + jumpsUnder30) == orderedSystems.__len__():
+            routeTypeMult = 1.25
+
+        #Route has fairly evenly spaced jumps
+        if jumpsNear100 == orderedSystems.__len__():
+            routeTypeMult = 1.25
 
         #Less total distance needs to give a higher value
         weightedDistance = magicNumber/totalDistance
-        totalValue = pairValue * self.Supply * weightedDistance
+        totalValue = (pairValue * self.Supply * weightedDistance) * routeTypeMult
 
         return totalValue
