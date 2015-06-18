@@ -1,4 +1,4 @@
-from edsystem import EDSystem
+﻿from edsystem import EDSystem
 from edrareroute import EDRareRoute
 import random
 import math
@@ -48,20 +48,26 @@ class RouteCalc(object):
         
         currentGeneration = 0
         currentPopulation = startingPopulation
+        lastRouteFoundOn = currentGeneration
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
         possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Values'))]
 
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
-        #Than our current best
-        while currentGeneration <= maxGenerations:
+        #Than our current best. We go until we hit the maxGenerations or until we go 1000 generations
+        #with no improvement.
+        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-1000):
+            if (currentGeneration%500) == 0:
+                print("Generation: {0}".format(currentGeneration))
             currentGeneration += 1
             nextPopulation = []
 
             #Getting the best route in the current population
             bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Values'))
             if bestRoute.Fitness_Values > possibleRoutes[-1].Fitness_Values:
+                print("\tpotential route found: generation {0}".format(currentGeneration))
+                lastRouteFoundOn = currentGeneration
                 possibleRoutes.append(bestRoute)
 
             for i in range(0,currentPopulation.__len__()):

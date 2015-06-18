@@ -264,9 +264,7 @@ class RouteOrder(object):
         TODO: Take into account the individual jump lengths between station, currently just taking into account 
                 total distance of the route
               This means:
-                    We want a route that all jumps are less than somewhere around 100LY or
-                    We want a route with 2 jumps over 160LY, the rest under 30LY
-                            the 160ly number is the same value as in the CalcSellers method
+                    Take off value if a jump is over a certain distance, maybe around 200LY
         '''
         totalValue = 0.01
         #if this group has no valid sellers just return now
@@ -359,31 +357,35 @@ class RouteOrder(object):
         # value lower
         magicNumber = routeLength * 100
         totalDistance = 0
-        jumpsUnder30 = 0
-        jumpsNear100 = 0
-        jumpsOver160 = 0
+        clusterShortLY = 35
+        clusterLongLY = 160
+        spreadMinLY = 55
+        spreadMaxLY = 100
+        clusterShortJumps = 0
+        clusterLongJumps = 0
+        spreadJumps = 0
         for i in range(0,routeLength):
             currentSystem = orderedSystems[i]
             nextSystem = orderedSystems[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
             totalDistance += jumpDistance
-            if jumpDistance <= 30:
-                jumpsUnder30 += 1
-            elif jumpDistance >= 50 and jumpDistance <= 100:
-                jumpsNear100 += 1
-            elif jumpDistance >= 160:
-                jumpsOver160 += 1  
+            if jumpDistance <= clusterShortLY:
+                clusterShortJumps += 1
+            elif jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
+                spreadJumps += 1
+            elif jumpDistance >= clusterLongLY:
+                clusterLongJumps += 1  
 
         routeTypeMult = 0.75
         
         #Route has 2 groups systems separated by a long jump
         #Ideally jumpsOver160 would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
-        if jumpsOver160 == 2 and (jumpsOver160 + jumpsUnder30) == orderedSystems.__len__():
+        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == orderedSystems.__len__():
             routeTypeMult = 1.25
 
         #Route has fairly evenly spaced jumps
-        if jumpsNear100 == orderedSystems.__len__():
+        if spreadJumps == orderedSystems.__len__():
             routeTypeMult = 1.25
 
         #Less total distance needs to give a higher value

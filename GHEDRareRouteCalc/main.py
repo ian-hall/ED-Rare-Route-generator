@@ -139,10 +139,10 @@ for i in range(1,cleanedCSV.__len__()-1):
 TODO: Allow users to enter the values for size/station distance.
 '''
 
-testSize = 8
+testSize = 6
 totalSellers = 2
 maxStationDistance = 5000
-popSize = 100
+popSize = 150
 gens = 10000
 routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
 
