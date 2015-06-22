@@ -75,7 +75,7 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-'''
+
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -104,43 +104,18 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-
+'''
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
-    '''
-    tempSystem = []
-    tempDistances = []
-    tempSystem.append(cleanedCSV[i][0])
-    tempSystem.append(cleanedCSV[i][1])
-    tempSystem.append(cleanedCSV[i][2])
-    tempSystem.append(cleanedCSV[i][3])
-    tempSystem.append(cleanedCSV[i][4])
-    tempSystem.append(cleanedCSV[i][5])
-    tempSystem.append(cleanedCSV[i][6])
-    tempSystem.append(i-1)
-    
-    for j in range (7,headers.__len__()-3):
-        tempDistances.append(cleanedCSV[i][j])
-    tempSystem.append(tempDistances)
-
-    #Exclude permit systems, they are bad anyway
-    if not "permit" in tempSystem[6]:
-        allSystems.append(EDSystem(tempSystem))
-    
-    '''
-
     currentSystem = __ValidateLine(cleanedCSV[i],i)   
-    #exclude permit systems because they aren't great anyway
-    if not "permit" in currentSystem.System_Name:
-        allSystems.append(currentSystem)
+    allSystems.append(currentSystem)
 
 '''
 TODO: Allow users to enter the values for size/station distance.
 '''
 
-testSize = 6
-totalSellers = 2
+testSize = 4
 maxStationDistance = 5000
 popSize = 150
 gens = 10000
@@ -152,19 +127,19 @@ for route in routes:
 
 #Yaso-Kondi loop
 #Indices based on my ed.csv file with permit systems included
-'''
+
 ykLoopList = []
-ykLoopList.append(allSystems[104])
-ykLoopList.append(allSystems[79])
 ykLoopList.append(allSystems[20])
 ykLoopList.append(allSystems[7])
 ykLoopList.append(allSystems[31])
 ykLoopList.append(allSystems[12])
 ykLoopList.append(allSystems[34])
 ykLoopList.append(allSystems[91])
+ykLoopList.append(allSystems[104])
+ykLoopList.append(allSystems[79])
 ykLoop = EDRareRoute(ykLoopList)
 print("YK Loop")
 print(ykLoop)
-'''
+
 
 input("enter to close")

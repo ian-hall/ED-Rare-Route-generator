@@ -357,18 +357,22 @@ class RouteOrder(object):
         # value lower
         magicNumber = routeLength * 100
         totalDistance = 0
-        clusterShortLY = 35
-        clusterLongLY = 160
-        spreadMinLY = 55
-        spreadMaxLY = 100
+        clusterShortLY = 40
+        clusterLongLY = 120
+        spreadMinLY = 50
+        spreadMaxLY = 110
+        maxJumpRangeLY = 200
         clusterShortJumps = 0
         clusterLongJumps = 0
         spreadJumps = 0
+        longestJump = -1
         for i in range(0,routeLength):
             currentSystem = orderedSystems[i]
             nextSystem = orderedSystems[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
             totalDistance += jumpDistance
+            if longestJump < jumpDistance:
+                longestJump = jumpDistance
             if jumpDistance <= clusterShortLY:
                 clusterShortJumps += 1
             elif jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
@@ -376,6 +380,7 @@ class RouteOrder(object):
             elif jumpDistance >= clusterLongLY:
                 clusterLongJumps += 1  
 
+        #set this at a default value less than 1 since most routes will have this
         routeTypeMult = 0.75
         
         #Route has 2 groups systems separated by a long jump
@@ -388,8 +393,15 @@ class RouteOrder(object):
         if spreadJumps == orderedSystems.__len__():
             routeTypeMult = 1.25
 
+        #lower multiplier if we have an extra long jump between systems
+        if routeTypeMult > 1 and longestJump >= maxJumpRangeLY:
+            routeTypeMult = 1
+
         #Less total distance needs to give a higher value
         weightedDistance = magicNumber/totalDistance
+        magicSupply = orderedSystems.__len__() * 10
+        #greater supply is a greater number, this is so we don't have supply playing as large a roll in total value
+        weightedSupply = self.Supply/magicSupply
         totalValue = (pairValue * self.Supply * weightedDistance) * routeTypeMult
 
         return totalValue

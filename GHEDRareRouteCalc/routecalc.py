@@ -10,13 +10,15 @@ class RouteCalc(object):
     Class for calculating rare trade routes
     '''
     @classmethod
-    def GeneticSolverStart(self,popSize: int, maxGenerations: int, allSystems: [], maxStationDistance: int, routeLength: int):
+    def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
         population = []
-        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance]
+
+        #check for max station distance and also exclude systems that require a permit to enter
+        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
@@ -55,9 +57,9 @@ class RouteCalc(object):
         possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Values'))]
 
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
-        #Than our current best. We go until we hit the maxGenerations or until we go 1000 generations
-        #with no improvement.
-        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-1000):
+        #Than our current best. We go until we hit the maxGenerations or until we go a certain number
+        #of generations with no improvement.
+        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-2000):
             if (currentGeneration%500) == 0:
                 print("Generation: {0}".format(currentGeneration))
             currentGeneration += 1
@@ -102,8 +104,10 @@ class RouteCalc(object):
             selectionValues.append(percentages[i] + selectionValues[i-1])
 
         while parents.__len__() != 2:
-            value = random.random()
+            #uniform(0,1) might be the same as random()? looks like we can get 0.9999999999999 which is good enough
+            value = random.uniform(0,1)
             for i in range(0,population.__len__()):
+                #stopping at the first selectionValue greater than the random value
                 if value <= selectionValues[i]:
                     #Again, we need to avoid duplicates
                     if parents.count(population[i]) == 0:
