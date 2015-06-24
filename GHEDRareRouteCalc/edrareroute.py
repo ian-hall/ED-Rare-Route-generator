@@ -402,6 +402,6 @@ class RouteOrder(object):
         magicSupply = orderedSystems.__len__() * 10
         #greater supply is a greater number, this is so we don't have supply playing as large a roll in total value
         weightedSupply = self.Supply/magicSupply
-        totalValue = (pairValue * self.Supply * weightedDistance) * routeTypeMult
+        totalValue = (pairValue * weightedSupply * weightedDistance) * routeTypeMult
 
         return totalValue

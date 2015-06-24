@@ -75,7 +75,7 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-'''
+
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -104,7 +104,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-
+'''
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
