@@ -75,7 +75,7 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-
+'''
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -104,12 +104,23 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-'''
+
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
     currentSystem = __ValidateLine(cleanedCSV[i],i)   
-    allSystems.append(currentSystem)
+    if allSystems.count(currentSystem) != 0:
+        print("duplicate stations found:")
+        dupes = []
+        for system in allSystems:
+            if system == currentSystem:
+                system.AddRares(currentSystem)
+                dupes.append(system)
+        for system in dupes:
+            print("\t{0}".format(system))
+        print("\t{0}".format(currentSystem))
+    else:
+        allSystems.append(currentSystem)
 
 '''
 TODO: Allow users to enter the values for size/station distance.

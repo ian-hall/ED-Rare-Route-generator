@@ -46,6 +46,10 @@ class RouteCalc(object):
         the population. If a solution is found in these children, or if
         this is the last generation, the best of the children is 
         selected.
+
+        TODO: Eliminate possibility of creating two new routes when you calculate a child and 
+              then get chosen for mutation
+                maybe just have the reproduce function return a list of systems instead of the edrareroute object
         '''
         
         currentGeneration = 0
@@ -160,8 +164,10 @@ class RouteCalc(object):
     def __Mutate(self,route: EDRareRoute, validSystems: []):
         '''
         TODO: Modify to allow more types of mutation:
-                    Chance to simply shuffle around the systems... maybe if a sufficiently high value is already found?
+                    Chance to simply shuffle around the systems
                     Chance to replace X number of systems instead of just 1
+                    Reasoning: It is possible to have a great group of systems that are just in the wrong order.
+                               Need to try and give these groups a chance to like...actually be great
         '''
         tempRoute = route.GetRoute()
         systemToChange = random.randrange(0,tempRoute.__len__())
