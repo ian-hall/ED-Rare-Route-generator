@@ -75,7 +75,7 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-
+'''
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -89,7 +89,6 @@ with open('ed.csv') as csvFile:
         breakout = False
 '''
 target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
-# OLD URL target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=1haUVaFIxFq5IPqZugJ8cfCEqBrZvFFzcA-uXB4pTfW4&exportFormat=csv&gid=0'
 csvFile = request.urlopen(target_url)
 fileToText = csvFile.read()
 usableCSV = str(fileToText).split('\\n')
@@ -104,7 +103,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-'''
+
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
@@ -126,7 +125,7 @@ for i in range(1,cleanedCSV.__len__()-1):
 TODO: Allow users to enter the values for size/station distance.
 '''
 
-testSize = 4
+testSize = 8
 maxStationDistance = 5000
 popSize = 150
 gens = 10000
@@ -137,20 +136,21 @@ for route in routes:
     print(route)
 
 #Yaso-Kondi loop
-#Indices based on my ed.csv file with permit systems included
-
+#Indices based on my ed.csv file 
+#Indices changed base on duplicate stations being eliminated and ignoring permit systems
+'''
 ykLoopList = []
+ykLoopList.append(allSystems[103])
+ykLoopList.append(allSystems[78])
 ykLoopList.append(allSystems[20])
 ykLoopList.append(allSystems[7])
 ykLoopList.append(allSystems[31])
 ykLoopList.append(allSystems[12])
 ykLoopList.append(allSystems[34])
-ykLoopList.append(allSystems[91])
-ykLoopList.append(allSystems[104])
-ykLoopList.append(allSystems[79])
+ykLoopList.append(allSystems[90])
 ykLoop = EDRareRoute(ykLoopList)
 print("YK Loop")
 print(ykLoop)
-
+'''
 
 input("enter to close")

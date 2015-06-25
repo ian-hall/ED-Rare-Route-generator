@@ -260,11 +260,6 @@ class RouteOrder(object):
         We want a route with an even number, or within one, of stations between each designated seller
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
-
-        TODO: Take into account the individual jump lengths between station, currently just taking into account 
-                total distance of the route
-              This means:
-                    Take off value if a jump is over a certain distance, maybe around 200LY
         '''
         totalValue = 0.01
         #if this group has no valid sellers just return now
@@ -381,10 +376,10 @@ class RouteOrder(object):
                 clusterLongJumps += 1  
 
         #set this at a default value less than 1 since most routes will have this
-        routeTypeMult = 0.75
+        routeTypeMult = 0.5
         
         #Route has 2 groups systems separated by a long jump
-        #Ideally jumpsOver160 would be variable and equal to the number of sellers,
+        #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
         if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == orderedSystems.__len__():
             routeTypeMult = 1.25
@@ -395,7 +390,7 @@ class RouteOrder(object):
 
         #lower multiplier if we have an extra long jump between systems
         if routeTypeMult > 1 and longestJump >= maxJumpRangeLY:
-            routeTypeMult = 1
+            routeTypeMult = .8
 
         #Less total distance needs to give a higher value
         weightedDistance = magicNumber/totalDistance

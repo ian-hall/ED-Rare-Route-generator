@@ -46,10 +46,6 @@ class RouteCalc(object):
         the population. If a solution is found in these children, or if
         this is the last generation, the best of the children is 
         selected.
-
-        TODO: Eliminate possibility of creating two new routes when you calculate a child and 
-              then get chosen for mutation
-                maybe just have the reproduce function return a list of systems instead of the edrareroute object
         '''
         
         currentGeneration = 0
@@ -63,7 +59,7 @@ class RouteCalc(object):
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
         #Than our current best. We go until we hit the maxGenerations or until we go a certain number
         #of generations with no improvement.
-        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-2000):
+        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-3500):
             if (currentGeneration%500) == 0:
                 print("Generation: {0}".format(currentGeneration))
             currentGeneration += 1
@@ -81,7 +77,7 @@ class RouteCalc(object):
                 child = self.__Reproduce(parents)
                 if random.random() <= 0.05:
                     child = self.__Mutate(child,validSystems)
-                nextPopulation.append(child)
+                nextPopulation.append(EDRareRoute(child))
 
             currentPopulation = nextPopulation
 
@@ -96,16 +92,26 @@ class RouteCalc(object):
         We rank each route relative to the others in the population.
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is 1
         Rand is called and the closest value over is chosen
+
+        TODO: Find why the percentages and selectionValues lists sometimes have pop+1 elements
+                    (maybe only when debugging?)
+              Change this to scale at a higher value... percentages my get too small with very large
+                    populations
         '''
         percentages = []
         total = sum([route.Fitness_Values for route in population])
         for value in [route.Fitness_Values for route in population]:
             percentages.append(value/total * 1.0)
        
+        #print("percent: {0}".format(percentages.__len__()))
+        #print("pop: {0}".format(population.__len__()))
+        
         parents = []
         selectionValues = [percentages[0]]
         for i in range(1,percentages.__len__()):
             selectionValues.append(percentages[i] + selectionValues[i-1])
+
+        #print("values: {0}".format(selectionValues.__len__()))
 
         while parents.__len__() != 2:
             #uniform(0,1) might be the same as random()? looks like we can get 0.9999999999999 which is good enough
@@ -158,10 +164,10 @@ class RouteCalc(object):
                     newRoute.append(toAdd)
 
         #print("\n\t***Child created***\n",EDRareRoute(newRoute))
-        return EDRareRoute(newRoute)
-
+        #return EDRareRoute(newRoute)
+        return newRoute
     @classmethod
-    def __Mutate(self,route: EDRareRoute, validSystems: []):
+    def __Mutate(self,route: [], validSystems: []):
         '''
         TODO: Modify to allow more types of mutation:
                     Chance to simply shuffle around the systems
@@ -169,7 +175,8 @@ class RouteCalc(object):
                     Reasoning: It is possible to have a great group of systems that are just in the wrong order.
                                Need to try and give these groups a chance to like...actually be great
         '''
-        tempRoute = route.GetRoute()
+        #tempRoute = route.GetRoute()
+        tempRoute = [val for val in route]
         systemToChange = random.randrange(0,tempRoute.__len__())
         newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 
         #Need to avoid duplicates
@@ -178,6 +185,6 @@ class RouteCalc(object):
         tempRoute[systemToChange] = newSystem
 
         #print("Mutated:\n",EDRareRoute(tempRoute))
-        return EDRareRoute(tempRoute)
-
+        #return EDRareRoute(tempRoute)
+        return tempRoute
 
