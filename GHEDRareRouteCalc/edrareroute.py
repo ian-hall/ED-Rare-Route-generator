@@ -34,6 +34,8 @@ class EDRareRoute(object):
             see RouteOrder class
             maybe replace this whole thing with RouteOrder since
                 i'm not doing another genetic thing here
+            Print a list of all possible seller pairs if more than 1 exists.
+                RouteOrder class will always return the last pair found as the best...and while it will work it might not be best
         '''   
         '''
         population = []

@@ -107,17 +107,22 @@ for line in reader:
 
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
-    currentSystem = __ValidateLine(cleanedCSV[i],i)   
+    currentSystem = __ValidateLine(cleanedCSV[i],i)
+    '''
+    If a system/station is already in the allSystems list we will simply add
+    the rare items from the found station to the station in the list. The found
+    station is then NOT added to the list.
+    '''   
     if allSystems.count(currentSystem) != 0:
-        print("duplicate stations found:")
+        #print("duplicate stations found:")
         dupes = []
         for system in allSystems:
             if system == currentSystem:
                 system.AddRares(currentSystem)
                 dupes.append(system)
-        for system in dupes:
-            print("\t{0}".format(system))
-        print("\t{0}".format(currentSystem))
+        #for system in dupes:
+        #    print("\t{0}".format(system))
+        #print("\t{0}".format(currentSystem))
     else:
         allSystems.append(currentSystem)
 
@@ -125,7 +130,7 @@ for i in range(1,cleanedCSV.__len__()-1):
 TODO: Allow users to enter the values for size/station distance.
 '''
 
-testSize = 8
+testSize = 7
 maxStationDistance = 5000
 popSize = 150
 gens = 10000
@@ -134,23 +139,38 @@ routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance
 print("\t****possible routes****")
 for route in routes:
     print(route)
-
-#Yaso-Kondi loop
-#Indices based on my ed.csv file 
-#Indices changed base on duplicate stations being eliminated and ignoring permit systems
 '''
+#Yaso Kondi loop
+#Indices based on live spreadsheet, no duplicates
 ykLoopList = []
-ykLoopList.append(allSystems[103])
-ykLoopList.append(allSystems[78])
-ykLoopList.append(allSystems[20])
-ykLoopList.append(allSystems[7])
-ykLoopList.append(allSystems[31])
-ykLoopList.append(allSystems[12])
-ykLoopList.append(allSystems[34])
-ykLoopList.append(allSystems[90])
+ykLoopList.append(allSystems[106]) #Yaso
+ykLoopList.append(allSystems[80])  #Quech
+ykLoopList.append(allSystems[21])  #Coq
+ykLoopList.append(allSystems[8])   #Alt
+ykLoopList.append(allSystems[32])  #Eth
+ykLoopList.append(allSystems[13])  #Az
+ykLoopList.append(allSystems[35])  #George
+ykLoopList.append(allSystems[93])  #Utg
 ykLoop = EDRareRoute(ykLoopList)
 print("YK Loop")
 print(ykLoop)
+
+
+#8 system round found by program
+#indeces based on live spreadsheet, no duplicates
+genRoute8 = []
+genRoute8.append(allSystems[20]) #Chi Er
+genRoute8.append(allSystems[8])  #Alt
+genRoute8.append(allSystems[16]) #Bast
+genRoute8.append(allSystems[90]) #Tio
+genRoute8.append(allSystems[14]) #Baltah
+genRoute8.append(allSystems[49]) #Iru
+genRoute8.append(allSystems[57]) #Karsu
+genRoute8.append(allSystems[24]) #Delta P
+goodRoute8 = EDRareRoute(genRoute8)
+print("8 System route")
+print(goodRoute8)
 '''
+
 
 input("enter to close")

@@ -3,8 +3,7 @@ import re
 
 class EDSystem( object ):
     '''
-    TODO: change Items/Cost/Supply/Max_Supply to lists to support stations with
-          multiple rare items
+    TODO:  pretty printing so you don't see the braces around the lists
     '''
     def __init__(self, supplyCap, avgSupply, itemCost, itemName, distToStation,
                        stationName, systemName, stationIndex, distToOthers: []):
