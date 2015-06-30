@@ -129,17 +129,28 @@ for i in range(1,cleanedCSV.__len__()-1):
 '''
 TODO: Allow users to enter the values for size/station distance.
 '''
+exitTestLoop = False
+testNum = 0
+maxTests = 50
+while not exitTestLoop and testNum < maxTests:
+    testNum += 1
+    print("Test: {0}".format(testNum))
+    testSize = 10
+    maxStationDistance = 5000
+    popSize = 150
+    gens = 10000
+    routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
+    bestRoute = max(routes,key=operator.attrgetter('Fitness_Values'))
+    print("Best route found had value {0}".format(bestRoute.Fitness_Values))
+    if bestRoute.Fitness_Values >= (testSize * 10):
+        print(bestRoute)
+        exitTestLoop = True
+    
 
-testSize = 7
-maxStationDistance = 5000
-popSize = 150
-gens = 10000
-routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
+#print("\t****possible routes****")
+#for route in routes:
+#    print(route)
 
-print("\t****possible routes****")
-for route in routes:
-    print(route)
-'''
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates
 ykLoopList = []
@@ -157,7 +168,7 @@ print(ykLoop)
 
 
 #8 system round found by program
-#indeces based on live spreadsheet, no duplicates
+#indices based on live spreadsheet, no duplicates
 genRoute8 = []
 genRoute8.append(allSystems[20]) #Chi Er
 genRoute8.append(allSystems[8])  #Alt
@@ -170,7 +181,7 @@ genRoute8.append(allSystems[24]) #Delta P
 goodRoute8 = EDRareRoute(genRoute8)
 print("8 System route")
 print(goodRoute8)
-'''
+
 
 
 input("enter to close")

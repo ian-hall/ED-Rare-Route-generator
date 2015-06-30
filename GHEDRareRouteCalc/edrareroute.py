@@ -31,148 +31,17 @@ class EDRareRoute(object):
             total distance of the route
             number of systems that are valid selling points
         TODO:
-            see RouteOrder class
             maybe replace this whole thing with RouteOrder since
                 i'm not doing another genetic thing here
             Print a list of all possible seller pairs if more than 1 exists.
                 RouteOrder class will always return the last pair found as the best...and while it will work it might not be best
         '''   
-        '''
-        population = []
-        validSystems = [system for system in self.__Route]
-        popSize = 30
-        maxGens = 25
-        routeLength = self.__Route.__len__()
-
-        
-        for i in range(0,popSize):
-            tempSystemList = []
-            for j in range(0,routeLength):
-                tempSystem = random.randrange(0,validSystems.__len__())
-                   
-                #Need to avoid duplicates
-                while tempSystemList.count(tempSystem) != 0:
-                    tempSystem = random.randrange(0,validSystems.__len__())
-                tempSystemList.append(tempSystem)
-            population.append(RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply))
-
-        return self.__GeneticRouteStart(population, maxGens, validSystems)
-        '''
         tempSystemList = [ i for i in range(0,self.__Route.__len__()) ]
 
         currentRoute = RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
         self.Best_Order = currentRoute.Order
         self.Best_Sell_Points = currentRoute.Best_Sellers
         return currentRoute.Value
-
-    def __GeneticRouteStart(self, startingPop: [], maxGenerations: int, validSystems: []):
-        currentGen = 0
-        currentPopulation = startingPop
-        bestRoute = startingPop[0]
-
-        #Don't really have a 'solved' state, so we just get best of each generation if it is better
-        #Than our current best
-        while currentGen <= maxGenerations:
-            currentGen += 1
-            nextPopulation = []
-
-            #Getting the best route in the current population
-            '''
-            We get a list of orders for the current route.
-            We want to find which, out of those orders, is the best
-            '''
-            currentBest = max(currentPopulation,key=operator.attrgetter('Value'))
-            if currentBest.Value > bestRoute.Value:
-                bestRoute = currentBest
-
-            for i in range(0,currentPopulation.__len__()):
-                parents = self.__GetRouteParents(currentPopulation)
-                child = self.__RouteReproduce(parents)
-                if random.random() <= 0.05:
-                    child = self.__RouteMutate(child)
-                nextPopulation.append(child)
-
-            currentPopulation = nextPopulation
-
-        self.Best_Order = bestRoute.Order
-        self.Best_Sell_Points = bestRoute.Best_Sellers
-        return bestRoute.Value
-
-    def __GetRouteParents(self, population):
-        percentages = []
-        total = sum([order.Value for order in population])
-        for value in [order.Value for order in population]:
-            percentages.append(value/total * 1.0)
-       
-        parents = []
-        selectionValues = [percentages[0]]
-        for i in range(1,percentages.__len__()):
-            selectionValues.append(percentages[i] + selectionValues[i-1])
-
-        while parents.__len__() != 2:
-            value = random.random()
-            for i in range(0,population.__len__()):
-                if value <= selectionValues[i]:
-                    #Again, we need to avoid duplicates
-                    if parents.count(population[i]) == 0:
-                        parents.append(population[i])
-                    # Need to break out so the loop starts again with a new value to check
-                    break
-
-        return parents
-
-    def __RouteReproduce(self, parents: [2]):
-        order1 = parents[0].Order
-        order2 = parents[1].Order
-        pivot = random.randrange(order1.__len__())
-        newOrder = []
-
-
-        if random.randrange(0,sys.maxsize)%2 == 0:
-            for i in range(0,pivot):
-                newOrder.append(order1[i])
-            for i in range(0,order2.__len__()):
-                toAdd = order2[i]
-                while newOrder.count(toAdd) != 0 and newOrder.__len__() != order1.__len__():
-                    i += 1
-                    toAdd = order2[i]
-                if newOrder.__len__() != order1.__len__():
-                    newOrder.append(toAdd)
-        else:
-            for i in range(0,pivot):
-                newOrder.append(order2[i])
-            for i in range(0,order1.__len__()):
-                toAdd = order1[i]
-                while newOrder.count(toAdd) != 0 and newOrder.__len__() != order1.__len__():
-                    i += 1
-                    toAdd = order1[i]
-                if newOrder.__len__() != order1.__len__():
-                    newOrder.append(toAdd)
-
-        # need to eliminate duplicates
-        if set(order1) != set(newOrder):
-            # if sets aren't equal then there is at least one duplicate
-            notIncluded = set(order1).difference(set(newOrder))
-            count = collections.Counter(newOrder)       
-            for key,val in count.items():
-                if val > 1:
-                    index = newOrder.index(key)
-                    newOrder[index] = notIncluded.pop()
-
-
-        #print("\n\t***Child created***\n",EDRareRoute(newRoute))
-        return RouteOrder(newOrder,self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
-
-    def __RouteMutate(self, child):
-        newOrder = [var for var in child.Order]
-        swap1 = random.randrange(0,newOrder.__len__())
-        swap2 = random.randrange(0,newOrder.__len__())
-        while swap2 == swap1:
-            swap2 = random.randrange(0,newOrder.__len__())
-        temp = newOrder[swap1]
-        newOrder[swap1] = newOrder[swap2]
-        newOrder[swap2] = temp
-        return RouteOrder(newOrder,self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
 
     def __CalcSellers(self):
         sellingDistance = 160
@@ -352,7 +221,7 @@ class RouteOrder(object):
         # magicnumber is supposed to be an absolute max for distance.... originally 100ly per system
         # if the total distance is further than this we are going to weigh the total 
         # value lower
-        magicNumber = routeLength * 100
+        maxGoodDistance = routeLength * 100
         totalDistance = 0
         clusterShortLY = 40
         clusterLongLY = 120
@@ -395,7 +264,7 @@ class RouteOrder(object):
             routeTypeMult = .8
 
         #Less total distance needs to give a higher value
-        weightedDistance = magicNumber/totalDistance
+        weightedDistance = maxGoodDistance/totalDistance
         magicSupply = orderedSystems.__len__() * 10
         #greater supply is a greater number, this is so we don't have supply playing as large a roll in total value
         weightedSupply = self.Supply/magicSupply
