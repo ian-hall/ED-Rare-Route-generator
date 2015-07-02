@@ -104,7 +104,6 @@ for line in reader:
         cleanedCSV.append(line)
     breakout = False
 
-
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
     currentSystem = __ValidateLine(cleanedCSV[i],i)
@@ -135,13 +134,14 @@ maxTests = 50
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 10
+    testSize = 12
     maxStationDistance = 5000
     popSize = 150
-    gens = 10000
+    gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
     bestRoute = max(routes,key=operator.attrgetter('Fitness_Values'))
     print("Best route found had value {0}".format(bestRoute.Fitness_Values))
+    #10*route.len for fitness value seems to be the sweet spot for when "good" routes start
     if bestRoute.Fitness_Values >= (testSize * 10):
         print(bestRoute)
         exitTestLoop = True

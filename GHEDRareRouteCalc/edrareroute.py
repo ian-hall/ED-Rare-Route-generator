@@ -9,9 +9,10 @@ import operator
 
 class EDRareRoute(object):
     def __init__(self,systemList: []):
+        #Routes up to len 11 can be solved by this, haven't been able to go higher
+        if systemList.__len__() > 11 or systemList.__len__() < 4:
+            raise Exception("Error: Route must be 4 - 11 in length")
         self.__Route = [val for val in systemList]
-        if self.__Route.__len__() > 14 or self.__Route.__len__() < 4:
-            raise Exception("Error: Route must be 4 - 12 in length")
             
         #self.__Station_Distances = self.__DistancesBetweenSystems()
         self.Sellers_Per_Station = {}
@@ -131,6 +132,12 @@ class RouteOrder(object):
         We want a route with an even number, or within one, of stations between each designated seller
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
+
+        TODO: Larger route lengths seem to have a harder time getting high fitness values...
+                either we are unlucky in the population selection or the math is off here?
+                seems like it could just be because longer routes have a harder time finding
+                a good group of systems so their weightedDistance is inherently lower causing 
+                lower fitness values than expected
         '''
         totalValue = 0.01
         #if this group has no valid sellers just return now

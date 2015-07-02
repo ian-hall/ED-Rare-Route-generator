@@ -59,7 +59,7 @@ class RouteCalc(object):
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
         #Than our current best. We go until we hit the maxGenerations or until we go a certain number
         #of generations with no improvement.
-        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-3500):
+        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-5000):
             if (currentGeneration%500) == 0:
                 print("Generation: {0}".format(currentGeneration))
             currentGeneration += 1
