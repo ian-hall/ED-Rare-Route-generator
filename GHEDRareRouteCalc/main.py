@@ -128,13 +128,16 @@ for i in range(1,cleanedCSV.__len__()-1):
 '''
 TODO: Allow users to enter the values for size/station distance.
 '''
+
+#Genetic
 exitTestLoop = False
 testNum = 0
 maxTests = 50
+'''
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 12
+    testSize = 8
     maxStationDistance = 5000
     popSize = 150
     gens = 25000
@@ -145,7 +148,12 @@ while not exitTestLoop and testNum < maxTests:
     if bestRoute.Fitness_Values >= (testSize * 10):
         print(bestRoute)
         exitTestLoop = True
-    
+'''    
+
+#Brute
+testSize = 8
+maxStationDistance = 5000
+RouteCalc.Brute(allSystems,maxStationDistance,testSize)
 
 #print("\t****possible routes****")
 #for route in routes:

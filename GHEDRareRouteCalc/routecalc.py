@@ -4,6 +4,7 @@ import random
 import math
 import sys
 import operator
+import itertools
 
 class RouteCalc(object):
     '''
@@ -187,4 +188,20 @@ class RouteCalc(object):
         #print("Mutated:\n",EDRareRoute(tempRoute))
         #return EDRareRoute(tempRoute)
         return tempRoute
+
+    @classmethod
+    def Brute(self, allSystems: [], maxStationDistance, routeLength):
+        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
+        if validSystems.__len__() < routeLength:
+            print("Not enough systems for a route...")
+            return
+        test = itertools.permutations(validSystems,2)
+        for elem in test:
+            permStr = ['( ']
+            for system in elem:
+                permStr.append(system.System_Name)
+                permStr.append(', ')
+            permStr.append(')')
+            print(''.join(permStr))
+
 
