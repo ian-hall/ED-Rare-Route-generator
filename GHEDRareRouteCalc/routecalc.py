@@ -55,7 +55,7 @@ class RouteCalc(object):
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
-        possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Values'))]
+        possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Value'))]
 
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
         #Than our current best. We go until we hit the maxGenerations or until we go a certain number
@@ -67,8 +67,8 @@ class RouteCalc(object):
             nextPopulation = []
 
             #Getting the best route in the current population
-            bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Values'))
-            if bestRoute.Fitness_Values > possibleRoutes[-1].Fitness_Values:
+            bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
+            if bestRoute.Fitness_Value > possibleRoutes[-1].Fitness_Value:
                 print("\tpotential route found: generation {0}".format(currentGeneration))
                 lastRouteFoundOn = currentGeneration
                 possibleRoutes.append(bestRoute)
@@ -100,8 +100,8 @@ class RouteCalc(object):
                     populations
         '''
         percentages = []
-        total = sum([route.Fitness_Values for route in population])
-        for value in [route.Fitness_Values for route in population]:
+        total = sum([route.Fitness_Value for route in population])
+        for value in [route.Fitness_Value for route in population]:
             percentages.append(value/total * 1.0)
        
         #print("percent: {0}".format(percentages.__len__()))
@@ -125,9 +125,6 @@ class RouteCalc(object):
                         parents.append(population[i])
                     # Need to break out so the loop starts again with a new value to check
                     break
-        #print("Parents chosen: ")
-        #for route in parents:
-        #    print(route)
         return parents
 
     @classmethod
@@ -148,8 +145,6 @@ class RouteCalc(object):
                 toAdd = route2[i]
                 if newRoute.count(toAdd) != 0:  #and newRoute.__len__() != route2.__len__():
                     continue
-                    #i += 1
-                    #toAdd = route2[i]
                 if newRoute.__len__() != route2.__len__():
                     newRoute.append(toAdd)
         else:
@@ -159,13 +154,8 @@ class RouteCalc(object):
                 toAdd = route1[i]
                 if newRoute.count(toAdd) != 0: #and newRoute.__len__() != route1.__len__():
                     continue
-                    #i += 1
-                    #toAdd = route1[i]
                 if newRoute.__len__() != route1.__len__():
                     newRoute.append(toAdd)
-
-        #print("\n\t***Child created***\n",EDRareRoute(newRoute))
-        #return EDRareRoute(newRoute)
         return newRoute
     @classmethod
     def __Mutate(self,route: [], validSystems: []):
@@ -185,23 +175,19 @@ class RouteCalc(object):
             newSystem = validSystems[random.randrange(0,validSystems.__len__())]
         tempRoute[systemToChange] = newSystem
 
-        #print("Mutated:\n",EDRareRoute(tempRoute))
-        #return EDRareRoute(tempRoute)
         return tempRoute
 
     @classmethod
     def Brute(self, allSystems: [], maxStationDistance, routeLength):
+        goodRoutes = []
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
-        test = itertools.permutations(validSystems,2)
-        for elem in test:
-            permStr = ['( ']
-            for system in elem:
-                permStr.append(system.System_Name)
-                permStr.append(', ')
-            permStr.append(')')
-            print(''.join(permStr))
+        allRoutes = itertools.permutations(validSystems,routeLength)
+        for route in allRoutes:
+            current = EDRareRoute(route)
+            if current.Fitness_Value >= 10 * routeLength:
+                goodRoutes.append(current)
 
-
+        return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))

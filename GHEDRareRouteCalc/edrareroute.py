@@ -20,7 +20,7 @@ class EDRareRoute(object):
         self.Possible_Sell_Points = self.__CalcSellers()
         self.Best_Order = []
         self.Best_Sell_Points = []
-        self.Fitness_Values = self.__Fitness()
+        self.Fitness_Value = self.__Fitness()
 
     def GetRoute(self):
         return [val for val in self.__Route]       
@@ -98,7 +98,7 @@ class EDRareRoute(object):
     def __str__(self):
         strList = []
         if self.Best_Sell_Points:
-            strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Values))
+            strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Value))
             for index in self.Best_Order:
                 strList.append('{0}\n'.format(self.__Route[index]))
             strList.append("\n\tSell rares at:\n")
@@ -106,7 +106,7 @@ class EDRareRoute(object):
                 strList.append('{0}\n'.format(seller))
             strList.append("\tEnd Rare Route!!!\n")
         else:
-            strList.append("\nFound a route with value:{0}, but it is no good".format(self.Fitness_Values))
+            strList.append("\nFound a route with value:{0}, but it is no good".format(self.Fitness_Value))
         return ''.join(strList)
 
 class RouteOrder(object):

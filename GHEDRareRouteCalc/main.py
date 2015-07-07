@@ -137,27 +137,28 @@ maxTests = 50
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 8
+    testSize = 4
     maxStationDistance = 5000
     popSize = 150
     gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
-    bestRoute = max(routes,key=operator.attrgetter('Fitness_Values'))
-    print("Best route found had value {0}".format(bestRoute.Fitness_Values))
+    bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
+    print("Best route found had value {0}".format(bestRoute.Fitness_Value))
     #10*route.len for fitness value seems to be the sweet spot for when "good" routes start
-    if bestRoute.Fitness_Values >= (testSize * 10):
+    if bestRoute.Fitness_Value >= (testSize * 10):
         print(bestRoute)
         exitTestLoop = True
-'''    
+'''
 
 #Brute
-testSize = 8
-maxStationDistance = 5000
-RouteCalc.Brute(allSystems,maxStationDistance,testSize)
+#stupid slow
+testSize = 4
+maxStationDistance = 750
+routes = RouteCalc.Brute(allSystems,maxStationDistance,testSize)
 
-#print("\t****possible routes****")
-#for route in routes:
-#    print(route)
+print("\t****possible routes****")
+for route in routes:
+    print(route)
 
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates
