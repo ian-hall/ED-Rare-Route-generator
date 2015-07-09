@@ -133,32 +133,34 @@ TODO: Allow users to enter the values for size/station distance.
 exitTestLoop = False
 testNum = 0
 maxTests = 50
-'''
+
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 4
-    maxStationDistance = 5000
+    testSize = 8
+    maxStationDistance = 3000
     popSize = 150
     gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
     bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
     #10*route.len for fitness value seems to be the sweet spot for when "good" routes start
-    if bestRoute.Fitness_Value >= (testSize * 10):
+    #The above is kind of ok but (50 + 1 + 1) * 1.25 is the minimum for an ideal route, so 65 is the sweet spot
+    #short routes with low item stock, and long routes with high item stock can offset this, but whatever??
+    if bestRoute.Fitness_Value >= 65:
         print(bestRoute)
         exitTestLoop = True
-'''
+
 
 #Brute
 #stupid slow
-testSize = 4
-maxStationDistance = 750
-routes = RouteCalc.Brute(allSystems,maxStationDistance,testSize)
+#testSize = 4
+#maxStationDistance = 700
+#routes = RouteCalc.Brute(allSystems,maxStationDistance,testSize)
 
-print("\t****possible routes****")
-for route in routes:
-    print(route)
+#print("\t****possible routes****")
+#for route in routes:
+#    print(route)
 
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates

@@ -42,16 +42,23 @@ class RouteCalc(object):
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parent states. These states
-        are then merged into a child that has a low (5%) chance to be
+        are then merged into a child that has a small chance to be
         mutated. Children are created until they have a number equal to 
         the population. If a solution is found in these children, or if
         this is the last generation, the best of the children is 
         selected.
+
+        TODO: Only have possibleRoutes hold routes that pass the fitness threshold
+                of 65. I guess just keep replacing the initial value until we find a 
+                route that passes this mark and then continue adding until the loop
+                exits.
         '''
         
         currentGeneration = 0
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
+        mutationChance = 0.2
+        totalMutate = 0
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
@@ -68,20 +75,25 @@ class RouteCalc(object):
 
             #Getting the best route in the current population
             bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
+            #The last element of the possibleRoutes list should be the max, so we don't need to call max
             if bestRoute.Fitness_Value > possibleRoutes[-1].Fitness_Value:
-                print("\tpotential route found: generation {0}".format(currentGeneration))
+                print("\t{0} -> {1}".format(currentGeneration,bestRoute.Fitness_Value))
                 lastRouteFoundOn = currentGeneration
                 possibleRoutes.append(bestRoute)
 
+            numMutate = 0
             for i in range(0,currentPopulation.__len__()):
                 parents = self.__SelectParents(currentPopulation)
                 child = self.__Reproduce(parents)
-                if random.random() <= 0.05:
+                if random.random() <= mutationChance:
                     child = self.__Mutate(child,validSystems)
+                    numMutate += 1
                 nextPopulation.append(EDRareRoute(child))
+            totalMutate += numMutate
 
             currentPopulation = nextPopulation
 
+        print("avg mutations: {0}".format(totalMutate/currentGeneration))
         return possibleRoutes
 
 
@@ -166,8 +178,8 @@ class RouteCalc(object):
                     Reasoning: It is possible to have a great group of systems that are just in the wrong order.
                                Need to try and give these groups a chance to like...actually be great
         '''
-        #tempRoute = route.GetRoute()
         tempRoute = [val for val in route]
+        
         systemToChange = random.randrange(0,tempRoute.__len__())
         newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 
         #Need to avoid duplicates
@@ -179,6 +191,9 @@ class RouteCalc(object):
 
     @classmethod
     def Brute(self, allSystems: [], maxStationDistance, routeLength):
+        '''
+        TODO: Hardcode a small set of systems here so I can run this and have it finish sometime in the next hundred years
+        '''
         goodRoutes = []
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:

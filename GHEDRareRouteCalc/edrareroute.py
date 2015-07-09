@@ -9,7 +9,7 @@ import operator
 
 class EDRareRoute(object):
     def __init__(self,systemList: []):
-        #Routes up to len 11 can be solved by this, haven't been able to go higher
+        #Routes up to len 11 can be solved by this, haven't been able to verify higher
         if systemList.__len__() > 11 or systemList.__len__() < 4:
             raise Exception("Error: Route must be 4 - 11 in length")
         self.__Route = [val for val in systemList]
