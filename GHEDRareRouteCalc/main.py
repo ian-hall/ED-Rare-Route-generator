@@ -132,12 +132,12 @@ TODO: Allow users to enter the values for size/station distance.
 #Genetic
 exitTestLoop = False
 testNum = 0
-maxTests = 50
+maxTests = 20
 
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 8
+    testSize = 10
     maxStationDistance = 3000
     popSize = 150
     gens = 25000
@@ -176,7 +176,6 @@ ykLoopList.append(allSystems[93])  #Utg
 ykLoop = EDRareRoute(ykLoopList)
 print("YK Loop")
 print(ykLoop)
-
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates

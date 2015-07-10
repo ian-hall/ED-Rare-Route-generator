@@ -57,8 +57,7 @@ class RouteCalc(object):
         currentGeneration = 0
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
-        mutationChance = 0.2
-        totalMutate = 0
+        mutationChance = 0.35
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
@@ -81,19 +80,15 @@ class RouteCalc(object):
                 lastRouteFoundOn = currentGeneration
                 possibleRoutes.append(bestRoute)
 
-            numMutate = 0
             for i in range(0,currentPopulation.__len__()):
                 parents = self.__SelectParents(currentPopulation)
                 child = self.__Reproduce(parents)
                 if random.random() <= mutationChance:
                     child = self.__Mutate(child,validSystems)
-                    numMutate += 1
                 nextPopulation.append(EDRareRoute(child))
-            totalMutate += numMutate
 
             currentPopulation = nextPopulation
 
-        print("avg mutations: {0}".format(totalMutate/currentGeneration))
         return possibleRoutes
 
 
@@ -106,7 +101,10 @@ class RouteCalc(object):
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is 1
         Rand is called and the closest value over is chosen
 
-        TODO: Find why the percentages and selectionValues lists sometimes have pop+1 elements
+        TODO: Move the calculation of the selection values out of here and into the main loop, they only
+                    need to be calculated once...
+              Combine this with the reproduce function.... since there really is no reason for them to be separate
+              Find why the percentages and selectionValues lists sometimes have pop+1 elements
                     (maybe only when debugging?)
               Change this to scale at a higher value... percentages my get too small with very large
                     populations
@@ -171,21 +169,23 @@ class RouteCalc(object):
         return newRoute
     @classmethod
     def __Mutate(self,route: [], validSystems: []):
-        '''
-        TODO: Modify to allow more types of mutation:
-                    Chance to simply shuffle around the systems
-                    Chance to replace X number of systems instead of just 1
-                    Reasoning: It is possible to have a great group of systems that are just in the wrong order.
-                               Need to try and give these groups a chance to like...actually be great
-        '''
         tempRoute = [val for val in route]
         
-        systemToChange = random.randrange(0,tempRoute.__len__())
-        newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 
-        #Need to avoid duplicates
-        while tempRoute.count(newSystem) != 0:
-            newSystem = validSystems[random.randrange(0,validSystems.__len__())]
-        tempRoute[systemToChange] = newSystem
+        #Going to do a 66/33 split for replacing systems or shuffling the route
+        mutateType = random.random()
+        if mutateType < 0.34:
+            #shuffle route
+            random.shuffle(tempRoute)
+        else:
+            #change up to half the systems in a route
+            numSystemsToChange = random.randrange(1,tempRoute.__len__()/2)
+            for i in range(0, numSystemsToChange):
+                systemToChange = random.randrange(0,tempRoute.__len__())
+                newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 
+                #Need to avoid duplicates
+                while tempRoute.count(newSystem) != 0:
+                    newSystem = validSystems[random.randrange(0,validSystems.__len__())]
+                tempRoute[systemToChange] = newSystem    
 
         return tempRoute
 
