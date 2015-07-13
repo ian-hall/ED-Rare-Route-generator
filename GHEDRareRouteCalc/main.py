@@ -138,7 +138,7 @@ while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
     testSize = 10
-    maxStationDistance = 3000
+    maxStationDistance = 5000
     popSize = 150
     gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
@@ -154,9 +154,21 @@ while not exitTestLoop and testNum < maxTests:
 
 #Brute
 #stupid slow
-#testSize = 4
-#maxStationDistance = 700
-#routes = RouteCalc.Brute(allSystems,maxStationDistance,testSize)
+testSize = 8
+maxStationDistance = 5000
+bruteSystems = []
+bruteSystems.append(allSystems[61])  #Lave
+bruteSystems.append(allSystems[63])  #Leesti
+bruteSystems.append(allSystems[78])  #Orr
+bruteSystems.append(allSystems[92])  #Usz
+bruteSystems.append(allSystems[108]) #Zee
+bruteSystems.append(allSystems[0])   #39 T
+bruteSystems.append(allSystems[33])  #Fuj
+bruteSystems.append(allSystems[35])  #George
+bruteSystems.append(allSystems[26])  #Diso
+bruteSystems.append(allSystems[69])  #Momus
+bruteSystems.append(allSystems[102]) #Wolf
+#routes = RouteCalc.Brute(bruteSystems,maxStationDistance,testSize)
 
 #print("\t****possible routes****")
 #for route in routes:

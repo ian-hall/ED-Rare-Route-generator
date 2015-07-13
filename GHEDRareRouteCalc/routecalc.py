@@ -19,7 +19,7 @@ class RouteCalc(object):
         population = []
 
         #check for max station distance and also exclude systems that require a permit to enter
-        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
+        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
@@ -80,9 +80,11 @@ class RouteCalc(object):
                 lastRouteFoundOn = currentGeneration
                 possibleRoutes.append(bestRoute)
 
+            relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
             for i in range(0,currentPopulation.__len__()):
-                parents = self.__SelectParents(currentPopulation)
-                child = self.__Reproduce(parents)
+                child = self.__ReproNew(currentPopulation,relativeFitnessVals)
+                #parents = self.__SelectParents(currentPopulation)
+                #child = self.__Reproduce(parents)
                 if random.random() <= mutationChance:
                     child = self.__Mutate(child,validSystems)
                 nextPopulation.append(EDRareRoute(child))
@@ -91,6 +93,67 @@ class RouteCalc(object):
 
         return possibleRoutes
 
+    @classmethod
+    def __CalculateRelativeFitness(self, population: []):
+        '''
+        We rank each route relative to the others in the population.
+        We then assign them a value such that values[0] is percent[0] and values[pop-1] is 1
+        '''
+        percentages = []
+        total = sum([route.Fitness_Value for route in population])
+        for value in [route.Fitness_Value for route in population]:
+            percentages.append(value/total * 1.0)
+               
+        selectionValues = [percentages[0]]
+        for i in range(1,percentages.__len__()):
+            selectionValues.append(percentages[i] + selectionValues[i-1])
+        return selectionValues
+    
+    @classmethod
+    def __ReproNew(self, population: [], selectionValues: []): 
+        '''
+        Chooses parent nodes based on relative goodness of the population.
+        A child node is created by combining the parent nodes
+        '''
+              
+        #Get the parents
+        parents = []
+        while parents.__len__() != 2:
+            value = random.uniform(0,1)
+            for i in range(0,population.__len__()):
+                #stopping at the first selectionValue greater than the random value
+                if value <= selectionValues[i]:
+                    #Again, we need to avoid duplicates
+                    if parents.count(population[i]) == 0:
+                        parents.append(population[i])
+                    # Need to break out so the loop starts again with a new value to check
+                    break
+
+        #Create the new child
+        route1 = parents[0].GetRoute()
+        route2 = parents[1].GetRoute()
+        pivot = random.randrange(route1.__len__())
+        newRoute = []
+
+        if random.randrange(0,sys.maxsize)%2 == 0:
+            for i in range(0,pivot):
+                newRoute.append(route1[i])
+            for i in range(0,route2.__len__()):
+                toAdd = route2[i]
+                if newRoute.count(toAdd) != 0:
+                    continue
+                if newRoute.__len__() != route2.__len__():
+                    newRoute.append(toAdd)
+        else:
+            for i in range(0,pivot):
+                newRoute.append(route2[i])
+            for i in range(0,route1.__len__()):
+                toAdd = route1[i]
+                if newRoute.count(toAdd) != 0:
+                    continue
+                if newRoute.__len__() != route1.__len__():
+                    newRoute.append(toAdd)
+        return newRoute
 
     @classmethod
     def __SelectParents(self,population: []):       
@@ -101,10 +164,7 @@ class RouteCalc(object):
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is 1
         Rand is called and the closest value over is chosen
 
-        TODO: Move the calculation of the selection values out of here and into the main loop, they only
-                    need to be calculated once...
-              Combine this with the reproduce function.... since there really is no reason for them to be separate
-              Find why the percentages and selectionValues lists sometimes have pop+1 elements
+        TODO:Find why the percentages and selectionValues lists sometimes have pop+1 elements
                     (maybe only when debugging?)
               Change this to scale at a higher value... percentages my get too small with very large
                     populations
@@ -167,6 +227,7 @@ class RouteCalc(object):
                 if newRoute.__len__() != route1.__len__():
                     newRoute.append(toAdd)
         return newRoute
+    
     @classmethod
     def __Mutate(self,route: [], validSystems: []):
         tempRoute = [val for val in route]
@@ -178,7 +239,7 @@ class RouteCalc(object):
             random.shuffle(tempRoute)
         else:
             #change up to half the systems in a route
-            numSystemsToChange = random.randrange(1,tempRoute.__len__()/2)
+            numSystemsToChange = random.randrange(1,math.ceil(tempRoute.__len__()/2))
             for i in range(0, numSystemsToChange):
                 systemToChange = random.randrange(0,tempRoute.__len__())
                 newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 
@@ -191,9 +252,6 @@ class RouteCalc(object):
 
     @classmethod
     def Brute(self, allSystems: [], maxStationDistance, routeLength):
-        '''
-        TODO: Hardcode a small set of systems here so I can run this and have it finish sometime in the next hundred years
-        '''
         goodRoutes = []
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:
@@ -202,7 +260,7 @@ class RouteCalc(object):
         allRoutes = itertools.permutations(validSystems,routeLength)
         for route in allRoutes:
             current = EDRareRoute(route)
-            if current.Fitness_Value >= 10 * routeLength:
+            if current.Fitness_Value >= 65:
                 goodRoutes.append(current)
 
         return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))
