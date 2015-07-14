@@ -14,7 +14,6 @@ class EDRareRoute(object):
             raise Exception("Error: Route must be 4 - 11 in length")
         self.__Route = [val for val in systemList]
             
-        #self.__Station_Distances = self.__DistancesBetweenSystems()
         self.Sellers_Per_Station = {}
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Possible_Sell_Points = self.__CalcSellers()
@@ -136,10 +135,10 @@ class RouteOrder(object):
         TODO: Larger route lengths seem to have a harder time getting high fitness values...
                 either we are unlucky in the population selection or the math is off here?
                 seems like it could just be because longer routes have a harder time finding
-                a good group of systems so their weightedDistance is inherently lower causing 
+                a good group of systems so their weightedDistance is lower causing 
                 lower fitness values than expected
         '''
-        totalValue = 0.01
+        totalValue = 3
         #if this group has no valid sellers just return now
         if self.__SellLocs.__len__() == 0:
             return totalValue
@@ -150,7 +149,7 @@ class RouteOrder(object):
 
         routeLength = orderedSystems.__len__()
 
-        pairValue = 0.01
+        pairValue = 0
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
@@ -225,16 +224,14 @@ class RouteOrder(object):
                         pairValue = (numBefore1 + numBefore2)
                         self.Best_Sellers = sellerPair
 
-        # magicnumber is supposed to be an absolute max for distance.... originally 100ly per system
-        # if the total distance is further than this we are going to weigh the total 
-        # value lower
-        maxGoodDistance = routeLength * 100
+        # Max good distance for a route should avg around 100ly a jump 
+        maxGoodDistance = routeLength * 110
         totalDistance = 0
         clusterShortLY = 40
         clusterLongLY = 120
         spreadMinLY = 50
         spreadMaxLY = 110
-        maxJumpRangeLY = 200
+        maxJumpRangeLY = 225
         clusterShortJumps = 0
         clusterLongJumps = 0
         spreadJumps = 0
@@ -254,21 +251,22 @@ class RouteOrder(object):
                 clusterLongJumps += 1  
 
         #set this at a default value less than 1 since most routes will have this
-        routeTypeMult = 0.5
+        routeTypeMult = 0.4
         
-        #Route has 2 groups systems separated by a long jump
+        #Route has 2 groups of systems separated by a long jump
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
         if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == orderedSystems.__len__():
-            routeTypeMult = 1.25
+           routeTypeMult = 1
 
         #Route has fairly evenly spaced jumps
+        #Maybe a higher multiplier to compensate for the longer distances
         if spreadJumps == orderedSystems.__len__():
-            routeTypeMult = 1.25
+            routeTypeMult = 1.5
 
         #lower multiplier if we have an extra long jump between systems
-        if routeTypeMult > 1 and longestJump >= maxJumpRangeLY:
-            routeTypeMult = .8
+        if routeTypeMult >= 1 and longestJump >= maxJumpRangeLY:
+            routeTypeMult = .75
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance

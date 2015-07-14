@@ -137,7 +137,7 @@ maxTests = 20
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 10
+    testSize = 8
     maxStationDistance = 5000
     popSize = 150
     gens = 25000
