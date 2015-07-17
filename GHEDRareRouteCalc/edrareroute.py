@@ -17,7 +17,7 @@ class EDRareRoute(object):
         self.Sellers_Per_Station = {}
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Possible_Sell_Points = self.__CalcSellers()
-        self.Best_Order = []
+        #self.Best_Order = []
         self.Best_Sell_Points = []
         self.Fitness_Value = self.__Fitness()
 
@@ -36,10 +36,10 @@ class EDRareRoute(object):
             Print a list of all possible seller pairs if more than 1 exists.
                 RouteOrder class will always return the last pair found as the best...and while it will work it might not be best
         '''   
-        tempSystemList = [ i for i in range(0,self.__Route.__len__()) ]
+        #tempSystemList = [ i for i in range(0,self.__Route.__len__()) ]
 
-        currentRoute = RouteOrder(tempSystemList, self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
-        self.Best_Order = currentRoute.Order
+        currentRoute = RouteOrder(self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
+        #self.Best_Order = currentRoute.Order
         self.Best_Sell_Points = currentRoute.Best_Sellers
         return currentRoute.Value
 
@@ -114,11 +114,11 @@ class RouteOrder(object):
     The list of ints represents an order for the systems, with the 
     ints themselves being the index of the system in the list of systems.
     '''
-    def __init__(self, indexList: [], systems: [], sellLocs: [], sellersPerStation: {}, itemSupply):
+    def __init__(self, systems: [], sellLocs: [], sellersPerStation: {}, itemSupply):
         '''
         sellLocs members will always be length 2
         '''
-        self.Order = indexList
+        #self.Order = indexList
         self.__Systems = systems
         self.__SellLocs = sellLocs
         self.Route_Sellers = sellersPerStation
@@ -142,20 +142,20 @@ class RouteOrder(object):
         #if this group has no valid sellers just return now
         if self.__SellLocs.__len__() == 0:
             return totalValue
-
+        '''
         orderedSystems = []
         for index in self.Order:
             orderedSystems.append(self.__Systems[index])
+        '''
 
-        routeLength = orderedSystems.__len__()
-
+        routeLength = self.__Systems.__len__()        
         pairValue = 0
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
 
-            loc1Index = orderedSystems.index(loc1)
-            loc2Index = orderedSystems.index(loc2)
+            loc1Index = self.__Systems.index(loc1)
+            loc2Index = self.__Systems.index(loc2)
             jumpsBetween = 0
 
             if loc1Index > loc2Index:
@@ -166,9 +166,9 @@ class RouteOrder(object):
             indexForSystemsSellingLoc1 = []
             indexForSystemsSellingLoc2 = []
             for system in self.Route_Sellers[loc1]:
-                indexForSystemsSellingLoc1.append(orderedSystems.index(system))
+                indexForSystemsSellingLoc1.append(self.__Systems.index(system))
             for system in self.Route_Sellers[loc2]:
-                indexForSystemsSellingLoc2.append(orderedSystems.index(system))
+                indexForSystemsSellingLoc2.append(self.__Systems.index(system))
 
             # At this point we have the location of the sellers in the route
             # as well as the number of jumps between them. Ideally we want 
@@ -228,7 +228,7 @@ class RouteOrder(object):
         maxGoodDistance = routeLength * 110
         totalDistance = 0
         clusterShortLY = 40
-        clusterLongLY = 120
+        clusterLongLY = 160
         spreadMinLY = 50
         spreadMaxLY = 110
         maxJumpRangeLY = 225
@@ -237,40 +237,40 @@ class RouteOrder(object):
         spreadJumps = 0
         longestJump = -1
         for i in range(0,routeLength):
-            currentSystem = orderedSystems[i]
-            nextSystem = orderedSystems[(i+1)%routeLength]
+            currentSystem = self.__Systems[i]
+            nextSystem = self.__Systems[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
             totalDistance += jumpDistance
             if longestJump < jumpDistance:
                 longestJump = jumpDistance
             if jumpDistance <= clusterShortLY:
                 clusterShortJumps += 1
-            elif jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
+            if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
                 spreadJumps += 1
-            elif jumpDistance >= clusterLongLY:
+            if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
                 clusterLongJumps += 1  
 
         #set this at a default value less than 1 since most routes will have this
-        routeTypeMult = 0.4
+        routeTypeMult = 0.5
         
         #Route has 2 groups of systems separated by a long jump
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
-        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == orderedSystems.__len__():
+        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
            routeTypeMult = 1
 
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances
-        if spreadJumps == orderedSystems.__len__():
+        if spreadJumps == self.__Systems.__len__():
             routeTypeMult = 1.5
 
-        #lower multiplier if we have an extra long jump between systems
-        if routeTypeMult >= 1 and longestJump >= maxJumpRangeLY:
-            routeTypeMult = .75
+        #lower multiplier if we have an extra long jump between systems 
+        #if longestJump >= maxJumpRangeLY:
+        #    routeTypeMult = .75
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance
-        magicSupply = orderedSystems.__len__() * 10
+        magicSupply = self.__Systems.__len__() * 10
         #greater supply is a greater number, this is so we don't have supply playing as large a roll in total value
         weightedSupply = self.Supply/magicSupply
         totalValue = (pairValue * weightedSupply * weightedDistance) * routeTypeMult

@@ -75,7 +75,7 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-'''
+
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -103,7 +103,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-
+'''
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
     currentSystem = __ValidateLine(cleanedCSV[i],i)
@@ -138,7 +138,7 @@ while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
     testSize = 8
-    maxStationDistance = 5000
+    maxStationDistance = 700
     popSize = 150
     gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
@@ -154,7 +154,7 @@ while not exitTestLoop and testNum < maxTests:
 
 #Brute
 #stupid slow
-testSize = 8
+testSize = 4
 maxStationDistance = 5000
 bruteSystems = []
 bruteSystems.append(allSystems[61])  #Lave

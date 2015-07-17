@@ -42,7 +42,7 @@ class RouteCalc(object):
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parent states. These states
-        are then merged into a child that has a small chance to be
+        are then merged into a child that has a chance to be
         mutated. Children are created until they have a number equal to 
         the population. If a solution is found in these children, or if
         this is the last generation, the best of the children is 
@@ -57,7 +57,7 @@ class RouteCalc(object):
         currentGeneration = 0
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
-        mutationChance = 0.35
+        mutationChance = 0.3
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
@@ -112,7 +112,7 @@ class RouteCalc(object):
     @classmethod
     def __ReproNew(self, population: [], selectionValues: []): 
         '''
-        Chooses parent nodes based on relative goodness of the population.
+        Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
         '''
               
@@ -120,15 +120,21 @@ class RouteCalc(object):
         parents = []
         while parents.__len__() != 2:
             value = random.uniform(0,1)
-            for i in range(0,population.__len__()):
-                #stopping at the first selectionValue greater than the random value
+            i = 0
+            while True:
+                currentSelection = None
                 if value <= selectionValues[i]:
-                    #Again, we need to avoid duplicates
-                    if parents.count(population[i]) == 0:
-                        parents.append(population[i])
-                    # Need to break out so the loop starts again with a new value to check
+                    currentSelection = population[i]
+                    parents.append(currentSelection)
                     break
-
+                #Going to try ignoring duplicates for this
+                #if parents.count(currentSelection) == 0:
+                #    parents.append(population[i])
+                #    break
+                else:
+                    i = 0
+                    value = random.uniform(0,1)
+                i += 1
         #Create the new child
         route1 = parents[0].GetRoute()
         route2 = parents[1].GetRoute()
@@ -154,87 +160,14 @@ class RouteCalc(object):
                 if newRoute.__len__() != route1.__len__():
                     newRoute.append(toAdd)
         return newRoute
-
-    @classmethod
-    def __SelectParents(self,population: []):       
-        '''
-        Returns a list of size 2 with the chosen parents.
-        Parents are chosen based on how good the route is.
-        We rank each route relative to the others in the population.
-        We then assign them a value such that values[0] is percent[0] and values[pop-1] is 1
-        Rand is called and the closest value over is chosen
-
-        TODO:Find why the percentages and selectionValues lists sometimes have pop+1 elements
-                    (maybe only when debugging?)
-              Change this to scale at a higher value... percentages my get too small with very large
-                    populations
-        '''
-        percentages = []
-        total = sum([route.Fitness_Value for route in population])
-        for value in [route.Fitness_Value for route in population]:
-            percentages.append(value/total * 1.0)
-       
-        #print("percent: {0}".format(percentages.__len__()))
-        #print("pop: {0}".format(population.__len__()))
         
-        parents = []
-        selectionValues = [percentages[0]]
-        for i in range(1,percentages.__len__()):
-            selectionValues.append(percentages[i] + selectionValues[i-1])
-
-        #print("values: {0}".format(selectionValues.__len__()))
-
-        while parents.__len__() != 2:
-            #uniform(0,1) might be the same as random()? looks like we can get 0.9999999999999 which is good enough
-            value = random.uniform(0,1)
-            for i in range(0,population.__len__()):
-                #stopping at the first selectionValue greater than the random value
-                if value <= selectionValues[i]:
-                    #Again, we need to avoid duplicates
-                    if parents.count(population[i]) == 0:
-                        parents.append(population[i])
-                    # Need to break out so the loop starts again with a new value to check
-                    break
-        return parents
-
-    @classmethod
-    def __Reproduce(self,parents: [2]):
-        '''
-        Returns a new state based off the 2 parents states.
-        Rand is used to determine which board is copied first
-        '''
-        route1 = parents[0].GetRoute()
-        route2 = parents[1].GetRoute()
-        pivot = random.randrange(route1.__len__())
-        newRoute = []
-
-        if random.randrange(0,sys.maxsize)%2 == 0:
-            for i in range(0,pivot):
-                newRoute.append(route1[i])
-            for i in range(0,route2.__len__()):
-                toAdd = route2[i]
-                if newRoute.count(toAdd) != 0:  #and newRoute.__len__() != route2.__len__():
-                    continue
-                if newRoute.__len__() != route2.__len__():
-                    newRoute.append(toAdd)
-        else:
-            for i in range(0,pivot):
-                newRoute.append(route2[i])
-            for i in range(0,route1.__len__()):
-                toAdd = route1[i]
-                if newRoute.count(toAdd) != 0: #and newRoute.__len__() != route1.__len__():
-                    continue
-                if newRoute.__len__() != route1.__len__():
-                    newRoute.append(toAdd)
-        return newRoute
-    
     @classmethod
     def __Mutate(self,route: [], validSystems: []):
         tempRoute = [val for val in route]
         
-        #Going to do a 66/33 split for replacing systems or shuffling the route
+        #Going to do a 80/20 split for replacing systems or shuffling the route
         mutateType = random.random()
-        if mutateType < 0.34:
+        if mutateType < 0.20:
             #shuffle route
             random.shuffle(tempRoute)
         else:
@@ -256,7 +189,7 @@ class RouteCalc(object):
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
-            return
+            return []
         allRoutes = itertools.permutations(validSystems,routeLength)
         for route in allRoutes:
             current = EDRareRoute(route)
