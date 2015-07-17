@@ -125,15 +125,16 @@ class RouteCalc(object):
                 currentSelection = None
                 if value <= selectionValues[i]:
                     currentSelection = population[i]
-                    parents.append(currentSelection)
-                    break
+                    if parents.count(currentSelection) == 0:
+                        parents.append(currentSelection)
+                        break
+                    else:
+                        i = 0
+                        value = random.uniform(0,1)
                 #Going to try ignoring duplicates for this
                 #if parents.count(currentSelection) == 0:
                 #    parents.append(population[i])
                 #    break
-                else:
-                    i = 0
-                    value = random.uniform(0,1)
                 i += 1
         #Create the new child
         route1 = parents[0].GetRoute()
@@ -159,6 +160,8 @@ class RouteCalc(object):
                     continue
                 if newRoute.__len__() != route1.__len__():
                     newRoute.append(toAdd)
+        #print(parents)
+        #input("wait")
         return newRoute
         
     @classmethod
