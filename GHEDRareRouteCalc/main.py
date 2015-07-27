@@ -75,7 +75,7 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-
+'''
 with open('ed.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
@@ -103,7 +103,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-'''
+
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
     currentSystem = __ValidateLine(cleanedCSV[i],i)
@@ -139,15 +139,13 @@ while not exitTestLoop and testNum < maxTests:
     print("Test: {0}".format(testNum))
     testSize = 8
     maxStationDistance = 700
-    popSize = 150
+    popSize = 75
     gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
     bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
-    #10*route.len for fitness value seems to be the sweet spot for when "good" routes start
-    #The above is kind of ok but (50 + 1 + 1) * 1.25 is the minimum for an ideal route, so 65 is the sweet spot
-    #short routes with low item stock, and long routes with high item stock can offset this, but whatever??
-    if bestRoute.Fitness_Value >= 65:
+    #fitness function seems to start giving good routes around values of 60
+    if bestRoute.Fitness_Value >= 60:
         print(bestRoute)
         exitTestLoop = True
 

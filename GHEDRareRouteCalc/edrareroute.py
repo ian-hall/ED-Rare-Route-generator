@@ -98,8 +98,8 @@ class EDRareRoute(object):
         strList = []
         if self.Best_Sell_Points:
             strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Value))
-            for index in self.Best_Order:
-                strList.append('{0}\n'.format(self.__Route[index]))
+            for system in self.__Route:
+                strList.append('{0}\n'.format(system))
             strList.append("\n\tSell rares at:\n")
             for seller in self.Best_Sell_Points:
                 strList.append('{0}\n'.format(seller))
@@ -257,16 +257,12 @@ class RouteOrder(object):
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
         if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
-           routeTypeMult = 1
+           routeTypeMult = 1.2
 
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances
         if spreadJumps == self.__Systems.__len__():
             routeTypeMult = 1.5
-
-        #lower multiplier if we have an extra long jump between systems 
-        #if longestJump >= maxJumpRangeLY:
-        #    routeTypeMult = .75
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance

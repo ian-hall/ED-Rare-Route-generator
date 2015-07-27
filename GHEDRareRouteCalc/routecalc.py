@@ -48,16 +48,13 @@ class RouteCalc(object):
         this is the last generation, the best of the children is 
         selected.
 
-        TODO: Only have possibleRoutes hold routes that pass the fitness threshold
-                of 65. I guess just keep replacing the initial value until we find a 
-                route that passes this mark and then continue adding until the loop
-                exits.
+        TODO: Only have possibleRoutes hold routes that pass some goodness threshold. 
         '''
         
         currentGeneration = 0
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
-        mutationChance = 0.3
+        mutationChance = 0.5
         
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
@@ -125,16 +122,9 @@ class RouteCalc(object):
                 currentSelection = None
                 if value <= selectionValues[i]:
                     currentSelection = population[i]
-                    if parents.count(currentSelection) == 0:
-                        parents.append(currentSelection)
-                        break
-                    else:
-                        i = 0
-                        value = random.uniform(0,1)
-                #Going to try ignoring duplicates for this
-                #if parents.count(currentSelection) == 0:
-                #    parents.append(population[i])
-                #    break
+                    #if parents.count(currentSelection) == 0:
+                    parents.append(currentSelection)
+                    break
                 i += 1
         #Create the new child
         route1 = parents[0].GetRoute()
@@ -196,7 +186,7 @@ class RouteCalc(object):
         allRoutes = itertools.permutations(validSystems,routeLength)
         for route in allRoutes:
             current = EDRareRoute(route)
-            if current.Fitness_Value >= 65:
+            if current.Fitness_Value >= 60:
                 goodRoutes.append(current)
 
         return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))
