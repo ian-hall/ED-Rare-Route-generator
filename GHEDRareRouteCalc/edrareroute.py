@@ -1,5 +1,4 @@
 ﻿from edsystem import EDSystem
-from EDSystemPair import EDSystemPair
 import random
 import collections
 import itertools
@@ -257,7 +256,7 @@ class RouteOrder(object):
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
         if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
-           routeTypeMult = 1.2
+           routeTypeMult = 1.25
 
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances

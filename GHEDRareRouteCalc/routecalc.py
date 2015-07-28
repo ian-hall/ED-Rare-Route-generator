@@ -11,7 +11,7 @@ class RouteCalc(object):
     Class for calculating rare trade routes
     '''
     @classmethod
-    def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength):
+    def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength, silent):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
@@ -35,10 +35,10 @@ class RouteCalc(object):
                 tempSystemList.append(tempSystem)
             population.append(EDRareRoute(tempSystemList))
 
-        return self.__GeneticSolver(population,maxGenerations,validSystems)
+        return self.__GeneticSolver(population,maxGenerations,validSystems, silent)
 
     @classmethod
-    def __GeneticSolver(self,startingPopulation: [], maxGenerations: int, validSystems: []):
+    def __GeneticSolver(self,startingPopulation: [], maxGenerations: int, validSystems: [], silent):
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parent states. These states
@@ -46,9 +46,7 @@ class RouteCalc(object):
         mutated. Children are created until they have a number equal to 
         the population. If a solution is found in these children, or if
         this is the last generation, the best of the children is 
-        selected.
-
-        TODO: Only have possibleRoutes hold routes that pass some goodness threshold. 
+        selected. 
         '''
         
         currentGeneration = 0
@@ -56,6 +54,7 @@ class RouteCalc(object):
         lastRouteFoundOn = currentGeneration
         mutationChance = 0.5
         
+        goodRouteCutoff = 65
         #Just add this now so we don't have to worry about the list being empty
         #If it turns out to be the best... I guess we did a lot of work for nothing
         possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Value'))]
@@ -63,8 +62,9 @@ class RouteCalc(object):
         #Don't really have a 'solved' state, so we just get best of each generation if it is better
         #Than our current best. We go until we hit the maxGenerations or until we go a certain number
         #of generations with no improvement.
-        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-5000):
-            if (currentGeneration%500) == 0:
+        maxGenUntilExit = 2500
+        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-maxGenUntilExit):
+            if (currentGeneration%500) == 0 and not silent:
                 print("Generation: {0}".format(currentGeneration))
             currentGeneration += 1
             nextPopulation = []
@@ -72,16 +72,17 @@ class RouteCalc(object):
             #Getting the best route in the current population
             bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
             #The last element of the possibleRoutes list should be the max, so we don't need to call max
-            if bestRoute.Fitness_Value > possibleRoutes[-1].Fitness_Value:
-                print("\t{0} -> {1}".format(currentGeneration,bestRoute.Fitness_Value))
+            if bestRoute.Fitness_Value > possibleRoutes[0].Fitness_Value:
+                if not silent:
+                    print("\t{0} -> {1}".format(currentGeneration,bestRoute.Fitness_Value))
+                possibleRoutes[0] = bestRoute
                 lastRouteFoundOn = currentGeneration
-                possibleRoutes.append(bestRoute)
+                if bestRoute.Fitness_Value > goodRouteCutoff:
+                    possibleRoutes.append(bestRoute)
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
             for i in range(0,currentPopulation.__len__()):
-                child = self.__ReproNew(currentPopulation,relativeFitnessVals)
-                #parents = self.__SelectParents(currentPopulation)
-                #child = self.__Reproduce(parents)
+                child = self.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
                     child = self.__Mutate(child,validSystems)
                 nextPopulation.append(EDRareRoute(child))
@@ -107,7 +108,7 @@ class RouteCalc(object):
         return selectionValues
     
     @classmethod
-    def __ReproNew(self, population: [], selectionValues: []): 
+    def __Reproduce(self, population: [], selectionValues: []): 
         '''
         Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
@@ -179,6 +180,7 @@ class RouteCalc(object):
     @classmethod
     def Brute(self, allSystems: [], maxStationDistance, routeLength):
         goodRoutes = []
+        goodRouteCutoff = 65
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
@@ -186,7 +188,7 @@ class RouteCalc(object):
         allRoutes = itertools.permutations(validSystems,routeLength)
         for route in allRoutes:
             current = EDRareRoute(route)
-            if current.Fitness_Value >= 60:
+            if current.Fitness_Value >= goodRouteCutoff:
                 goodRoutes.append(current)
 
         return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))

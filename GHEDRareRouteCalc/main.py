@@ -2,7 +2,7 @@
 from edsystem import EDSystem
 from edrareroute import EDRareRoute
 from routecalc import RouteCalc
-from EDSystemPair import EDSystemPair
+from performancecalc import PerformanceCalc
 from urllib import request
 import csv
 import operator
@@ -113,42 +113,39 @@ for i in range(1,cleanedCSV.__len__()-1):
     station is then NOT added to the list.
     '''   
     if allSystems.count(currentSystem) != 0:
-        #print("duplicate stations found:")
         dupes = []
         for system in allSystems:
             if system == currentSystem:
                 system.AddRares(currentSystem)
                 dupes.append(system)
-        #for system in dupes:
-        #    print("\t{0}".format(system))
-        #print("\t{0}".format(currentSystem))
     else:
         allSystems.append(currentSystem)
 
 '''
 TODO: Allow users to enter the values for size/station distance.
 '''
-
+'''
 #Genetic
 exitTestLoop = False
 testNum = 0
 maxTests = 20
+#fitness function seems to start giving good routes around values of 65
+goodRouteCutoff = 65
 
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 8
-    maxStationDistance = 700
+    testSize = 5
+    maxStationDistance = 999999
     popSize = 75
     gens = 25000
     routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
     bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
-    #fitness function seems to start giving good routes around values of 60
-    if bestRoute.Fitness_Value >= 60:
+    if bestRoute.Fitness_Value >= goodRouteCutoff:
         print(bestRoute)
         exitTestLoop = True
-
+'''
 
 #Brute
 #stupid slow
@@ -183,9 +180,9 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[93])  #Utg
-ykLoop = EDRareRoute(ykLoopList)
-print("YK Loop")
-print(ykLoop)
+#ykLoop = EDRareRoute(ykLoopList)
+#print("YK Loop")
+#print(ykLoop)
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -198,10 +195,10 @@ genRoute8.append(allSystems[14]) #Baltah
 genRoute8.append(allSystems[49]) #Iru
 genRoute8.append(allSystems[57]) #Karsu
 genRoute8.append(allSystems[24]) #Delta P
-goodRoute8 = EDRareRoute(genRoute8)
-print("8 System route")
-print(goodRoute8)
+#goodRoute8 = EDRareRoute(genRoute8)
+#print("8 System route")
+#print(goodRoute8)
 
-
+PerformanceCalc.CheckPerformance(allSystems)
 
 input("enter to close")
