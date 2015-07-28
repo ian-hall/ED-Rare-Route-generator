@@ -14,9 +14,9 @@ class PerformanceCalc(object):
         maxTests = 10
         goodRouteCutoff = 65
 
-        popSize = 75
+        popSize = 5
         maxStationDistance = 999999
-        gens = 10000
+        gens = 10
             
         routeLen = 5
         maxRouteLen = 8
@@ -66,8 +66,8 @@ class PerformanceMetrics(object):
                 totalTimeUnsolved += self.Times[i]
 
         percentSolved = (numSolved/numEntries) * 100
-        avgTimeSolved = totalTimeSolved/numSolved
-        avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved)
+        avgTimeSolved = totalTimeSolved/numSolved if numSolved > 0 else 0
+        avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
 
         strList.append("Route Length {0}:".format(self.Route_Length))
         strList.append("\n\tPop size: {0}:".format(self.Pop_Size))
