@@ -14,22 +14,23 @@ class PerformanceCalc(object):
         maxTests = 10
         goodRouteCutoff = 65
 
-        popSize = 5
+        popSize = 50
+        maxPopSize = 110
         maxStationDistance = 999999
-        gens = 10
+        maxGens = 15000
             
-        routeLen = 5
-        maxRouteLen = 8
+        routeLen = 6
+        maxRouteLen = 6
 
-        while routeLen <= maxRouteLen:
-            stats = PerformanceMetrics(routeLen,popSize)
+        while popSize <= maxPopSize:
+            stats = PerformanceMetrics(routeLen,popSize,maxGens)
             testNum = 0
             while testNum < maxTests:
                 testNum += 1
-                print("Test: {0}".format(testNum))
+                #print("Test: {0}".format(testNum))
                 solved = False
                 startTime = time.time()
-                routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,routeLen, True)
+                routes = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeLen, True)
                 endTime = time.time()
                 elapsed = endTime - startTime
                 bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
@@ -39,13 +40,14 @@ class PerformanceCalc(object):
                 stats.Times.append(elapsed)
                 stats.Solved.append(solved)
             print(stats)
-            routeLen += 1
-        input("wait")
+            popSize += 10
+        #input("wait")
 
 class PerformanceMetrics(object):
-    def __init__(self,length,popSize):
+    def __init__(self,length,popSize,maxGens):
         self.Route_Length = length
         self.Pop_Size = popSize
+        self.Max_Gens = maxGens
         self.Times = []
         self.Solved = []
 
@@ -70,7 +72,8 @@ class PerformanceMetrics(object):
         avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
 
         strList.append("Route Length {0}:".format(self.Route_Length))
-        strList.append("\n\tPop size: {0}:".format(self.Pop_Size))
+        strList.append("\n\tPop size {0}".format(self.Pop_Size))
+        strList.append("\n\tMax generations: {0}".format(self.Max_Gens)) 
         strList.append("\n\tSolved Percentage: {0}".format(percentSolved))
         strList.append("\n\tAvg time to solve: {0}".format(avgTimeSolved))
         strList.append("\n\tAvg time for unsolved: {0}".format(avgTimeUnsolved))

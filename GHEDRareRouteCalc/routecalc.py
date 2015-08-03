@@ -52,33 +52,56 @@ class RouteCalc(object):
         currentGeneration = 0
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
-        mutationChance = 0.5
+        baseMutation = 0.1
+        mutationChance = baseMutation
         
-        goodRouteCutoff = 65
-        #Just add this now so we don't have to worry about the list being empty
-        #If it turns out to be the best... I guess we did a lot of work for nothing
-        possibleRoutes = [max(currentPopulation,key=operator.attrgetter('Fitness_Value'))]
+        #Just keep track of the single best route
+        possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
 
-        #Don't really have a 'solved' state, so we just get best of each generation if it is better
-        #Than our current best. We go until we hit the maxGenerations or until we go a certain number
-        #of generations with no improvement.
-        maxGenUntilExit = 2500
-        while currentGeneration < maxGenerations and lastRouteFoundOn >= (currentGeneration-maxGenUntilExit):
+        #Want the program to keep running until it finds something, which it will eventually.
+        #Going to increase the mutation chance for every couple generations it goes without increasing
+        #the value of the best route.
+        mutationIncrease = 0.2
+        timeBetweenIncrease = 1000
+        lastIncrease = currentGeneration
+
+        #If the current possibleRoute has value of atleast F, force an exit the next time a mutation increase
+        #would occur
+        exitAtFVal = 70
+        #Also force an exit if X generations pass with no improvement
+        maxGensSinceLast = 3000
+
+        #Stil going to force an exit after a max number of generations is reached
+        while currentGeneration < maxGenerations:
             if (currentGeneration%500) == 0 and not silent:
                 print("Generation: {0}".format(currentGeneration))
             currentGeneration += 1
             nextPopulation = []
 
-            #Getting the best route in the current population
             bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
-            #The last element of the possibleRoutes list should be the max, so we don't need to call max
-            if bestRoute.Fitness_Value > possibleRoutes[0].Fitness_Value:
+
+            if bestRoute.Fitness_Value > possibleRoute.Fitness_Value:
                 if not silent:
                     print("\t{0} -> {1}".format(currentGeneration,bestRoute.Fitness_Value))
-                possibleRoutes[0] = bestRoute
+                possibleRoute = bestRoute
                 lastRouteFoundOn = currentGeneration
-                if bestRoute.Fitness_Value > goodRouteCutoff:
-                    possibleRoutes.append(bestRoute)
+                #Reset mutation chance upon finding a new best route
+                mutationChance = baseMutation
+
+            #Exit if we are at least at the exitAtFVal and going to increase the mutation chance this gen
+            if bestRoute.Fitness_Value > exitAtFVal and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
+                break
+            
+            #Exit if it has been X generations since last found route
+            if currentGeneration - lastRouteFoundOn >= maxGensSinceLast:
+                break
+
+            #Should probably check to make sure this stops at 1 but I guess it doesnt really matter since random() always returns < 1
+            if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
+                mutationChance += mutationIncrease
+                lastIncrease = currentGeneration
+                if not silent:
+                    print("\tCurrent mutation chance: {0}".format(mutationChance))
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
             for i in range(0,currentPopulation.__len__()):
@@ -89,7 +112,7 @@ class RouteCalc(object):
 
             currentPopulation = nextPopulation
 
-        return possibleRoutes
+        return (possibleRoute,currentGeneration)
 
     @classmethod
     def __CalculateRelativeFitness(self, population: []):

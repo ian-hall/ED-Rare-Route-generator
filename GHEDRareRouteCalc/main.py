@@ -124,7 +124,7 @@ for i in range(1,cleanedCSV.__len__()-1):
 '''
 TODO: Allow users to enter the values for size/station distance.
 '''
-'''
+
 #Genetic
 exitTestLoop = False
 testNum = 0
@@ -135,21 +135,22 @@ goodRouteCutoff = 65
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    testSize = 5
-    maxStationDistance = 999999
+    routeSize = 5
+    maxStationDistance = 4500
     popSize = 75
-    gens = 25000
-    routes = RouteCalc.GeneticSolverStart(popSize,gens,allSystems,maxStationDistance,testSize)
-    bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
+    maxGens = 20000
+    routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeSize, False)
+    bestRoute = routeTuple[0]
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
     if bestRoute.Fitness_Value >= goodRouteCutoff:
         print(bestRoute)
+        print("\tFound after {0} generations.".format(routeTuple[1]))
         exitTestLoop = True
-'''
+
 
 #Brute
 #stupid slow
-testSize = 4
+routeSize = 4
 maxStationDistance = 5000
 bruteSystems = []
 bruteSystems.append(allSystems[61])  #Lave
@@ -163,7 +164,7 @@ bruteSystems.append(allSystems[35])  #George
 bruteSystems.append(allSystems[26])  #Diso
 bruteSystems.append(allSystems[69])  #Momus
 bruteSystems.append(allSystems[102]) #Wolf
-#routes = RouteCalc.Brute(bruteSystems,maxStationDistance,testSize)
+#routes = RouteCalc.Brute(bruteSystems,maxStationDistance,routeSize)
 
 #print("\t****possible routes****")
 #for route in routes:
@@ -180,9 +181,9 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[93])  #Utg
-#ykLoop = EDRareRoute(ykLoopList)
-#print("YK Loop")
-#print(ykLoop)
+ykLoop = EDRareRoute(ykLoopList)
+print("YK Loop")
+print(ykLoop)
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -195,10 +196,10 @@ genRoute8.append(allSystems[14]) #Baltah
 genRoute8.append(allSystems[49]) #Iru
 genRoute8.append(allSystems[57]) #Karsu
 genRoute8.append(allSystems[24]) #Delta P
-#goodRoute8 = EDRareRoute(genRoute8)
-#print("8 System route")
-#print(goodRoute8)
+goodRoute8 = EDRareRoute(genRoute8)
+print("8 System route")
+print(goodRoute8)
 
-PerformanceCalc.CheckPerformance(allSystems)
+#PerformanceCalc.CheckPerformance(allSystems)
 
-input("enter to close")
+#input("enter to close")
