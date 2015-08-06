@@ -94,6 +94,7 @@ class EDRareRoute(object):
         
 
     def __str__(self):
+        avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
         if self.Best_Sell_Points:
             strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Value))
@@ -102,7 +103,8 @@ class EDRareRoute(object):
             strList.append("\n\tSell rares at:\n")
             for seller in self.Best_Sell_Points:
                 strList.append('{0}\n'.format(seller))
-            strList.append("\tEnd Rare Route!!!\n")
+            strList.append("\nTotal goods: {0}".format(self.Total_Supply))
+            strList.append("\nAvg cost: {0}".format(avgCost))
         else:
             strList.append("\nFound a route with value:{0}, but it is no good".format(self.Fitness_Value))
         return ''.join(strList)
@@ -131,11 +133,7 @@ class RouteOrder(object):
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
 
-        TODO: Larger route lengths seem to have a harder time getting high fitness values...
-                either we are unlucky in the population selection or the math is off here?
-                seems like it could just be because longer routes have a harder time finding
-                a good group of systems so their weightedDistance is lower causing 
-                lower fitness values than expected
+        TODO: Take into account cost of items
         '''
         totalValue = 3
         #if this group has no valid sellers just return now
@@ -268,6 +266,12 @@ class RouteOrder(object):
         magicSupply = self.__Systems.__len__() * 10
         #greater supply is a greater number, this is so we don't have supply playing as large a roll in total value
         weightedSupply = self.Supply/magicSupply
-        totalValue = (pairValue * weightedSupply * weightedDistance) * routeTypeMult
+
+        #want to also do seomthing with the cost of the items..       
+        avgCost = sum([sum(val.Cost) for val in self.__Systems])/self.__Systems.__len__()
+        weightedCost = avgCost/2000
+
+
+        totalValue = (pairValue * weightedSupply * weightedDistance * weightedCost) * routeTypeMult
 
         return totalValue

@@ -11,16 +11,16 @@ import time
 class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,allSystems):
-        maxTests = 10
-        goodRouteCutoff = 65
+        maxTests = 20
+        goodRouteCutoff = 100
 
-        popSize = 50
-        maxPopSize = 110
-        maxStationDistance = 999999
+        popSize = 80
+        maxPopSize = 80
+        maxStationDistance = 4500
         maxGens = 15000
             
-        routeLen = 6
-        maxRouteLen = 6
+        routeLen = 8
+        maxRouteLen = 8
 
         while popSize <= maxPopSize:
             stats = PerformanceMetrics(routeLen,popSize,maxGens)
@@ -30,18 +30,19 @@ class PerformanceCalc(object):
                 #print("Test: {0}".format(testNum))
                 solved = False
                 startTime = time.time()
-                routes = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeLen, True)
+                routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeLen, True)
                 endTime = time.time()
                 elapsed = endTime - startTime
-                bestRoute = max(routes,key=operator.attrgetter('Fitness_Value'))
+                bestRoute = routeTuple[0]
                 if bestRoute.Fitness_Value >= goodRouteCutoff:
                     solved = True
 
                 stats.Times.append(elapsed)
                 stats.Solved.append(solved)
+                stats.Gens.append(routeTuple[1])
+
             print(stats)
             popSize += 10
-        #input("wait")
 
 class PerformanceMetrics(object):
     def __init__(self,length,popSize,maxGens):
@@ -50,6 +51,7 @@ class PerformanceMetrics(object):
         self.Max_Gens = maxGens
         self.Times = []
         self.Solved = []
+        self.Gens = []
 
     def __str__(self):
         strList = []
@@ -57,6 +59,8 @@ class PerformanceMetrics(object):
         numSolved = 0
         totalTimeSolved = 0
         totalTimeUnsolved = 0
+        totalGensSolved = 0
+        totalGensUnsolved = 0
 
         numEntries = self.Solved.__len__()
 
@@ -64,18 +68,24 @@ class PerformanceMetrics(object):
             if self.Solved[i]:
                 numSolved += 1
                 totalTimeSolved += self.Times[i]
+                totalGensSolved += self.Gens[i]
             else:
                 totalTimeUnsolved += self.Times[i]
+                totalGensUnsolved += self.Gens[i]
 
         percentSolved = (numSolved/numEntries) * 100
         avgTimeSolved = totalTimeSolved/numSolved if numSolved > 0 else 0
         avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
+        avgGensSolved = totalGensSolved/numSolved if numSolved > 0 else 0 
+        avgGensUnsolved = totalGensUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0  
 
         strList.append("Route Length {0}:".format(self.Route_Length))
-        strList.append("\n\tPop size {0}".format(self.Pop_Size))
-        strList.append("\n\tMax generations: {0}".format(self.Max_Gens)) 
+        strList.append("\nPop size {0}".format(self.Pop_Size))
+        strList.append("\nMax generations: {0}".format(self.Max_Gens)) 
         strList.append("\n\tSolved Percentage: {0}".format(percentSolved))
         strList.append("\n\tAvg time to solve: {0}".format(avgTimeSolved))
+        strList.append("\n\tAvg generations to solve: {0}".format(avgGensSolved))
         strList.append("\n\tAvg time for unsolved: {0}".format(avgTimeUnsolved))
+        strList.append("\n\tAvg generations for unsolved: {0}".format(avgGensUnsolved))
 
         return ''.join(strList)

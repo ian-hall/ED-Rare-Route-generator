@@ -18,8 +18,10 @@ class RouteCalc(object):
         '''
         population = []
 
-        #check for max station distance and also exclude systems that require a permit to enter
-        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name]
+        #check for max station distance and also exclude systems that require a permit to enter as well as systems with supply of X or less
+        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
+                                                            and "permit" not in system.System_Name
+                                                            and system.Max_Supply > 4]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
@@ -61,13 +63,13 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually.
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.2
+        mutationIncrease = 0.3
         timeBetweenIncrease = 1000
         lastIncrease = currentGeneration
 
         #If the current possibleRoute has value of atleast F, force an exit the next time a mutation increase
         #would occur
-        exitAtFVal = 70
+        exitAtFVal = 110
         #Also force an exit if X generations pass with no improvement
         maxGensSinceLast = 3000
 

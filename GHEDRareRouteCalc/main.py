@@ -129,13 +129,13 @@ TODO: Allow users to enter the values for size/station distance.
 exitTestLoop = False
 testNum = 0
 maxTests = 20
-#fitness function seems to start giving good routes around values of 65
-goodRouteCutoff = 65
+
+goodRouteCutoff = 110
 
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 5
+    routeSize = 8
     maxStationDistance = 4500
     popSize = 75
     maxGens = 20000
@@ -201,5 +201,3 @@ print("8 System route")
 print(goodRoute8)
 
 #PerformanceCalc.CheckPerformance(allSystems)
-
-#input("enter to close")
