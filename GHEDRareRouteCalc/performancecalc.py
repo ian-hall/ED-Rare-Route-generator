@@ -12,7 +12,7 @@ class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,allSystems):
         maxTests = 20
-        goodRouteCutoff = 100
+        goodRouteCutoff = RouteCalc.Route_Cutoff
 
         popSize = 80
         maxPopSize = 80

@@ -16,7 +16,6 @@ class EDRareRoute(object):
         self.Sellers_Per_Station = {}
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Possible_Sell_Points = self.__CalcSellers()
-        #self.Best_Order = []
         self.Best_Sell_Points = []
         self.Fitness_Value = self.__Fitness()
 
@@ -35,10 +34,8 @@ class EDRareRoute(object):
             Print a list of all possible seller pairs if more than 1 exists.
                 RouteOrder class will always return the last pair found as the best...and while it will work it might not be best
         '''   
-        #tempSystemList = [ i for i in range(0,self.__Route.__len__()) ]
 
         currentRoute = RouteOrder(self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
-        #self.Best_Order = currentRoute.Order
         self.Best_Sell_Points = currentRoute.Best_Sellers
         return currentRoute.Value
 
@@ -119,7 +116,6 @@ class RouteOrder(object):
         '''
         sellLocs members will always be length 2
         '''
-        #self.Order = indexList
         self.__Systems = systems
         self.__SellLocs = sellLocs
         self.Route_Sellers = sellersPerStation
@@ -264,14 +260,17 @@ class RouteOrder(object):
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance
         magicSupply = self.__Systems.__len__() * 10
-        #greater supply is a greater number, this is so we don't have supply playing as large a roll in total value
         weightedSupply = self.Supply/magicSupply
 
         #want to also do seomthing with the cost of the items..       
         avgCost = sum([sum(val.Cost) for val in self.__Systems])/self.__Systems.__len__()
-        weightedCost = avgCost/2000
+
+        weightedCost = avgCost / self.Supply
+        #Lower the weighted cost if we are under an avg of 10 supply per station
+        weightedCost = weightedCost if weightedSupply > 1 else weightedCost/4
 
 
-        totalValue = (pairValue * weightedSupply * weightedDistance * weightedCost) * routeTypeMult
+
+        totalValue = pairValue * weightedDistance * weightedSupply * routeTypeMult * weightedCost
 
         return totalValue

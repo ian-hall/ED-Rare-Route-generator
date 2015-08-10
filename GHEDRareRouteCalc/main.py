@@ -130,12 +130,12 @@ exitTestLoop = False
 testNum = 0
 maxTests = 20
 
-goodRouteCutoff = 110
+goodRouteCutoff = RouteCalc.Route_Cutoff
 
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 8
+    routeSize = 4
     maxStationDistance = 4500
     popSize = 75
     maxGens = 20000
@@ -150,7 +150,7 @@ while not exitTestLoop and testNum < maxTests:
 
 #Brute
 #stupid slow
-routeSize = 4
+routeSize = 8
 maxStationDistance = 5000
 bruteSystems = []
 bruteSystems.append(allSystems[61])  #Lave

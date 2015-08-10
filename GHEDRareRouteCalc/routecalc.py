@@ -10,6 +10,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
+    Route_Cutoff = 2000
     @classmethod
     def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength, silent):
         '''
@@ -21,7 +22,7 @@ class RouteCalc(object):
         #check for max station distance and also exclude systems that require a permit to enter as well as systems with supply of X or less
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
                                                             and "permit" not in system.System_Name
-                                                            and system.Max_Supply > 4]
+                                                            and system.Max_Supply > 1]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
@@ -58,7 +59,7 @@ class RouteCalc(object):
         mutationChance = baseMutation
         
         #Just keep track of the single best route
-        possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
+        bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
 
         #Want the program to keep running until it finds something, which it will eventually.
         #Going to increase the mutation chance for every couple generations it goes without increasing
@@ -69,7 +70,7 @@ class RouteCalc(object):
 
         #If the current possibleRoute has value of atleast F, force an exit the next time a mutation increase
         #would occur
-        exitAtFVal = 110
+        exitAtFVal = RouteCalc.Route_Cutoff
         #Also force an exit if X generations pass with no improvement
         maxGensSinceLast = 3000
 
@@ -80,18 +81,18 @@ class RouteCalc(object):
             currentGeneration += 1
             nextPopulation = []
 
-            bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
+            possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
 
-            if bestRoute.Fitness_Value > possibleRoute.Fitness_Value:
+            if possibleRoute.Fitness_Value > bestRoute.Fitness_Value:
                 if not silent:
-                    print("\t{0} -> {1}".format(currentGeneration,bestRoute.Fitness_Value))
-                possibleRoute = bestRoute
+                    print("\t{0} -> {1}".format(currentGeneration,possibleRoute.Fitness_Value))
+                bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
                 #Reset mutation chance upon finding a new best route
                 mutationChance = baseMutation
 
             #Exit if we are at least at the exitAtFVal and going to increase the mutation chance this gen
-            if bestRoute.Fitness_Value > exitAtFVal and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
+            if bestRoute.Fitness_Value >= exitAtFVal and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
                 break
             
             #Exit if it has been X generations since last found route
@@ -114,7 +115,7 @@ class RouteCalc(object):
 
             currentPopulation = nextPopulation
 
-        return (possibleRoute,currentGeneration)
+        return (bestRoute,currentGeneration)
 
     @classmethod
     def __CalculateRelativeFitness(self, population: []):
@@ -205,7 +206,7 @@ class RouteCalc(object):
     @classmethod
     def Brute(self, allSystems: [], maxStationDistance, routeLength):
         goodRoutes = []
-        goodRouteCutoff = 65
+        goodRouteCutoff = RouteCalc.Route_Cutoff
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
@@ -213,7 +214,7 @@ class RouteCalc(object):
         allRoutes = itertools.permutations(validSystems,routeLength)
         for route in allRoutes:
             current = EDRareRoute(route)
-            if current.Fitness_Value >= goodRouteCutoff:
+            if current.Fitness_Value >= self.Route_Cutoff:
                 goodRoutes.append(current)
 
         return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))
