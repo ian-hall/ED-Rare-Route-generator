@@ -131,14 +131,14 @@ testNum = 0
 maxTests = 20
 
 goodRouteCutoff = RouteCalc.Route_Cutoff
-
+'''
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 4
-    maxStationDistance = 4500
-    popSize = 75
-    maxGens = 20000
+    routeSize = 9
+    maxStationDistance = 2000
+    popSize = 80
+    maxGens = 15000
     routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeSize, False)
     bestRoute = routeTuple[0]
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
@@ -146,7 +146,7 @@ while not exitTestLoop and testNum < maxTests:
         print(bestRoute)
         print("\tFound after {0} generations.".format(routeTuple[1]))
         exitTestLoop = True
-
+'''
 
 #Brute
 #stupid slow
@@ -174,13 +174,13 @@ bruteSystems.append(allSystems[102]) #Wolf
 #Indices based on live spreadsheet, no duplicates
 ykLoopList = []
 ykLoopList.append(allSystems[106]) #Yaso
-ykLoopList.append(allSystems[80])  #Quech
+ykLoopList.append(allSystems[81])  #Quech
 ykLoopList.append(allSystems[21])  #Coq
 ykLoopList.append(allSystems[8])   #Alt
 ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
-ykLoopList.append(allSystems[93])  #Utg
+ykLoopList.append(allSystems[94])  #Utg
 ykLoop = EDRareRoute(ykLoopList)
 print("YK Loop")
 print(ykLoop)
@@ -191,10 +191,10 @@ genRoute8 = []
 genRoute8.append(allSystems[20]) #Chi Er
 genRoute8.append(allSystems[8])  #Alt
 genRoute8.append(allSystems[16]) #Bast
-genRoute8.append(allSystems[90]) #Tio
+genRoute8.append(allSystems[91]) #Tio
 genRoute8.append(allSystems[14]) #Baltah
 genRoute8.append(allSystems[49]) #Iru
-genRoute8.append(allSystems[57]) #Karsu
+genRoute8.append(allSystems[58]) #Karsu
 genRoute8.append(allSystems[24]) #Delta P
 goodRoute8 = EDRareRoute(genRoute8)
 print("8 System route")

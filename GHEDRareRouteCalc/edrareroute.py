@@ -103,7 +103,9 @@ class EDRareRoute(object):
             strList.append("\nTotal goods: {0}".format(self.Total_Supply))
             strList.append("\nAvg cost: {0}".format(avgCost))
         else:
-            strList.append("\nFound a route with value:{0}, but it is no good".format(self.Fitness_Value))
+            strList.append("\n(Bad)Route with value:{0}\n".format(self.Fitness_Value))
+            for system in self.__Route:
+               strList.append('{0}\n'.format(system))
         return ''.join(strList)
 
 class RouteOrder(object):
@@ -259,15 +261,16 @@ class RouteOrder(object):
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance
-        magicSupply = self.__Systems.__len__() * 10
+        magicSupply = self.__Systems.__len__() * 12
         weightedSupply = self.Supply/magicSupply
 
         #want to also do seomthing with the cost of the items..       
         avgCost = sum([sum(val.Cost) for val in self.__Systems])/self.__Systems.__len__()
 
+        #TODO Lower this, cost is playing too large or a part on the final value
         weightedCost = avgCost / self.Supply
-        #Lower the weighted cost if we are under an avg of 10 supply per station
-        weightedCost = weightedCost if weightedSupply > 1 else weightedCost/4
+        #Lower the weighted cost if we are under an avg of 12 supply per station
+        weightedCost = weightedCost if weightedSupply > 1 else weightedCost/5
 
 
 

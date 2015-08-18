@@ -16,13 +16,13 @@ class PerformanceCalc(object):
 
         popSize = 80
         maxPopSize = 80
-        maxStationDistance = 4500
+        maxStationDistance = 2000
         maxGens = 15000
             
         routeLen = 8
         maxRouteLen = 8
 
-        while popSize <= maxPopSize:
+        while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize,maxGens)
             testNum = 0
             while testNum < maxTests:
@@ -42,7 +42,8 @@ class PerformanceCalc(object):
                 stats.Gens.append(routeTuple[1])
 
             print(stats)
-            popSize += 10
+            #popSize += 10
+            routeLen += 1
 
 class PerformanceMetrics(object):
     def __init__(self,length,popSize,maxGens):
