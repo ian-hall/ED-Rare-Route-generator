@@ -16,7 +16,7 @@ class PerformanceCalc(object):
 
         popSize = 80
         maxPopSize = 80
-        maxStationDistance = 2000
+        maxStationDistance = 5000
         maxGens = 15000
             
         routeLen = 8

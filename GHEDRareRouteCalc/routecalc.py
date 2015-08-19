@@ -10,7 +10,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 2100
+    Route_Cutoff = 1800
     @classmethod
     def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength, silent):
         '''
@@ -207,7 +207,9 @@ class RouteCalc(object):
     def Brute(self, allSystems: [], maxStationDistance, routeLength):
         goodRoutes = []
         goodRouteCutoff = RouteCalc.Route_Cutoff
-        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance and "permit" not in system.System_Name ]
+        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
+                                                            and "permit" not in system.System_Name
+                                                            and system.Max_Supply > 1]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []

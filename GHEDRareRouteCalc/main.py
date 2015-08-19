@@ -75,8 +75,8 @@ def __ValidateLine(currentLine, lineNum):
 cleanedCSV = []
 allSystems = []
 
-'''
-with open('ed.csv') as csvFile:
+
+with open('ED2.csv') as csvFile:
     reader = csv.reader(csvFile)
     breakout = False
     for line in reader:
@@ -103,7 +103,7 @@ for line in reader:
     if not breakout:
         cleanedCSV.append(line)
     breakout = False
-
+'''
 headers = cleanedCSV[0]
 for i in range(1,cleanedCSV.__len__()-1):
     currentSystem = __ValidateLine(cleanedCSV[i],i)
@@ -135,8 +135,8 @@ goodRouteCutoff = RouteCalc.Route_Cutoff
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 9
-    maxStationDistance = 2000
+    routeSize = 7
+    maxStationDistance = 5000
     popSize = 80
     maxGens = 15000
     routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeSize, False)
@@ -151,24 +151,24 @@ while not exitTestLoop and testNum < maxTests:
 #Brute
 #stupid slow
 routeSize = 8
-maxStationDistance = 5000
+maxStationDistance = 2000
 bruteSystems = []
-bruteSystems.append(allSystems[61])  #Lave
-bruteSystems.append(allSystems[63])  #Leesti
-bruteSystems.append(allSystems[78])  #Orr
-bruteSystems.append(allSystems[92])  #Usz
-bruteSystems.append(allSystems[108]) #Zee
+bruteSystems.append(allSystems[62])  #Lave
+bruteSystems.append(allSystems[64])  #Leesti
+bruteSystems.append(allSystems[79])  #Orr
+bruteSystems.append(allSystems[93])  #Usz
+bruteSystems.append(allSystems[107]) #Zee
 bruteSystems.append(allSystems[0])   #39 T
 bruteSystems.append(allSystems[33])  #Fuj
 bruteSystems.append(allSystems[35])  #George
 bruteSystems.append(allSystems[26])  #Diso
-bruteSystems.append(allSystems[69])  #Momus
-bruteSystems.append(allSystems[102]) #Wolf
-#routes = RouteCalc.Brute(bruteSystems,maxStationDistance,routeSize)
+bruteSystems.append(allSystems[70])  #Momus
+bruteSystems.append(allSystems[103]) #Wolf
+routes = RouteCalc.Brute(bruteSystems,maxStationDistance,routeSize)
 
-#print("\t****possible routes****")
-#for route in routes:
-#    print(route)
+print("\t****possible routes****")
+for route in routes:
+    print(route)
 
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates
