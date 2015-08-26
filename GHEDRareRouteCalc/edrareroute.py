@@ -93,19 +93,32 @@ class EDRareRoute(object):
     def __str__(self):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
+        stationsPerLine = 4
+        count = 0
         if self.Best_Sell_Points:
-            strList.append("\n\tRare route!!! Value:{0}\n".format(self.Fitness_Value))
+            strList.append("\n\tRoute Value:{0}\n".format(self.Fitness_Value))
             for system in self.__Route:
-                strList.append('{0}\n'.format(system))
-            strList.append("\n\tSell rares at:\n")
-            for seller in self.Best_Sell_Points:
-                strList.append('{0}\n'.format(seller))
-            strList.append("\nTotal goods: {0}".format(self.Total_Supply))
-            strList.append("\nAvg cost: {0}".format(avgCost))
+                strList.append("({0}){1}".format(system.Index,system.System_Name))
+                if system in self.Best_Sell_Points:
+                    strList.append("(*)-> ".format(system.Index,system.System_Name))
+                else:
+                    strList.append("-> ")
+                count += 1
+                if count%stationsPerLine == 0:
+                    strList.append("\n")
+            
+            for station in self.Best_Sell_Points:
+                strList.append("\nAt {0} sell:\n\t".format(station.System_Name))
+                for seller in self.Sellers_Per_Station[station]:
+                    strList.append("{0} ".format(seller.Index))
+        
         else:
             strList.append("\n(Bad)Route with value:{0}\n".format(self.Fitness_Value))
             for system in self.__Route:
                strList.append('{0}\n'.format(system))
+
+        strList.append("\n\nTotal goods: {0}".format(self.Total_Supply))
+        strList.append("\nAvg cost: {0}".format(avgCost))
         return ''.join(strList)
 
 class RouteOrder(object):
@@ -176,28 +189,26 @@ class RouteOrder(object):
                 for i in range(loc2Index,loc1Index):
                     if indexForSystemsSellingLoc1.count(i) != 0:
                         numBefore1 += 1
-                #print("1: ",numBefore1)
                         
                 numBefore2 = 0
                 for i in range(loc1Index,loc2Index + routeLength):
                     if indexForSystemsSellingLoc2.count(i % routeLength) != 0:
                         numBefore2 += 1
-                #print("2: ",numBefore2)
             else:
                 numBefore2 = 0
                 for i in range(loc1Index,loc2Index):
                     if indexForSystemsSellingLoc2.count(i) != 0:
                         numBefore2 += 1
-                #print("2: ",numBefore2)
                         
                 numBefore1 = 0
                 for i in range(loc2Index,loc1Index + routeLength):
                     if indexForSystemsSellingLoc1.count(i % routeLength) != 0:
                         numBefore1 += 1
-                #print("1: ",numBefore1)
                
             # if the total number before each = len-2 or len then we have a good one... should treat each the same
             # as far as value goes len-2 means we have a rather evenly spaced loop, len means we have grouped systems
+            #TODO: Clean this up
+            #      Need to take into account where the odd station occurs for odd length routes, for example we want at most 1 system between a seller when sometimes we will get 2
             if routeLength % 2 == 0:
                 if (numBefore1 == numBefore2):
                     pairValue = 50
@@ -257,7 +268,7 @@ class RouteOrder(object):
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances
         if spreadJumps == self.__Systems.__len__():
-            routeTypeMult = 1.5
+            routeTypeMult = 1.4
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance
@@ -266,14 +277,9 @@ class RouteOrder(object):
 
         #want to also do seomthing with the cost of the items..       
         avgCost = sum([sum(val.Cost) for val in self.__Systems])/self.__Systems.__len__()
+        #base avg cost around 1500 each
+        weightedCost = avgCost / 1500
 
-        #TODO Lower this, cost is playing too large or a part on the final value
-        weightedCost = avgCost / self.Supply
-        #Lower the weighted cost if we are under an avg of 12 supply per station
-        weightedCost = weightedCost if weightedSupply > 1 else weightedCost/5
-
-
-
-        totalValue = pairValue * weightedDistance * weightedSupply * routeTypeMult * weightedCost
+        totalValue = pairValue * weightedCost * weightedDistance * weightedSupply * routeTypeMult
 
         return totalValue

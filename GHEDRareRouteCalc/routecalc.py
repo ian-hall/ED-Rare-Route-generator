@@ -10,7 +10,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 1800
+    Route_Cutoff = 110
     @classmethod
     def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength, silent):
         '''

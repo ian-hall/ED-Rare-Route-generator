@@ -135,7 +135,7 @@ goodRouteCutoff = RouteCalc.Route_Cutoff
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 7
+    routeSize = 11
     maxStationDistance = 5000
     popSize = 80
     maxGens = 15000
@@ -151,24 +151,26 @@ while not exitTestLoop and testNum < maxTests:
 #Brute
 #stupid slow
 routeSize = 8
-maxStationDistance = 2000
+maxStationDistance = 999999999
 bruteSystems = []
 bruteSystems.append(allSystems[62])  #Lave
 bruteSystems.append(allSystems[64])  #Leesti
 bruteSystems.append(allSystems[79])  #Orr
 bruteSystems.append(allSystems[93])  #Usz
-bruteSystems.append(allSystems[107]) #Zee
+bruteSystems.append(allSystems[108]) #Zee
 bruteSystems.append(allSystems[0])   #39 T
 bruteSystems.append(allSystems[33])  #Fuj
 bruteSystems.append(allSystems[35])  #George
 bruteSystems.append(allSystems[26])  #Diso
 bruteSystems.append(allSystems[70])  #Momus
-bruteSystems.append(allSystems[103]) #Wolf
-routes = RouteCalc.Brute(bruteSystems,maxStationDistance,routeSize)
+bruteSystems.append(allSystems[102]) #Witch
+bruteSystems.append(allSystems[8])   #Alt
+bruteSystems.append(allSystems[91])  #Tio
+#routes = RouteCalc.Brute(bruteSystems,maxStationDistance,routeSize)
 
-print("\t****possible routes****")
-for route in routes:
-    print(route)
+#print("\t****possible routes****")
+#for route in routes:
+#    print(route)
 
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates
@@ -181,9 +183,9 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[94])  #Utg
-ykLoop = EDRareRoute(ykLoopList)
-print("YK Loop")
-print(ykLoop)
+#ykLoop = EDRareRoute(ykLoopList)
+#print("\n\nYK Loop")
+#print(ykLoop)
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -196,8 +198,33 @@ genRoute8.append(allSystems[14]) #Baltah
 genRoute8.append(allSystems[49]) #Iru
 genRoute8.append(allSystems[58]) #Karsu
 genRoute8.append(allSystems[24]) #Delta P
-goodRoute8 = EDRareRoute(genRoute8)
-print("8 System route")
-print(goodRoute8)
+#goodRoute8 = EDRareRoute(genRoute8)
+#print("\n\n8 System route")
+#print(goodRoute8)
+
+#5 system test
+test5 = []
+test5.append(allSystems[49]) #Iru
+test5.append(allSystems[76]) #ngur
+test5.append(allSystems[64]) #Leesti
+test5.append(allSystems[5])  #Agan
+test5.append(allSystems[8])  #Alt
+#route5 = EDRareRoute(test5)
+#print(route5)
+
+#109 85 5 64 62 77 49 18 92 28 8
+systems11_1 = []
+systems11_1.append(allSystems[108]) #Zee
+systems11_1.append(allSystems[84])  #Rus
+systems11_1.append(allSystems[5])   #Agan
+systems11_1.append(allSystems[64])  #Leesti
+systems11_1.append(allSystems[62])  #Lave
+systems11_1.append(allSystems[76])  #Ngur
+systems11_1.append(allSystems[49])  #Iru
+systems11_1.append(allSystems[18])  #CD_75
+systems11_1.append(allSystems[91])  #Tio
+systems11_1.append(allSystems[28])  #Epsi
+systems11_1.append(allSystems[8])   #Alt
+print(EDRareRoute(systems11_1))
 
 #PerformanceCalc.CheckPerformance(allSystems)
