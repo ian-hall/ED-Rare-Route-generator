@@ -11,7 +11,7 @@ import time
 class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,allSystems):
-        maxTests = 40
+        maxTests = 20
         goodRouteCutoff = RouteCalc.Route_Cutoff
 
         popSize = 80
@@ -19,8 +19,8 @@ class PerformanceCalc(object):
         maxStationDistance = 5000
         maxGens = 15000
             
-        routeLen = 4
-        maxRouteLen = 4
+        routeLen = 7
+        maxRouteLen = 7
 
         while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize,maxGens)

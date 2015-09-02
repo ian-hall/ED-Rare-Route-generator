@@ -263,12 +263,12 @@ class RouteOrder(object):
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
         if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
-           routeTypeMult = 1.25
+           routeTypeMult = 2
 
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances
         if spreadJumps == self.__Systems.__len__():
-            routeTypeMult = 1.4
+            routeTypeMult = 2.25
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance

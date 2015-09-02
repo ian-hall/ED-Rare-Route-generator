@@ -131,11 +131,11 @@ testNum = 0
 maxTests = 20
 
 goodRouteCutoff = RouteCalc.Route_Cutoff
-'''
+
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 11
+    routeSize = 5
     maxStationDistance = 5000
     popSize = 80
     maxGens = 15000
@@ -146,7 +146,6 @@ while not exitTestLoop and testNum < maxTests:
         print(bestRoute)
         print("\tFound after {0} generations.".format(routeTuple[1]))
         exitTestLoop = True
-'''
 
 #Brute
 #stupid slow
@@ -183,9 +182,9 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[94])  #Utg
-#ykLoop = EDRareRoute(ykLoopList)
-#print("\n\nYK Loop")
-#print(ykLoop)
+ykLoop = EDRareRoute(ykLoopList)
+print("\n\nYK Loop")
+print(ykLoop)
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -225,6 +224,6 @@ systems11_1.append(allSystems[18])  #CD_75
 systems11_1.append(allSystems[91])  #Tio
 systems11_1.append(allSystems[28])  #Epsi
 systems11_1.append(allSystems[8])   #Alt
-print(EDRareRoute(systems11_1))
+#print(EDRareRoute(systems11_1))
 
 #PerformanceCalc.CheckPerformance(allSystems)
