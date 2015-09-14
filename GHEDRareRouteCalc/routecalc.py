@@ -10,7 +10,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 200
+    Route_Cutoff = 145
     @classmethod
     def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength, silent):
         '''
@@ -64,15 +64,15 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually.
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.3
-        timeBetweenIncrease = 1500
+        mutationIncrease = 0.25
+        timeBetweenIncrease = 1200
         lastIncrease = currentGeneration
 
         #If the current possibleRoute has value of atleast F, force an exit the next time a mutation increase
         #would occur
         exitAtFVal = RouteCalc.Route_Cutoff
         #Also force an exit if X generations pass with no improvement
-        maxGensSinceLast = 3*timeBetweenIncrease
+        maxGensSinceLast = 4*timeBetweenIncrease
 
         #Stil going to force an exit after a max number of generations is reached
         while currentGeneration < maxGenerations:

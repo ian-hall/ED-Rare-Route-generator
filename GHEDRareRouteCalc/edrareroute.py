@@ -5,7 +5,12 @@ import itertools
 import math
 import sys
 import operator
+from enum import Enum
 
+class RouteType(Enum):
+    Other = 0
+    Cluster = 1
+    Spread = 2.5
 class EDRareRoute(object):
     def __init__(self,systemList: []):
         #Routes up to len 11 can be solved by this, haven't been able to verify higher
@@ -143,20 +148,55 @@ class RouteOrder(object):
         We want a route with an even number, or within one, of stations between each designated seller
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
-
-        TODO: Take into account cost of items
         '''
         totalValue = 3
         #if this group has no valid sellers just return now
         if self.__SellLocs.__len__() == 0:
             return totalValue
-        '''
-        orderedSystems = []
-        for index in self.Order:
-            orderedSystems.append(self.__Systems[index])
-        '''
 
-        routeLength = self.__Systems.__len__()        
+        routeLength = self.__Systems.__len__()     
+       
+
+        # Max good distance for a route should avg around 100ly a jump 
+        maxGoodDistance = routeLength * 110
+        totalDistance = 0
+        clusterShortLY = 40
+        clusterLongLY = 160
+        spreadMinLY = 50
+        spreadMaxLY = 110
+        maxJumpRangeLY = 225
+        clusterShortJumps = 0
+        clusterLongJumps = 0
+        spreadJumps = 0
+        longestJump = -1
+
+        for i in range(0,routeLength):
+            currentSystem = self.__Systems[i]
+            nextSystem = self.__Systems[(i+1)%routeLength]
+            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            totalDistance += jumpDistance
+            if longestJump < jumpDistance:
+                longestJump = jumpDistance
+            if jumpDistance <= clusterShortLY:
+                clusterShortJumps += 1
+            if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
+                spreadJumps += 1
+            if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
+                clusterLongJumps += 1  
+
+        currentRouteType = RouteType.Other
+        
+        #Route has 2 groups of systems separated by a long jump
+        #Ideally clusterLongJumps would be variable and equal to the number of sellers,
+        #but I'm just worrying about 2 sellers for now
+        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
+           currentRouteType = RouteType.Cluster
+
+        #Route has fairly evenly spaced jumps
+        #Maybe a higher multiplier to compensate for the longer distances
+        if spreadJumps == self.__Systems.__len__():
+            currentRouteType = RouteType.Spread
+
         pairValue = 0
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
@@ -179,10 +219,19 @@ class RouteOrder(object):
                 indexForSystemsSellingLoc2.append(self.__Systems.index(system))
 
             # At this point we have the location of the sellers in the route
-            # as well as the number of jumps between them. Ideally we want 
-            # the sellers to be evenly spaced out, so routelen/2 distance apart
-            # We should not check for the location of systems that can sell 
-            # to loc1 and loc2
+            # as well as the number of jumps between them.
+            # Spread route, even length:
+            #   Equal number of systems between sellers
+            #   One non-selling system before each sell location, or numBefore1+numBefore2 = len-2
+            # Spread route, odd length:
+            #   Number of systems between sellers should have a difference of 1
+            #   One non-selling systems before each sell location.
+            # Cluster route, even length:
+            #   Equal number of systems between sellers
+            #   0 or 1 non-selling systems before each sell location
+            # Cluster route, odd length:
+            #   Number of systems between sellers should have a difference of 1
+            #   0 or 1 non-selling systems before each sell location
 
             if loc1Index > loc2Index:
                 numBefore1 = 0
@@ -204,13 +253,72 @@ class RouteOrder(object):
                 for i in range(loc2Index,loc1Index + routeLength):
                     if indexForSystemsSellingLoc1.count(i % routeLength) != 0:
                         numBefore1 += 1
-               
-            # if the total number before each = len-2 or len then we have a good one... should treat each the same
-            # as far as value goes len-2 means we have a rather evenly spaced loop, len means we have grouped systems
-            #TODO: Clean this up
-            #      Need to take into account where the odd station occurs for odd length routes, for example we want at most 1 system between a seller when sometimes we will get 2
+            
+            
+            if currentRouteType == RouteType.Spread:
+                #Spread route, even length
+                if routeLength%2 == 0:
+                    if numBefore1 == numBefore2 and (numBefore1 + numBefore2) == (routeLength - 2):
+                        pairValue = 50
+                        self.Best_Sellers = sellerPair
+                    elif numBefore1 == numBefore2:
+                        if pairValue < 25:
+                            pairValue = 25
+                            self.Best_Sellers = sellerPair
+                    else:
+                        if pairValue < (numBefore1 + numBefore2):
+                            pairValue = (numBefore1 + numBefore2)
+                            self.Best_Sellers = sellerPair
+                #Spread route, odd length
+                else:
+                    if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) == (routeLength - 2):
+                        pairValue = 50
+                        self.Best_Sellers = sellerPair
+                    elif math.fabs(numBefore1-numBefore2) == 1:
+                        if pairValue < 25:
+                            pairValue = 25
+                            self.Best_Sellers = sellerPair
+                    else:
+                        if pairValue < (numBefore1 + numBefore2):
+                            pairValue = (numBefore1 + numBefore2)
+                            self.Best_Sellers = sellerPair
+
+            elif currentRouteType == RouteType.Cluster:
+                #Cluster route, even length
+                if routeLength%2 == 0:
+                    if numBefore1 == numBefore2 and (numBefore1 + numBefore2) >= (routeLength - 2):
+                        pairValue = 50
+                        self.Best_Sellers = sellerPair
+                    elif numBefore1 == numBefore2:
+                        if pairValue < 25:
+                            pairValue = 25
+                            self.Best_Sellers = sellerPair
+                    else:
+                        if pairValue < (numBefore1 + numBefore2):
+                            pairValue = (numBefore1 + numBefore2)
+                            self.Best_Sellers = sellerPair
+                #Spread route, odd length
+                else:
+                    if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) >= (routeLength - 2):
+                        pairValue = 50
+                        self.Best_Sellers = sellerPair
+                    elif math.fabs(numBefore1-numBefore2) == 1:
+                        if pairValue < 25:
+                            pairValue = 25
+                            self.Best_Sellers = sellerPair
+                    else:
+                        if pairValue < (numBefore1 + numBefore2):
+                            pairValue = (numBefore1 + numBefore2)
+                            self.Best_Sellers = sellerPair
+            # Generic (bad) route
+            else:
+                if pairValue < (numBefore1 + numBefore2):
+                    pairValue = (numBefore1 + numBefore2)
+                    self.Best_Sellers = sellerPair
+            
+            '''  
             if routeLength % 2 == 0:
-                if (numBefore1 == numBefore2):
+                if (numBefore1 == numBefore2) and math.fabs(numBefore1 - routeLength/2) <=1:
                     pairValue = 50
                     self.Best_Sellers = sellerPair                 
                 else:
@@ -229,56 +337,22 @@ class RouteOrder(object):
                     else:
                         pairValue = (numBefore1 + numBefore2)
                         self.Best_Sellers = sellerPair
-
-        # Max good distance for a route should avg around 100ly a jump 
-        maxGoodDistance = routeLength * 110
-        totalDistance = 0
-        clusterShortLY = 40
-        clusterLongLY = 160
-        spreadMinLY = 50
-        spreadMaxLY = 110
-        maxJumpRangeLY = 225
-        clusterShortJumps = 0
-        clusterLongJumps = 0
-        spreadJumps = 0
-        longestJump = -1
-        for i in range(0,routeLength):
-            currentSystem = self.__Systems[i]
-            nextSystem = self.__Systems[(i+1)%routeLength]
-            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
-            totalDistance += jumpDistance
-            if longestJump < jumpDistance:
-                longestJump = jumpDistance
-            if jumpDistance <= clusterShortLY:
-                clusterShortJumps += 1
-            if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
-                spreadJumps += 1
-            if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
-                clusterLongJumps += 1  
-
-        #set this at a default value less than 1 since most routes will have this
-        routeTypeMult = 0.5
-        
-        #Route has 2 groups of systems separated by a long jump
-        #Ideally clusterLongJumps would be variable and equal to the number of sellers,
-        #but I'm just worrying about 2 sellers for now
-        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
-           routeTypeMult = 2
-
-        #Route has fairly evenly spaced jumps
-        #Maybe a higher multiplier to compensate for the longer distances
-        if spreadJumps == self.__Systems.__len__():
-            routeTypeMult = 2.25
+            '''
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance
         magicSupply = self.__Systems.__len__() * 12
         weightedSupply = self.Supply/magicSupply
-
-        #want to also do seomthing with the cost of the items..       
+  
         avgCost = sum([sum(val.Cost) for val in self.__Systems])/self.__Systems.__len__()
-        #base avg cost around 1500 each
-        weightedCost = avgCost / 1500
+        #"normalize" this by taking log base 1000 of avg
+        weightedCost = math.log(avgCost,1000)
+
+        routeTypeMult = 1
+        if currentRouteType == RouteType.Cluster:
+            routeTypeMult = 2
+        if currentRouteType == RouteType.Spread:
+            routeTypeMult = 2.3
 
         totalValue = pairValue * weightedCost * weightedDistance * weightedSupply * routeTypeMult
 
