@@ -160,7 +160,7 @@ class RouteOrder(object):
         # Max good distance for a route should avg around 100ly a jump 
         maxGoodDistance = routeLength * 110
         totalDistance = 0
-        clusterShortLY = 40
+        clusterShortLY = 55
         clusterLongLY = 160
         spreadMinLY = 50
         spreadMaxLY = 110
@@ -189,12 +189,12 @@ class RouteOrder(object):
         #Route has 2 groups of systems separated by a long jump
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
-        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == self.__Systems.__len__():
+        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == routeLength:
            currentRouteType = RouteType.Cluster
 
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances
-        if spreadJumps == self.__Systems.__len__():
+        if spreadJumps == routeLength:
             currentRouteType = RouteType.Spread
 
         pairValue = 0
@@ -204,12 +204,6 @@ class RouteOrder(object):
 
             loc1Index = self.__Systems.index(loc1)
             loc2Index = self.__Systems.index(loc2)
-            jumpsBetween = 0
-
-            if loc1Index > loc2Index:
-                jumpsBetween = loc1Index - loc2Index
-            else:
-                jumpsBetween = loc2Index - loc1Index
 
             indexForSystemsSellingLoc1 = []
             indexForSystemsSellingLoc2 = []
@@ -253,91 +247,43 @@ class RouteOrder(object):
                 for i in range(loc2Index,loc1Index + routeLength):
                     if indexForSystemsSellingLoc1.count(i % routeLength) != 0:
                         numBefore1 += 1
-            
-            
-            if currentRouteType == RouteType.Spread:
-                #Spread route, even length
-                if routeLength%2 == 0:
-                    if numBefore1 == numBefore2 and (numBefore1 + numBefore2) == (routeLength - 2):
+            #TODO: make this not ugly
+            if currentRouteType == RouteType.Spread and routeLength%2 == 0:
+                if numBefore1 == numBefore2 and (numBefore1 + numBefore2) == (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
-                    elif numBefore1 == numBefore2:
-                        if pairValue < 25:
-                            pairValue = 25
-                            self.Best_Sellers = sellerPair
-                    else:
-                        if pairValue < (numBefore1 + numBefore2):
-                            pairValue = (numBefore1 + numBefore2)
-                            self.Best_Sellers = sellerPair
-                #Spread route, odd length
                 else:
-                    if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) == (routeLength - 2):
+                    if pairValue < (numBefore1 + numBefore2) * 2:
+                        pairValue = (numBefore1 + numBefore2) * 2
+                        self.Best_Sellers = sellerPair
+            if currentRouteType == RouteType.Spread and routeLength%2 == 1:
+                if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) == (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
-                    elif math.fabs(numBefore1-numBefore2) == 1:
-                        if pairValue < 25:
-                            pairValue = 25
-                            self.Best_Sellers = sellerPair
-                    else:
-                        if pairValue < (numBefore1 + numBefore2):
-                            pairValue = (numBefore1 + numBefore2)
-                            self.Best_Sellers = sellerPair
-
-            elif currentRouteType == RouteType.Cluster:
-                #Cluster route, even length
-                if routeLength%2 == 0:
-                    if numBefore1 == numBefore2 and (numBefore1 + numBefore2) >= (routeLength - 2):
-                        pairValue = 50
-                        self.Best_Sellers = sellerPair
-                    elif numBefore1 == numBefore2:
-                        if pairValue < 25:
-                            pairValue = 25
-                            self.Best_Sellers = sellerPair
-                    else:
-                        if pairValue < (numBefore1 + numBefore2):
-                            pairValue = (numBefore1 + numBefore2)
-                            self.Best_Sellers = sellerPair
-                #Spread route, odd length
                 else:
-                    if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) >= (routeLength - 2):
+                    if pairValue < (numBefore1 + numBefore2) * 2:
+                        pairValue = (numBefore1 + numBefore2) * 2
+                        self.Best_Sellers = sellerPair
+            if currentRouteType == RouteType.Cluster and routeLength%2 == 0:
+                if numBefore1 == numBefore2 and (numBefore1 + numBefore2) >= (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
-                    elif math.fabs(numBefore1-numBefore2) == 1:
-                        if pairValue < 25:
-                            pairValue = 25
-                            self.Best_Sellers = sellerPair
-                    else:
-                        if pairValue < (numBefore1 + numBefore2):
-                            pairValue = (numBefore1 + numBefore2)
-                            self.Best_Sellers = sellerPair
-            # Generic (bad) route
-            else:
+                else:
+                    if pairValue < (numBefore1 + numBefore2) * 2:
+                        pairValue = (numBefore1 + numBefore2) * 2
+                        self.Best_Sellers = sellerPair
+            if currentRouteType == RouteType.Cluster and routeLength%2 == 1:
+                if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) > (routeLength - 2):
+                        pairValue = 50
+                        self.Best_Sellers = sellerPair
+                else:
+                    if pairValue < (numBefore1 + numBefore2) * 2:
+                        pairValue = (numBefore1 + numBefore2) * 2
+                        self.Best_Sellers = sellerPair
+            if currentRouteType == RouteType.Other:
                 if pairValue < (numBefore1 + numBefore2):
-                    pairValue = (numBefore1 + numBefore2)
-                    self.Best_Sellers = sellerPair
-            
-            '''  
-            if routeLength % 2 == 0:
-                if (numBefore1 == numBefore2) and math.fabs(numBefore1 - routeLength/2) <=1:
-                    pairValue = 50
-                    self.Best_Sellers = sellerPair                 
-                else:
-                    if (numBefore1 + numBefore2) < pairValue:
-                        pairValue = pairValue
-                    else:
                         pairValue = (numBefore1 + numBefore2)
                         self.Best_Sellers = sellerPair
-            else:
-                if math.fabs(numBefore1 - numBefore2) <= 1:
-                    pairValue = 50
-                    self.Best_Sellers = sellerPair
-                else:
-                    if (numBefore1 + numBefore2) < pairValue:
-                        pairValue = pairValue
-                    else:
-                        pairValue = (numBefore1 + numBefore2)
-                        self.Best_Sellers = sellerPair
-            '''
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance
@@ -348,7 +294,9 @@ class RouteOrder(object):
         #"normalize" this by taking log base 1000 of avg
         weightedCost = math.log(avgCost,1000)
 
-        routeTypeMult = 1
+        routeTypeMult = 0
+        if currentRouteType == RouteType.Other:
+            routeTypeMult = 1        
         if currentRouteType == RouteType.Cluster:
             routeTypeMult = 2
         if currentRouteType == RouteType.Spread:

@@ -17,10 +17,10 @@ class PerformanceCalc(object):
         popSize = 100
         maxPopSize = 100
         maxStationDistance = 5000
-        maxGens = 15000
+        maxGens = 9999999999999
             
-        routeLen = 8
-        maxRouteLen = 8
+        routeLen = 7
+        maxRouteLen = 9
 
         while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize,maxGens)

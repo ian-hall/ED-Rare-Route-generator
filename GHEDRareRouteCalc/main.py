@@ -137,7 +137,7 @@ while not exitTestLoop and testNum < maxTests:
     print("Test: {0}".format(testNum))
     routeSize = 8
     maxStationDistance = 5000
-    popSize = 100
+    popSize = 115
     maxGens = 9999999999
     routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeSize, False)
     bestRoute = routeTuple[0]
@@ -183,9 +183,9 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[94])  #Utg
-ykLoop = EDRareRoute(ykLoopList)
-print("\n\nYK Loop")
-print(ykLoop)
+#ykLoop = EDRareRoute(ykLoopList)
+#print("\n\nYK Loop")
+#print(ykLoop)
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -198,9 +198,9 @@ genRoute8.append(allSystems[14]) #Baltah
 genRoute8.append(allSystems[49]) #Iru
 genRoute8.append(allSystems[58]) #Karsu
 genRoute8.append(allSystems[24]) #Delta P
-badRoute8 = EDRareRoute(genRoute8)
-print("\n\nBad 8 System routes")
-print(badRoute8)
+#badRoute8 = EDRareRoute(genRoute8)
+#print("\n\nBad 8 System route, low item cost")
+#print(badRoute8)
 
 test8 = []
 test8.append(allSystems[8]) #Alt
@@ -211,7 +211,8 @@ test8.append(allSystems[11])#Any
 test8.append(allSystems[76])#Ngur
 test8.append(allSystems[14])#Balt
 test8.append(allSystems[20])#Chi Er
-print(EDRareRoute(test8))
+#print("\nBad 8 system route, poor seller spacing")
+#print(EDRareRoute(test8))
 
 #5 system test
 test5 = []
@@ -220,14 +221,17 @@ test5.append(allSystems[76]) #ngur
 test5.append(allSystems[64]) #Leesti
 test5.append(allSystems[5])  #Agan
 test5.append(allSystems[8])  #Alt
-print(EDRareRoute(test5))
+#print("\nBad 5 system route, poor systems distance")
+#print(EDRareRoute(test5))
+
 
 test4 = []
 test4.append(allSystems[33])  #Fuj
 test4.append(allSystems[0])   #39 T
 test4.append(allSystems[26])  #Diso
 test4.append(allSystems[64])  #Leesti
-print(EDRareRoute(test4))
+#print("\nGood 4 system route")
+#print(EDRareRoute(test4))
 
 #109 85 5 64 62 77 49 18 92 28 8
 systems11_1 = []
@@ -242,6 +246,16 @@ systems11_1.append(allSystems[18])  #CD-75
 systems11_1.append(allSystems[91])  #Tio
 systems11_1.append(allSystems[28])  #Epsi
 systems11_1.append(allSystems[8])   #Alt
+#print("\nBad 11 system route, poor system distances")
 #print(EDRareRoute(systems11_1))
+
+another5 = []
+another5.append(allSystems[64])  #Leesti
+another5.append(allSystems[26])  #Dis
+another5.append(allSystems[79])  #Orr
+another5.append(allSystems[94])  #Utg
+another5.append(allSystems[87])  #Tan
+#print("\nGood 5, multiple bad sell locations")
+#print(EDRareRoute(another5))
 
 #PerformanceCalc.CheckPerformance(allSystems)
