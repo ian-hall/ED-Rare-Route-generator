@@ -137,9 +137,8 @@ while not exitTestLoop and testNum < maxTests:
     print("Test: {0}".format(testNum))
     routeSize = 8
     maxStationDistance = 5000
-    popSize = 115
-    maxGens = 9999999999
-    routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeSize, False)
+    popSize = 100
+    routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeSize, False)
     bestRoute = routeTuple[0]
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
     if bestRoute.Fitness_Value >= goodRouteCutoff:
@@ -183,9 +182,8 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[94])  #Utg
-#ykLoop = EDRareRoute(ykLoopList)
-#print("\n\nYK Loop")
-#print(ykLoop)
+print("\n\nYK Loop")
+print(EDRareRoute(ykLoopList))
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -198,9 +196,8 @@ genRoute8.append(allSystems[14]) #Baltah
 genRoute8.append(allSystems[49]) #Iru
 genRoute8.append(allSystems[58]) #Karsu
 genRoute8.append(allSystems[24]) #Delta P
-#badRoute8 = EDRareRoute(genRoute8)
 #print("\n\nBad 8 System route, low item cost")
-#print(badRoute8)
+#print(EDRareRoute(genRoute8))
 
 test8 = []
 test8.append(allSystems[8]) #Alt

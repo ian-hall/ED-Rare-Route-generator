@@ -12,7 +12,7 @@ class RouteCalc(object):
     '''
     Route_Cutoff = 145
     @classmethod
-    def GeneticSolverStart(self,popSize, maxGenerations, allSystems: [], maxStationDistance, routeLength, silent):
+    def GeneticSolverStart(self,popSize, allSystems: [], maxStationDistance, routeLength, silent):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
@@ -38,10 +38,10 @@ class RouteCalc(object):
                 tempSystemList.append(tempSystem)
             population.append(EDRareRoute(tempSystemList))
 
-        return self.__GeneticSolver(population,maxGenerations,validSystems, silent)
+        return self.__GeneticSolver(population,validSystems, silent)
 
     @classmethod
-    def __GeneticSolver(self,startingPopulation: [], maxGenerations: int, validSystems: [], silent):
+    def __GeneticSolver(self,startingPopulation: [], validSystems: [], silent):
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parent states. These states
@@ -52,10 +52,10 @@ class RouteCalc(object):
         selected. 
         '''
         
-        currentGeneration = 0
+        currentGeneration = 1
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
-        baseMutation = 0.1
+        baseMutation = 0.05
         mutationChance = baseMutation
         
         #Just keep track of the single best route
@@ -64,26 +64,27 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually.
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.25
-        timeBetweenIncrease = 1200
+        mutationIncrease = 0.20
+        timeBetweenIncrease = 1000
         lastIncrease = currentGeneration
 
-        #If the current possibleRoute has value of atleast F, force an exit the next time a mutation increase
-        #would occur
-        exitAtFVal = RouteCalc.Route_Cutoff
-        #Also force an exit if X generations pass with no improvement
-        maxGensSinceLast = 4*timeBetweenIncrease
+        #Force an exit if X generations pass with no improvement
+        maxGensSinceLast = 5*timeBetweenIncrease
 
         #Stil going to force an exit after a max number of generations is reached
-        while currentGeneration < maxGenerations:
-            if (currentGeneration%500) == 0 and not silent:
-                print("Generation: {0}".format(currentGeneration))
+        while True:    
+            possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
+
+            if not silent:
+                if (currentGeneration%500) == 0:
+                    print("Generation: {0}".format(currentGeneration))
+                if currentGeneration == 1:
+                    print("Starting value: {0}".format(possibleRoute.Fitness_Value))
+
             currentGeneration += 1
             nextPopulation = []
 
-            possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
-
-            if possibleRoute.Fitness_Value > bestRoute.Fitness_Value:
+            if possibleRoute.Fitness_Value > bestRoute.Fitness_Value or currentGeneration == 1:
                 if not silent:
                     print("\t{0} -> {1}".format(currentGeneration,possibleRoute.Fitness_Value))
                 bestRoute = possibleRoute
@@ -91,8 +92,8 @@ class RouteCalc(object):
                 #Reset mutation chance upon finding a new best route
                 mutationChance = baseMutation
 
-            #Exit if we are at least at the exitAtFVal and going to increase the mutation chance this gen
-            if bestRoute.Fitness_Value >= exitAtFVal and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
+            #Exit if we are at least at the Route_Cutoff value and going to increase the mutation chance this gen
+            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
                 break
             
             #Exit if it has been X generations since last found route

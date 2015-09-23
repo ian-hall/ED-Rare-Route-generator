@@ -103,19 +103,24 @@ class EDRareRoute(object):
         if self.Best_Sell_Points:
             strList.append("\n\tRoute Value:{0}\n".format(self.Fitness_Value))
             for system in self.__Route:
-                strList.append("({0}){1}".format(system.Index,system.System_Name))
+                #strList.append("({0})[{1}]".format(system.Index,system.System_Name))
                 if system in self.Best_Sell_Points:
-                    strList.append("(*)-> ".format(system.Index,system.System_Name))
+                    strList.append("*<{0}>".format(system.System_Name))
                 else:
-                    strList.append("-> ")
+                    strList.append("[{0}]".format(system.System_Name))
+                strList.append(" >> ")
                 count += 1
                 if count%stationsPerLine == 0:
                     strList.append("\n")
             
             for station in self.Best_Sell_Points:
-                strList.append("\nAt {0} sell:\n\t".format(station.System_Name))
+                strList.append("\nAt <{0}> sell:\n\t".format(station.System_Name))
                 for seller in self.Sellers_Per_Station[station]:
-                    strList.append("{0} ".format(seller.Index))
+                    #strList.append("[{0}] ".format(seller.System_Name))
+                    if seller in self.Best_Sell_Points:
+                        strList.append(" <{0}> ".format(seller.System_Name))
+                    else:
+                        strList.append(" [{0}] ".format(seller.System_Name))
         
         else:
             strList.append("\n(Bad)Route with value:{0}\n".format(self.Fitness_Value))
@@ -160,9 +165,9 @@ class RouteOrder(object):
         # Max good distance for a route should avg around 100ly a jump 
         maxGoodDistance = routeLength * 110
         totalDistance = 0
-        clusterShortLY = 55
+        clusterShortLY = 50
         clusterLongLY = 160
-        spreadMinLY = 50
+        spreadMinLY = 45
         spreadMaxLY = 110
         maxJumpRangeLY = 225
         clusterShortJumps = 0
@@ -179,10 +184,10 @@ class RouteOrder(object):
                 longestJump = jumpDistance
             if jumpDistance <= clusterShortLY:
                 clusterShortJumps += 1
-            if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
-                spreadJumps += 1
             if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
-                clusterLongJumps += 1  
+                clusterLongJumps += 1 
+            if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
+                spreadJumps += 1 
 
         currentRouteType = RouteType.Other
         
@@ -197,7 +202,7 @@ class RouteOrder(object):
         if spreadJumps == routeLength:
             currentRouteType = RouteType.Spread
 
-        pairValue = 0
+        pairValue = -999
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
@@ -247,35 +252,53 @@ class RouteOrder(object):
                 for i in range(loc2Index,loc1Index + routeLength):
                     if indexForSystemsSellingLoc1.count(i % routeLength) != 0:
                         numBefore1 += 1
+            
             #TODO: make this not ugly
+            #      and also make this have the logic that I want which it apparently doesn't have right now
             if currentRouteType == RouteType.Spread and routeLength%2 == 0:
-                if numBefore1 == numBefore2 and (numBefore1 + numBefore2) == (routeLength - 2):
+                if numBefore1 == numBefore2:
+                    if (numBefore1 + numBefore2) == (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
+                    else:
+                        pairValue = 30 if pairValue < 30 else pairValue
+                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
                 else:
                     if pairValue < (numBefore1 + numBefore2) * 2:
                         pairValue = (numBefore1 + numBefore2) * 2
                         self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Spread and routeLength%2 == 1:
-                if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) == (routeLength - 2):
+                if math.fabs(numBefore1-numBefore2) == 1:
+                    if (numBefore1 + numBefore2) == (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
+                    else:
+                        pairValue = 30 if pairValue < 30 else pairValue
+                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
                 else:
                     if pairValue < (numBefore1 + numBefore2) * 2:
                         pairValue = (numBefore1 + numBefore2) * 2
                         self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Cluster and routeLength%2 == 0:
-                if numBefore1 == numBefore2 and (numBefore1 + numBefore2) >= (routeLength - 2):
+                if numBefore1 == numBefore2:
+                    if (numBefore1 + numBefore2) >= (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
+                    else:
+                        pairValue = 30 if pairValue < 30 else pairValue
+                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
                 else:
                     if pairValue < (numBefore1 + numBefore2) * 2:
                         pairValue = (numBefore1 + numBefore2) * 2
                         self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Cluster and routeLength%2 == 1:
-                if math.fabs(numBefore1-numBefore2) == 1 and (numBefore1 + numBefore2) > (routeLength - 2):
+                if math.fabs(numBefore1-numBefore2) == 1:
+                    if (numBefore1 + numBefore2) > (routeLength - 2):
                         pairValue = 50
                         self.Best_Sellers = sellerPair
+                    else:
+                        pairValue = 30 if pairValue < 30 else pairValue
+                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
                 else:
                     if pairValue < (numBefore1 + numBefore2) * 2:
                         pairValue = (numBefore1 + numBefore2) * 2

@@ -14,8 +14,8 @@ class PerformanceCalc(object):
         maxTests = 25
         goodRouteCutoff = RouteCalc.Route_Cutoff
 
-        popSize = 100
-        maxPopSize = 100
+        popSize = 120
+        maxPopSize = 120
         maxStationDistance = 5000
         maxGens = 9999999999999
             
