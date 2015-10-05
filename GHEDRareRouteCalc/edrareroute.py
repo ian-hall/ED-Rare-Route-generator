@@ -5,17 +5,18 @@ import itertools
 import math
 import sys
 import operator
-from enum import Enum
+from enum import Enum,unique
 
+@unique
 class RouteType(Enum):
-    Other = 0
-    Cluster = 1
-    Spread = 2.5
+    Other = 1
+    Cluster = 2
+    Spread = 2.3
 class EDRareRoute(object):
     def __init__(self,systemList: []):
-        #Routes up to len 11 can be solved by this, haven't been able to verify higher
-        if systemList.__len__() > 11 or systemList.__len__() < 4:
-            raise Exception("Error: Route must be 4 - 11 in length")
+        #Range of route lengths that are allowed, need at least 3 systems for the genetic alg to work
+        if systemList.__len__() > 11 or systemList.__len__() < 3:
+            raise Exception("Error: Route needs to have length [3-11]")
         self.__Route = [val for val in systemList]
             
         self.Sellers_Per_Station = {}
@@ -37,7 +38,6 @@ class EDRareRoute(object):
             maybe replace this whole thing with RouteOrder since
                 i'm not doing another genetic thing here
             Print a list of all possible seller pairs if more than 1 exists.
-                RouteOrder class will always return the last pair found as the best...and while it will work it might not be best
         '''   
 
         currentRoute = RouteOrder(self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
@@ -98,20 +98,17 @@ class EDRareRoute(object):
     def __str__(self):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
-        stationsPerLine = 4
         count = 0
         if self.Best_Sell_Points:
             strList.append("\n\tRoute Value:{0}\n".format(self.Fitness_Value))
             for system in self.__Route:
                 #strList.append("({0})[{1}]".format(system.Index,system.System_Name))
                 if system in self.Best_Sell_Points:
-                    strList.append("*<{0}>".format(system.System_Name))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
                 else:
-                    strList.append("[{0}]".format(system.System_Name))
-                strList.append(" >> ")
+                    strList.append("{0}: [{1} ({2})]".format(count+1,system.System_Name, system.Station_Name))
+                strList.append("\n")
                 count += 1
-                if count%stationsPerLine == 0:
-                    strList.append("\n")
             
             for station in self.Best_Sell_Points:
                 strList.append("\nAt <{0}> sell:\n\t".format(station.System_Name))
@@ -132,14 +129,12 @@ class EDRareRoute(object):
         return ''.join(strList)
 
 class RouteOrder(object):
-    '''
-    We are given a list of ints and a list of systems. 
-    The list of ints represents an order for the systems, with the 
-    ints themselves being the index of the system in the list of systems.
-    '''
     def __init__(self, systems: [], sellLocs: [], sellersPerStation: {}, itemSupply):
         '''
-        sellLocs members will always be length 2
+        systems: list of systems in route order
+        sellLocs: list of possible selling locations
+        sellersPerSTation: dictionary containing each system and systems that can sell to it
+        itemSupply: total supply of items buyable on the rotue
         '''
         self.__Systems = systems
         self.__SellLocs = sellLocs
@@ -154,7 +149,7 @@ class RouteOrder(object):
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
         '''
-        totalValue = 3
+        totalValue = 1
         #if this group has no valid sellers just return now
         if self.__SellLocs.__len__() == 0:
             return totalValue
@@ -203,6 +198,8 @@ class RouteOrder(object):
             currentRouteType = RouteType.Spread
 
         pairValue = -999
+        goodPair = 6
+        potentialPair = 1
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
@@ -216,21 +213,6 @@ class RouteOrder(object):
                 indexForSystemsSellingLoc1.append(self.__Systems.index(system))
             for system in self.Route_Sellers[loc2]:
                 indexForSystemsSellingLoc2.append(self.__Systems.index(system))
-
-            # At this point we have the location of the sellers in the route
-            # as well as the number of jumps between them.
-            # Spread route, even length:
-            #   Equal number of systems between sellers
-            #   One non-selling system before each sell location, or numBefore1+numBefore2 = len-2
-            # Spread route, odd length:
-            #   Number of systems between sellers should have a difference of 1
-            #   One non-selling systems before each sell location.
-            # Cluster route, even length:
-            #   Equal number of systems between sellers
-            #   0 or 1 non-selling systems before each sell location
-            # Cluster route, odd length:
-            #   Number of systems between sellers should have a difference of 1
-            #   0 or 1 non-selling systems before each sell location
 
             if loc1Index > loc2Index:
                 numBefore1 = 0
@@ -255,57 +237,72 @@ class RouteOrder(object):
             
             #TODO: make this not ugly
             #      and also make this have the logic that I want which it apparently doesn't have right now
+            # At this point we have the location of the sellers in the route
+            # as well as the number of jumps between them.
+            # Spread route, even length:
+            #   Equal number of systems between sellers
+            #   One non-selling system before each sell location, or numBefore1+numBefore2 = len-2
+            # Spread route, odd length:
+            #   Number of systems between sellers should have a difference of 1
+            #   One non-selling systems before each sell location.
+            # Cluster route, even length:
+            #   Equal number of systems between sellers
+            #   0 or 1 non-selling systems before each sell location
+            # Cluster route, odd length:
+            #   Number of systems between sellers should have a difference of 1
+            #   0 or 1 non-selling systems before each sell location
+
             if currentRouteType == RouteType.Spread and routeLength%2 == 0:
                 if numBefore1 == numBefore2:
                     if (numBefore1 + numBefore2) == (routeLength - 2):
-                        pairValue = 50
+                        pairValue = goodPair
                         self.Best_Sellers = sellerPair
                     else:
-                        pairValue = 30 if pairValue < 30 else pairValue
-                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
-                else:
-                    if pairValue < (numBefore1 + numBefore2) * 2:
-                        pairValue = (numBefore1 + numBefore2) * 2
-                        self.Best_Sellers = sellerPair
+                        if pairValue < potentialPair:
+                            pairValue = potentialPair
+                            self.Best_Sellers = sellerPair
+                if pairValue < (numBefore1 + numBefore2) / 10:
+                    pairValue = (numBefore1 + numBefore2) / 10
+                    self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Spread and routeLength%2 == 1:
                 if math.fabs(numBefore1-numBefore2) == 1:
                     if (numBefore1 + numBefore2) == (routeLength - 2):
-                        pairValue = 50
+                        pairValue = goodPair
                         self.Best_Sellers = sellerPair
                     else:
-                        pairValue = 30 if pairValue < 30 else pairValue
-                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
-                else:
-                    if pairValue < (numBefore1 + numBefore2) * 2:
-                        pairValue = (numBefore1 + numBefore2) * 2
-                        self.Best_Sellers = sellerPair
+                        if pairValue < potentialPair:
+                            pairValue = potentialPair
+                            self.Best_Sellers = sellerPair
+                if pairValue < (numBefore1 + numBefore2) / 10:
+                    pairValue = (numBefore1 + numBefore2) / 10
+                    self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Cluster and routeLength%2 == 0:
                 if numBefore1 == numBefore2:
                     if (numBefore1 + numBefore2) >= (routeLength - 2):
-                        pairValue = 50
+                        pairValue = goodPair
                         self.Best_Sellers = sellerPair
                     else:
-                        pairValue = 30 if pairValue < 30 else pairValue
-                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
-                else:
-                    if pairValue < (numBefore1 + numBefore2) * 2:
-                        pairValue = (numBefore1 + numBefore2) * 2
-                        self.Best_Sellers = sellerPair
+                        if pairValue < potentialPair:
+                            pairValue = potentialPair
+                            self.Best_Sellers = sellerPair
+                if pairValue < (numBefore1 + numBefore2) / 10:
+                    pairValue = (numBefore1 + numBefore2) / 10
+                    self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Cluster and routeLength%2 == 1:
                 if math.fabs(numBefore1-numBefore2) == 1:
                     if (numBefore1 + numBefore2) > (routeLength - 2):
-                        pairValue = 50
+                        pairValue = goodPair
                         self.Best_Sellers = sellerPair
                     else:
-                        pairValue = 30 if pairValue < 30 else pairValue
-                        self.Best_Sellers = sellerPair if pairValue < 30 else self.Best_Sellers
-                else:
-                    if pairValue < (numBefore1 + numBefore2) * 2:
-                        pairValue = (numBefore1 + numBefore2) * 2
-                        self.Best_Sellers = sellerPair
+                        if pairValue < potentialPair:
+                            pairValue = potentialPair
+                            self.Best_Sellers = sellerPair
+                if pairValue < (numBefore1 + numBefore2) / 10:
+                    pairValue = (numBefore1 + numBefore2) / 10
+                    self.Best_Sellers = sellerPair
             if currentRouteType == RouteType.Other:
-                if pairValue < (numBefore1 + numBefore2):
-                        pairValue = (numBefore1 + numBefore2)
+                if pairValue < (numBefore1 + numBefore2) / 15:
+                        pairValue = (numBefore1 + numBefore2) / 15
                         self.Best_Sellers = sellerPair
 
         #Less total distance needs to give a higher value
@@ -317,14 +314,8 @@ class RouteOrder(object):
         #"normalize" this by taking log base 1000 of avg
         weightedCost = math.log(avgCost,1000)
 
-        routeTypeMult = 0
-        if currentRouteType == RouteType.Other:
-            routeTypeMult = 1        
-        if currentRouteType == RouteType.Cluster:
-            routeTypeMult = 2
-        if currentRouteType == RouteType.Spread:
-            routeTypeMult = 2.3
 
-        totalValue = pairValue * weightedCost * weightedDistance * weightedSupply * routeTypeMult
+
+        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) * currentRouteType.value
 
         return totalValue

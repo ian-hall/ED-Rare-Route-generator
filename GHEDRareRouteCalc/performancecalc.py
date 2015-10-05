@@ -11,26 +11,25 @@ import time
 class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,allSystems):
-        maxTests = 25
+        maxTests = 10
         goodRouteCutoff = RouteCalc.Route_Cutoff
 
-        popSize = 120
-        maxPopSize = 120
-        maxStationDistance = 5000
-        maxGens = 9999999999999
+        popSize = 300
+        maxPopSize = 300
+        maxStationDistance = 999999
             
         routeLen = 7
-        maxRouteLen = 9
+        maxRouteLen = 8
 
         while routeLen <= maxRouteLen:
-            stats = PerformanceMetrics(routeLen,popSize,maxGens)
+            stats = PerformanceMetrics(routeLen,popSize)
             testNum = 0
             while testNum < maxTests:
                 testNum += 1
                 #print("Test: {0}".format(testNum))
                 solved = False
                 startTime = time.time()
-                routeTuple = RouteCalc.GeneticSolverStart(popSize,maxGens,allSystems,maxStationDistance,routeLen, True)
+                routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeLen, True)
                 endTime = time.time()
                 elapsed = endTime - startTime
                 bestRoute = routeTuple[0]
@@ -46,10 +45,9 @@ class PerformanceCalc(object):
             routeLen += 1
 
 class PerformanceMetrics(object):
-    def __init__(self,length,popSize,maxGens):
+    def __init__(self,length,popSize):
         self.Route_Length = length
         self.Pop_Size = popSize
-        self.Max_Gens = maxGens
         self.Times = []
         self.Solved = []
         self.Gens = []
@@ -82,7 +80,6 @@ class PerformanceMetrics(object):
 
         strList.append("Route Length {0}:".format(self.Route_Length))
         strList.append("\nPop size {0}".format(self.Pop_Size))
-        strList.append("\nMax generations: {0}".format(self.Max_Gens)) 
         strList.append("\n\tSolved Percentage: {0}".format(percentSolved))
         strList.append("\n\tAvg time to solve: {0}".format(avgTimeSolved))
         strList.append("\n\tAvg generations to solve: {0}".format(avgGensSolved))

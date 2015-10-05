@@ -121,36 +121,6 @@ for i in range(1,cleanedCSV.__len__()-1):
     else:
         allSystems.append(currentSystem)
 
-'''
-TODO: Allow users to enter the values for size/station distance.
-'''
-
-#Genetic
-exitTestLoop = False
-testNum = 0
-maxTests = 20
-
-goodRouteCutoff = RouteCalc.Route_Cutoff
-
-while not exitTestLoop and testNum < maxTests:
-    testNum += 1
-    print("Test: {0}".format(testNum))
-    routeSize = 8
-    maxStationDistance = 5000
-    popSize = 100
-    routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeSize, False)
-    bestRoute = routeTuple[0]
-    print("Best route found had value {0}".format(bestRoute.Fitness_Value))
-    if bestRoute.Fitness_Value >= goodRouteCutoff:
-        print(bestRoute)
-        print("\tFound after {0} generations.".format(routeTuple[1]))
-        exitTestLoop = True
-
-'''
-#Brute
-#stupid slow
-routeSize = 8
-maxStationDistance = 999999999
 bruteSystems = []
 bruteSystems.append(allSystems[62])  #Lave
 bruteSystems.append(allSystems[64])  #Leesti
@@ -165,11 +135,42 @@ bruteSystems.append(allSystems[70])  #Momus
 bruteSystems.append(allSystems[102]) #Witch
 bruteSystems.append(allSystems[8])   #Alt
 bruteSystems.append(allSystems[91])  #Tio
-routes = RouteCalc.Brute(bruteSystems,maxStationDistance,routeSize)
+
+'''
+TODO: Allow users to enter the values for size/station distance.
+'''
+
+#Genetic
+#TODO: Reintroduce a cutoff after X generations, probably around 6k
+exitTestLoop = False
+testNum = 0
+maxTests = 20
+while not exitTestLoop and testNum < maxTests:
+    testNum += 1
+    print("Test: {0}".format(testNum))
+    routeSize = 6
+    maxStationDistance = 999999999
+    popSize = 400
+    routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeSize, False)
+    bestRoute = routeTuple[0]
+    print("Best route found had value {0}".format(bestRoute.Fitness_Value))
+    if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
+        print(bestRoute)
+        print("\tFound after {0} generations.".format(routeTuple[1]))
+        exitTestLoop = True
+
+
+'''
+#Brute
+#stupid slow
+routeSize = 4
+maxStationDistance = 999999999
+routes = RouteCalc.Brute(allSystems,maxStationDistance,routeSize)
 print("\t****possible routes****")
 for route in routes:
     print(route)
 '''
+#PerformanceCalc.CheckPerformance(allSystems)
 
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates
@@ -182,8 +183,8 @@ ykLoopList.append(allSystems[32])  #Eth
 ykLoopList.append(allSystems[13])  #Az
 ykLoopList.append(allSystems[35])  #George
 ykLoopList.append(allSystems[94])  #Utg
-print("\n\nYK Loop")
-print(EDRareRoute(ykLoopList))
+#print("\n\nYK Loop")
+#print(EDRareRoute(ykLoopList))
 
 #8 system round found by program
 #indices based on live spreadsheet, no duplicates
@@ -230,7 +231,6 @@ test4.append(allSystems[64])  #Leesti
 #print("\nGood 4 system route")
 #print(EDRareRoute(test4))
 
-#109 85 5 64 62 77 49 18 92 28 8
 systems11_1 = []
 systems11_1.append(allSystems[108]) #Zee
 systems11_1.append(allSystems[84])  #Rus
@@ -255,4 +255,4 @@ another5.append(allSystems[87])  #Tan
 #print("\nGood 5, multiple bad sell locations")
 #print(EDRareRoute(another5))
 
-#PerformanceCalc.CheckPerformance(allSystems)
+#Orr Usz Witch 39 Hec Lee

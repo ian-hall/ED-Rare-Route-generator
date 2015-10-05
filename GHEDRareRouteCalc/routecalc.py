@@ -10,7 +10,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 145
+    Route_Cutoff = 13
     @classmethod
     def GeneticSolverStart(self,popSize, allSystems: [], maxStationDistance, routeLength, silent):
         '''
@@ -21,8 +21,8 @@ class RouteCalc(object):
 
         #check for max station distance and also exclude systems that require a permit to enter as well as systems with supply of X or less
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
-                                                            and "permit" not in system.System_Name
-                                                            and system.Max_Supply > 1]
+                                                            and "permit" not in system.System_Name]
+                                                            #and system.Max_Supply > 1]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
@@ -64,8 +64,8 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually.
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.20
-        timeBetweenIncrease = 1000
+        mutationIncrease = 0.23
+        timeBetweenIncrease = 750
         lastIncrease = currentGeneration
 
         #Force an exit if X generations pass with no improvement
@@ -84,12 +84,12 @@ class RouteCalc(object):
             currentGeneration += 1
             nextPopulation = []
 
-            if possibleRoute.Fitness_Value > bestRoute.Fitness_Value or currentGeneration == 1:
+            if possibleRoute.Fitness_Value > bestRoute.Fitness_Value:
                 if not silent:
                     print("\t{0} -> {1}".format(currentGeneration,possibleRoute.Fitness_Value))
                 bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
-                #Reset mutation chance upon finding a new best route
+                #Reset mutation chance when finding a new best route
                 mutationChance = baseMutation
 
             #Exit if we are at least at the Route_Cutoff value and going to increase the mutation chance this gen
@@ -144,7 +144,7 @@ class RouteCalc(object):
         #Get the parents
         parents = []
         while parents.__len__() != 2:
-            value = random.uniform(0,1)
+            value = random.random()
             i = 0
             while True:
                 currentSelection = None
@@ -180,15 +180,17 @@ class RouteCalc(object):
                     newRoute.append(toAdd)
         #print(parents)
         #input("wait")
+        #print(newRoute)
+        #input("wait")
         return newRoute
         
     @classmethod
     def __Mutate(self,route: [], validSystems: []):
         tempRoute = [val for val in route]
         
-        #Going to do a 80/20 split for replacing systems or shuffling the route
+        #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()
-        if mutateType < 0.20:
+        if mutateType < 0.05:
             #shuffle route
             random.shuffle(tempRoute)
         else:
@@ -196,11 +198,13 @@ class RouteCalc(object):
             numSystemsToChange = random.randrange(1,math.ceil(tempRoute.__len__()/2))
             for i in range(0, numSystemsToChange):
                 systemToChange = random.randrange(0,tempRoute.__len__())
-                newSystem = validSystems[random.randrange(0,validSystems.__len__())]                 
+                #newSystem = validSystems[random.randrange(0,validSystems.__len__())]     
+                newSystem = random.choice(validSystems)            
                 #Need to avoid duplicates
                 while tempRoute.count(newSystem) != 0:
-                    newSystem = validSystems[random.randrange(0,validSystems.__len__())]
+                    newSystem = random.choice(validSystems) 
                 tempRoute[systemToChange] = newSystem    
+            random.shuffle(tempRoute)
 
         return tempRoute
 
@@ -209,8 +213,8 @@ class RouteCalc(object):
         goodRoutes = []
         goodRouteCutoff = RouteCalc.Route_Cutoff
         validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
-                                                            and "permit" not in system.System_Name
-                                                            and system.Max_Supply > 1]
+                                                            and "permit" not in system.System_Name]
+                                                            #and system.Max_Supply > 1]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
