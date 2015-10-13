@@ -141,16 +141,15 @@ TODO: Allow users to enter the values for size/station distance.
 '''
 
 #Genetic
-#TODO: Reintroduce a cutoff after X generations, probably around 6k
 exitTestLoop = False
 testNum = 0
 maxTests = 20
 while not exitTestLoop and testNum < maxTests:
     testNum += 1
     print("Test: {0}".format(testNum))
-    routeSize = 6
-    maxStationDistance = 999999999
-    popSize = 400
+    routeSize = 7
+    maxStationDistance = 5000
+    popSize = 1000
     routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeSize, False)
     bestRoute = routeTuple[0]
     print("Best route found had value {0}".format(bestRoute.Fitness_Value))
@@ -171,6 +170,7 @@ for route in routes:
     print(route)
 '''
 #PerformanceCalc.CheckPerformance(allSystems)
+#PerformanceCalc.SelectionTester(500)
 
 #Yaso Kondi loop
 #Indices based on live spreadsheet, no duplicates
@@ -255,4 +255,4 @@ another5.append(allSystems[87])  #Tan
 #print("\nGood 5, multiple bad sell locations")
 #print(EDRareRoute(another5))
 
-#Orr Usz Witch 39 Hec Lee
+#Orr Usz Witch 39 Hec Lee 

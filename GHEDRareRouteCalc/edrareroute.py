@@ -149,7 +149,7 @@ class RouteOrder(object):
         so we give routes like that a high value. Then we need to calculate the total distance to go
         through that route round trip and combine the two into a good number
         '''
-        totalValue = 1
+        totalValue = 0.01
         #if this group has no valid sellers just return now
         if self.__SellLocs.__len__() == 0:
             return totalValue
@@ -199,7 +199,7 @@ class RouteOrder(object):
 
         pairValue = -999
         goodPair = 6
-        potentialPair = 1
+        potentialPair = 2
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
@@ -235,7 +235,7 @@ class RouteOrder(object):
                     if indexForSystemsSellingLoc1.count(i % routeLength) != 0:
                         numBefore1 += 1
             
-            #TODO: make this not ugly
+            #TODO: make this work
             #      and also make this have the logic that I want which it apparently doesn't have right now
             # At this point we have the location of the sellers in the route
             # as well as the number of jumps between them.
@@ -251,7 +251,7 @@ class RouteOrder(object):
             # Cluster route, odd length:
             #   Number of systems between sellers should have a difference of 1
             #   0 or 1 non-selling systems before each sell location
-
+            
             if currentRouteType == RouteType.Spread and routeLength%2 == 0:
                 if numBefore1 == numBefore2:
                     if (numBefore1 + numBefore2) == (routeLength - 2):
@@ -304,6 +304,30 @@ class RouteOrder(object):
                 if pairValue < (numBefore1 + numBefore2) / 15:
                         pairValue = (numBefore1 + numBefore2) / 15
                         self.Best_Sellers = sellerPair
+            
+            '''
+            if routeLength % 2 == 0:
+                if (numBefore1 == numBefore2) and math.fabs(numBefore1 - routeLength/2) <=1:
+                    pairValue = goodPair
+                    self.Best_Sellers = sellerPair                 
+                else:
+                    if (numBefore1 + numBefore2) < pairValue:
+                        pairValue = pairValue
+                    else:
+                        pairValue = (numBefore1 + numBefore2)
+                        self.Best_Sellers = sellerPair
+            else:
+                if math.fabs(numBefore1 - numBefore2) <= 1:
+                    pairValue = goodPair
+                    self.Best_Sellers = sellerPair
+                else:
+                    if (numBefore1 + numBefore2) < pairValue:
+                        pairValue = pairValue
+                    else:
+                        pairValue = (numBefore1 + numBefore2)
+                        self.Best_Sellers = sellerPair
+            '''
+
 
         #Less total distance needs to give a higher value
         weightedDistance = maxGoodDistance/totalDistance

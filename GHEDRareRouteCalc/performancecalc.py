@@ -7,6 +7,7 @@ import itertools
 import sys
 import math
 import time
+import bisect
 
 class PerformanceCalc(object):
     @classmethod
@@ -14,12 +15,12 @@ class PerformanceCalc(object):
         maxTests = 10
         goodRouteCutoff = RouteCalc.Route_Cutoff
 
-        popSize = 300
-        maxPopSize = 300
-        maxStationDistance = 999999
+        popSize = 100
+        maxPopSize = 100
+        maxStationDistance = 5000
             
-        routeLen = 7
-        maxRouteLen = 8
+        routeLen = 3
+        maxRouteLen = 5
 
         while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize)
@@ -43,6 +44,47 @@ class PerformanceCalc(object):
             print(stats)
             #popSize += 10
             routeLen += 1
+
+    @classmethod
+    def SelectionTester(self, size: int):
+        #Just copying from routecalc because i'm bad
+        for run in range(0,50000):
+            population = []
+            for i in range(0,size):
+                population.append(random.uniform(1,20))
+            upperVal = math.ceil(size * 1.2)
+            total = sum([val for val in population])
+
+            selectionValues = [population[0]/total * upperVal]
+            for i in range(1,population.__len__()):
+                percentTotal = population[i]/total * upperVal
+                selectionValues.append(percentTotal + selectionValues[i-1])
+
+            if abs(upperVal - selectionValues[-1]) >= 0.0001:
+                print("fail")
+
+            parentsBisect = []
+            parentsLoop = []
+            while parentsBisect.__len__() != 2:
+                value = random.uniform(0,upperVal)
+                parentsBisect.append(bisect.bisect(selectionValues,value))
+            
+                i = 0
+                while True:
+                    currentSelection = None
+                    if value <= selectionValues[i]:
+                        parentsLoop.append(i)
+                        break
+                    i += 1
+
+
+            if not (parentsBisect[0] == parentsLoop[0] and parentsBisect[1] == parentsLoop[1]):
+                print("fail")
+                print("b0: " + parentsBisect[0])
+                print("l0: " + parentsLoop[0])
+                print("b1: " + parentsBisect[1])
+                print("b2: " + parentsLoop[1])
+                
 
 class PerformanceMetrics(object):
     def __init__(self,length,popSize):
