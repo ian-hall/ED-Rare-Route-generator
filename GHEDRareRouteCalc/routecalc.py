@@ -11,19 +11,15 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 9
+    Route_Cutoff = 14
     @classmethod
-    def GeneticSolverStart(self,popSize, allSystems: [], maxStationDistance, routeLength, silent):
+    def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
         population = []
 
-        #check for max station distance and also exclude systems that require a permit to enter as well as systems with supply of X or less
-        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
-                                                            and "permit" not in system.System_Name]
-                                                            #and system.Max_Supply > 1]
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
@@ -108,6 +104,8 @@ class RouteCalc(object):
                     print("\tCurrent mutation chance: {0}".format(mutationChance))
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
+            
+            
             for i in range(0,currentPopulation.__len__()):
                 child = self.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
@@ -218,12 +216,11 @@ class RouteCalc(object):
         return tempRoute
 
     @classmethod
-    def Brute(self, allSystems: [], maxStationDistance, routeLength):
+    def Brute(self, validSystems: [], routeLength):
+        
         goodRoutes = []
         goodRouteCutoff = RouteCalc.Route_Cutoff
-        validSystems = [system for system in allSystems if system.Station_Distance <= maxStationDistance
-                                                            and "permit" not in system.System_Name]
-                                                            #and system.Max_Supply > 1]
+        
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
@@ -231,5 +228,11 @@ class RouteCalc(object):
             current = EDRareRoute(route)
             if current.Fitness_Value >= self.Route_Cutoff:
                 goodRoutes.append(current)
-
+        
         return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))
+    
+    @classmethod
+    def MP_Helper(self,route):
+        newRoute = EDRareRoute(route)
+        if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
+            print(newRoute)

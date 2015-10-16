@@ -72,12 +72,29 @@ def __ValidateLine(currentLine, lineNum):
                     distToStation, stationName, systemName, index,
                     distToOthers)
 
-cleanedCSV = []
-allSystems = []
+if __name__ == '__main__':
+    cleanedCSV = []
+    allSystems = []
 
 
-with open('ED2.csv') as csvFile:
-    reader = csv.reader(csvFile)
+    with open('ED2.csv') as csvFile:
+        reader = csv.reader(csvFile)
+        breakout = False
+        for line in reader:
+            for section in line:
+                if section == '':
+                    breakout = True
+                    break
+            if not breakout:
+                cleanedCSV.append(line)
+            breakout = False
+    '''
+    target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
+    csvFile = request.urlopen(target_url)
+    fileToText = csvFile.read()
+    usableCSV = str(fileToText).split('\\n')
+
+    reader = csv.reader(usableCSV)
     breakout = False
     for line in reader:
         for section in line:
@@ -87,172 +104,171 @@ with open('ED2.csv') as csvFile:
         if not breakout:
             cleanedCSV.append(line)
         breakout = False
-'''
-target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
-csvFile = request.urlopen(target_url)
-fileToText = csvFile.read()
-usableCSV = str(fileToText).split('\\n')
-
-reader = csv.reader(usableCSV)
-breakout = False
-for line in reader:
-    for section in line:
-        if section == '':
-            breakout = True
-            break
-    if not breakout:
-        cleanedCSV.append(line)
-    breakout = False
-'''
-headers = cleanedCSV[0]
-for i in range(1,cleanedCSV.__len__()-1):
-    currentSystem = __ValidateLine(cleanedCSV[i],i)
     '''
-    If a system/station is already in the allSystems list we will simply add
-    the rare items from the found station to the station in the list. The found
-    station is then NOT added to the list.
-    '''   
-    if allSystems.count(currentSystem) != 0:
-        dupes = []
-        for system in allSystems:
-            if system == currentSystem:
-                system.AddRares(currentSystem)
-                dupes.append(system)
+    headers = cleanedCSV[0]
+    for i in range(1,cleanedCSV.__len__()-1):
+        currentSystem = __ValidateLine(cleanedCSV[i],i)
+        '''
+        If a system/station is already in the allSystems list we will simply add
+        the rare items from the found station to the station in the list. The found
+        station is then NOT added to the list.
+        '''   
+        if allSystems.count(currentSystem) != 0:
+            dupes = []
+            for system in allSystems:
+                if system == currentSystem:
+                    system.AddRares(currentSystem)
+                    dupes.append(system)
+        else:
+            allSystems.append(currentSystem)
+
+    bruteSystems = []
+    bruteSystems.append(allSystems[62])  #Lave
+    bruteSystems.append(allSystems[64])  #Leesti
+    bruteSystems.append(allSystems[79])  #Orr
+    bruteSystems.append(allSystems[93])  #Usz
+    bruteSystems.append(allSystems[108]) #Zee
+    bruteSystems.append(allSystems[0])   #39 T
+    bruteSystems.append(allSystems[33])  #Fuj
+    bruteSystems.append(allSystems[35])  #George
+    bruteSystems.append(allSystems[26])  #Diso
+    bruteSystems.append(allSystems[70])  #Momus
+    bruteSystems.append(allSystems[102]) #Witch
+    bruteSystems.append(allSystems[8])   #Alt
+    bruteSystems.append(allSystems[91])  #Tio
+
+    maxStationDistance = 700
+    systemsNoPermit = [system for system in allSystems if system.Station_Distance <= maxStationDistance
+                                                             and "permit" not in system.System_Name]
+
+
+    '''
+    TODO: Allow users to enter the values for size/station distance.
+    '''
+    '''
+    #Genetic
+    exitTestLoop = False
+    testNum = 0
+    maxTests = 20
+    while not exitTestLoop and testNum < maxTests:
+        testNum += 1
+        print("Test: {0}".format(testNum))
+        routeSize = 3
+        popSize = 10
+        routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsNoPermit,routeSize, False)
+        bestRoute = routeTuple[0]
+        print("Best route found had value {0}".format(bestRoute.Fitness_Value))
+        if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
+            print(bestRoute)
+            print("\tFound after {0} generations.".format(routeTuple[1]))
+            exitTestLoop = True
+    '''
+    '''
+    #Brute
+    #stupid slow
+    routeSize = 3
+    maxStationDistance = 999999999
+    routes = RouteCalc.Brute(bruteSystems,routeSize)
+    print("\t****possible routes****")
+    if routes.__len__() > 0:
+        for route in routes:
+            print(route)
     else:
-        allSystems.append(currentSystem)
+        print("no routes =(")
+    '''
+    #PerformanceCalc.CheckPerformance(allSystems)
+    #PerformanceCalc.SelectionTester(500)
 
-bruteSystems = []
-bruteSystems.append(allSystems[62])  #Lave
-bruteSystems.append(allSystems[64])  #Leesti
-bruteSystems.append(allSystems[79])  #Orr
-bruteSystems.append(allSystems[93])  #Usz
-bruteSystems.append(allSystems[108]) #Zee
-bruteSystems.append(allSystems[0])   #39 T
-bruteSystems.append(allSystems[33])  #Fuj
-bruteSystems.append(allSystems[35])  #George
-bruteSystems.append(allSystems[26])  #Diso
-bruteSystems.append(allSystems[70])  #Momus
-bruteSystems.append(allSystems[102]) #Witch
-bruteSystems.append(allSystems[8])   #Alt
-bruteSystems.append(allSystems[91])  #Tio
+    #Yaso Kondi loop
+    #Indices based on live spreadsheet, no duplicates
+    ykLoopList = []
+    ykLoopList.append(allSystems[106]) #Yaso
+    ykLoopList.append(allSystems[81])  #Quech
+    ykLoopList.append(allSystems[21])  #Coq
+    ykLoopList.append(allSystems[8])   #Alt
+    ykLoopList.append(allSystems[32])  #Eth
+    ykLoopList.append(allSystems[13])  #Az
+    ykLoopList.append(allSystems[35])  #George
+    ykLoopList.append(allSystems[94])  #Utg
+    #print("\n\nYK Loop")
+    #print(EDRareRoute(ykLoopList))
 
-'''
-TODO: Allow users to enter the values for size/station distance.
-'''
+    #8 system round found by program
+    #indices based on live spreadsheet, no duplicates
+    genRoute8 = []
+    genRoute8.append(allSystems[20]) #Chi Er
+    genRoute8.append(allSystems[8])  #Alt
+    genRoute8.append(allSystems[16]) #Bast
+    genRoute8.append(allSystems[91]) #Tio
+    genRoute8.append(allSystems[14]) #Baltah
+    genRoute8.append(allSystems[49]) #Iru
+    genRoute8.append(allSystems[58]) #Karsu
+    genRoute8.append(allSystems[24]) #Delta P
+    #print("\n\nBad 8 System route, low item cost")
+    #print(EDRareRoute(genRoute8))
 
-#Genetic
-exitTestLoop = False
-testNum = 0
-maxTests = 20
-while not exitTestLoop and testNum < maxTests:
-    testNum += 1
-    print("Test: {0}".format(testNum))
-    routeSize = 7
-    maxStationDistance = 5000
-    popSize = 1000
-    routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeSize, False)
-    bestRoute = routeTuple[0]
-    print("Best route found had value {0}".format(bestRoute.Fitness_Value))
-    if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
-        print(bestRoute)
-        print("\tFound after {0} generations.".format(routeTuple[1]))
-        exitTestLoop = True
+    test8 = []
+    test8.append(allSystems[8]) #Alt
+    test8.append(allSystems[40])#Hec
+    test8.append(allSystems[5]) #Agan
+    test8.append(allSystems[64])#Leesti
+    test8.append(allSystems[11])#Any
+    test8.append(allSystems[76])#Ngur
+    test8.append(allSystems[14])#Balt
+    test8.append(allSystems[20])#Chi Er
+    #print("\nBad 8 system route, poor seller spacing")
+    #print(EDRareRoute(test8))
 
-
-'''
-#Brute
-#stupid slow
-routeSize = 4
-maxStationDistance = 999999999
-routes = RouteCalc.Brute(allSystems,maxStationDistance,routeSize)
-print("\t****possible routes****")
-for route in routes:
-    print(route)
-'''
-#PerformanceCalc.CheckPerformance(allSystems)
-#PerformanceCalc.SelectionTester(500)
-
-#Yaso Kondi loop
-#Indices based on live spreadsheet, no duplicates
-ykLoopList = []
-ykLoopList.append(allSystems[106]) #Yaso
-ykLoopList.append(allSystems[81])  #Quech
-ykLoopList.append(allSystems[21])  #Coq
-ykLoopList.append(allSystems[8])   #Alt
-ykLoopList.append(allSystems[32])  #Eth
-ykLoopList.append(allSystems[13])  #Az
-ykLoopList.append(allSystems[35])  #George
-ykLoopList.append(allSystems[94])  #Utg
-#print("\n\nYK Loop")
-#print(EDRareRoute(ykLoopList))
-
-#8 system round found by program
-#indices based on live spreadsheet, no duplicates
-genRoute8 = []
-genRoute8.append(allSystems[20]) #Chi Er
-genRoute8.append(allSystems[8])  #Alt
-genRoute8.append(allSystems[16]) #Bast
-genRoute8.append(allSystems[91]) #Tio
-genRoute8.append(allSystems[14]) #Baltah
-genRoute8.append(allSystems[49]) #Iru
-genRoute8.append(allSystems[58]) #Karsu
-genRoute8.append(allSystems[24]) #Delta P
-#print("\n\nBad 8 System route, low item cost")
-#print(EDRareRoute(genRoute8))
-
-test8 = []
-test8.append(allSystems[8]) #Alt
-test8.append(allSystems[40])#Hec
-test8.append(allSystems[5]) #Agan
-test8.append(allSystems[64])#Leesti
-test8.append(allSystems[11])#Any
-test8.append(allSystems[76])#Ngur
-test8.append(allSystems[14])#Balt
-test8.append(allSystems[20])#Chi Er
-#print("\nBad 8 system route, poor seller spacing")
-#print(EDRareRoute(test8))
-
-#5 system test
-test5 = []
-test5.append(allSystems[49]) #Iru
-test5.append(allSystems[76]) #ngur
-test5.append(allSystems[64]) #Leesti
-test5.append(allSystems[5])  #Agan
-test5.append(allSystems[8])  #Alt
-#print("\nBad 5 system route, poor systems distance")
-#print(EDRareRoute(test5))
+    #5 system test
+    test5 = []
+    test5.append(allSystems[49]) #Iru
+    test5.append(allSystems[76]) #ngur
+    test5.append(allSystems[64]) #Leesti
+    test5.append(allSystems[5])  #Agan
+    test5.append(allSystems[8])  #Alt
+    #print("\nBad 5 system route, poor systems distance")
+    #print(EDRareRoute(test5))
 
 
-test4 = []
-test4.append(allSystems[33])  #Fuj
-test4.append(allSystems[0])   #39 T
-test4.append(allSystems[26])  #Diso
-test4.append(allSystems[64])  #Leesti
-#print("\nGood 4 system route")
-#print(EDRareRoute(test4))
+    test4 = []
+    test4.append(allSystems[33])  #Fuj
+    test4.append(allSystems[0])   #39 T
+    test4.append(allSystems[26])  #Diso
+    test4.append(allSystems[64])  #Leesti
+    #print("\nGood 4 system route")
+    #print(EDRareRoute(test4))
 
-systems11_1 = []
-systems11_1.append(allSystems[108]) #Zee
-systems11_1.append(allSystems[84])  #Rus
-systems11_1.append(allSystems[5])   #Agan
-systems11_1.append(allSystems[64])  #Leesti
-systems11_1.append(allSystems[62])  #Lave
-systems11_1.append(allSystems[76])  #Ngur
-systems11_1.append(allSystems[49])  #Iru
-systems11_1.append(allSystems[18])  #CD-75
-systems11_1.append(allSystems[91])  #Tio
-systems11_1.append(allSystems[28])  #Epsi
-systems11_1.append(allSystems[8])   #Alt
-#print("\nBad 11 system route, poor system distances")
-#print(EDRareRoute(systems11_1))
+    systems11_1 = []
+    systems11_1.append(allSystems[108]) #Zee
+    systems11_1.append(allSystems[84])  #Rus
+    systems11_1.append(allSystems[5])   #Agan
+    systems11_1.append(allSystems[64])  #Leesti
+    systems11_1.append(allSystems[62])  #Lave
+    systems11_1.append(allSystems[76])  #Ngur
+    systems11_1.append(allSystems[49])  #Iru
+    systems11_1.append(allSystems[18])  #CD-75
+    systems11_1.append(allSystems[91])  #Tio
+    systems11_1.append(allSystems[28])  #Epsi
+    systems11_1.append(allSystems[8])   #Alt
+    #print("\nBad 11 system route, poor system distances")
+    #print(EDRareRoute(systems11_1))
 
-another5 = []
-another5.append(allSystems[64])  #Leesti
-another5.append(allSystems[26])  #Dis
-another5.append(allSystems[79])  #Orr
-another5.append(allSystems[94])  #Utg
-another5.append(allSystems[87])  #Tan
-#print("\nGood 5, multiple bad sell locations")
-#print(EDRareRoute(another5))
+    another5 = []
+    another5.append(allSystems[64])  #Leesti
+    another5.append(allSystems[26])  #Dis
+    another5.append(allSystems[79])  #Orr
+    another5.append(allSystems[94])  #Utg
+    another5.append(allSystems[87])  #Tan
+    #print("\nGood 5, multiple bad sell locations")
+    #print(EDRareRoute(another5))
 
-#Orr Usz Witch 39 Hec Lee 
+    #Orr Usz Witch 39 Hec Lee 
+
+    #pathetic attempt at multiprocessing
+    from multiprocessing import Pool, Queue
+    import multiprocessing
+
+    multiprocessing.freeze_support()
+    routePerms = itertools.permutations(bruteSystems,7)
+    with Pool(4) as p:
+        p.map(RouteCalc.MP_Helper,routePerms)

@@ -23,6 +23,7 @@ class EDRareRoute(object):
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Possible_Sell_Points = self.__CalcSellers()
         self.Best_Sell_Points = []
+        self.Route_Type = None
         self.Fitness_Value = self.__Fitness()
 
     def GetRoute(self):
@@ -42,6 +43,7 @@ class EDRareRoute(object):
 
         currentRoute = RouteOrder(self.__Route, self.Possible_Sell_Points, self.Sellers_Per_Station, self.Total_Supply)
         self.Best_Sell_Points = currentRoute.Best_Sellers
+        self.Route_Type = currentRoute.Route_Type
         return currentRoute.Value
 
     def __CalcSellers(self):
@@ -57,14 +59,18 @@ class EDRareRoute(object):
         combosWithAllSystems = []
         for combo in itertools.combinations(self.__Route,2):
             #If sellers can't sell to each other we know the combo is bad
-            if combo[0].System_Distances[combo[1].Index] < sellingDistance:
+            if self.Sellers_Per_Station[combo[0]].count(combo[1]) == 0:
                 continue
             sellersPerCombo = []
-            for obj in combo:
-                sellersPerCombo += [val for val in self.Sellers_Per_Station[obj]]
+            for seller in combo:
+                for system in self.Sellers_Per_Station[seller]:
+                    sellersPerCombo.append(system)
             if set(sellersPerCombo) == set(self.__Route):
-                combosWithAllSystems.append(combo)
-
+                #combosWithAllSystems.append(combo)
+                if abs(self.Sellers_Per_Station[combo[0]].__len__() - self.Sellers_Per_Station[combo[1]].__len__()) <= 1:
+                    #if set.intersection(
+                    combosWithAllSystems.append(combo)
+        '''
         #Want to remove combos with a difference greater than 1
         maxDifference = math.floor(self.__Route.__len__() / 2)
         while combosWithAllSystems.__len__ != 0:
@@ -91,7 +97,7 @@ class EDRareRoute(object):
 
         if maxDifference > 1:
             combosWithAllSystems = []
-        
+        '''
         return combosWithAllSystems
         
 
@@ -126,6 +132,7 @@ class EDRareRoute(object):
 
         strList.append("\n\nTotal goods: {0}".format(self.Total_Supply))
         strList.append("\nAvg cost: {0}".format(avgCost))
+        strList.append("\nType: {0}".format(self.Route_Type))
         return ''.join(strList)
 
 class RouteOrder(object):
@@ -141,6 +148,7 @@ class RouteOrder(object):
         self.Route_Sellers = sellersPerStation
         self.Supply = itemSupply
         self.Best_Sellers = None
+        self.Route_Type = None
         self.Value = self.__CalcValue()
 
     def __CalcValue(self):
@@ -157,45 +165,42 @@ class RouteOrder(object):
         routeLength = self.__Systems.__len__()     
        
 
-        # Max good distance for a route should avg around 100ly a jump 
+        # Max good distance for a route should avg around Xly a jump 
         maxGoodDistance = routeLength * 110
         totalDistance = 0
-        clusterShortLY = 50
+        clusterShortLY = 40
         clusterLongLY = 160
-        spreadMinLY = 45
+        spreadMinLY = 50
         spreadMaxLY = 110
-        maxJumpRangeLY = 225
-        clusterShortJumps = 0
-        clusterLongJumps = 0
+        maxJumpRangeLY = 230
+        clusterShort = 0
+        clusterLong = 0
         spreadJumps = 0
-        longestJump = -1
 
         for i in range(0,routeLength):
             currentSystem = self.__Systems[i]
             nextSystem = self.__Systems[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
             totalDistance += jumpDistance
-            if longestJump < jumpDistance:
-                longestJump = jumpDistance
             if jumpDistance <= clusterShortLY:
-                clusterShortJumps += 1
+                clusterShort += 1
             if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
-                clusterLongJumps += 1 
+                clusterLong += 1 
             if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
                 spreadJumps += 1 
 
-        currentRouteType = RouteType.Other
+        self.Route_Type = RouteType.Other
         
         #Route has 2 groups of systems separated by a long jump
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
         #but I'm just worrying about 2 sellers for now
-        if clusterLongJumps == 2 and (clusterLongJumps + clusterShortJumps) == routeLength:
-           currentRouteType = RouteType.Cluster
+        if clusterLong == 2 and (clusterLong + clusterShort) == routeLength:
+           self.Route_Type = RouteType.Cluster
 
         #Route has fairly evenly spaced jumps
         #Maybe a higher multiplier to compensate for the longer distances
         if spreadJumps == routeLength:
-            currentRouteType = RouteType.Spread
+            self.Route_Type = RouteType.Spread
 
         pairValue = -999
         goodPair = 6
@@ -252,7 +257,7 @@ class RouteOrder(object):
             #   Number of systems between sellers should have a difference of 1
             #   0 or 1 non-selling systems before each sell location
             
-            if currentRouteType == RouteType.Spread and routeLength%2 == 0:
+            if self.Route_Type == RouteType.Spread and routeLength%2 == 0:
                 if numBefore1 == numBefore2:
                     if (numBefore1 + numBefore2) == (routeLength - 2):
                         pairValue = goodPair
@@ -264,7 +269,7 @@ class RouteOrder(object):
                 if pairValue < (numBefore1 + numBefore2) / 10:
                     pairValue = (numBefore1 + numBefore2) / 10
                     self.Best_Sellers = sellerPair
-            if currentRouteType == RouteType.Spread and routeLength%2 == 1:
+            if self.Route_Type == RouteType.Spread and routeLength%2 == 1:
                 if math.fabs(numBefore1-numBefore2) == 1:
                     if (numBefore1 + numBefore2) == (routeLength - 2):
                         pairValue = goodPair
@@ -276,7 +281,7 @@ class RouteOrder(object):
                 if pairValue < (numBefore1 + numBefore2) / 10:
                     pairValue = (numBefore1 + numBefore2) / 10
                     self.Best_Sellers = sellerPair
-            if currentRouteType == RouteType.Cluster and routeLength%2 == 0:
+            if self.Route_Type == RouteType.Cluster and routeLength%2 == 0:
                 if numBefore1 == numBefore2:
                     if (numBefore1 + numBefore2) >= (routeLength - 2):
                         pairValue = goodPair
@@ -288,7 +293,7 @@ class RouteOrder(object):
                 if pairValue < (numBefore1 + numBefore2) / 10:
                     pairValue = (numBefore1 + numBefore2) / 10
                     self.Best_Sellers = sellerPair
-            if currentRouteType == RouteType.Cluster and routeLength%2 == 1:
+            if self.Route_Type == RouteType.Cluster and routeLength%2 == 1:
                 if math.fabs(numBefore1-numBefore2) == 1:
                     if (numBefore1 + numBefore2) > (routeLength - 2):
                         pairValue = goodPair
@@ -300,33 +305,35 @@ class RouteOrder(object):
                 if pairValue < (numBefore1 + numBefore2) / 10:
                     pairValue = (numBefore1 + numBefore2) / 10
                     self.Best_Sellers = sellerPair
-            if currentRouteType == RouteType.Other:
+            if self.Route_Type == RouteType.Other:
                 if pairValue < (numBefore1 + numBefore2) / 15:
                         pairValue = (numBefore1 + numBefore2) / 15
                         self.Best_Sellers = sellerPair
             
             '''
-            if routeLength % 2 == 0:
-                if (numBefore1 == numBefore2) and math.fabs(numBefore1 - routeLength/2) <=1:
-                    pairValue = goodPair
-                    self.Best_Sellers = sellerPair                 
-                else:
-                    if (numBefore1 + numBefore2) < pairValue:
-                        pairValue = pairValue
-                    else:
-                        pairValue = (numBefore1 + numBefore2)
-                        self.Best_Sellers = sellerPair
+            if self.Route_Type == RouteType.Other:
+                if potentialPair > pairValue:
+                    pairValue = potentialPair
+                    self.Best_Sellers = sellerPair          
             else:
-                if math.fabs(numBefore1 - numBefore2) <= 1:
-                    pairValue = goodPair
-                    self.Best_Sellers = sellerPair
-                else:
-                    if (numBefore1 + numBefore2) < pairValue:
-                        pairValue = pairValue
+                if routeLength % 2 == 0:
+                    if (numBefore1 == numBefore2) and math.fabs(numBefore1 - routeLength/2) <=1:
+                        pairValue = goodPair
+                        self.Best_Sellers = sellerPair                 
                     else:
-                        pairValue = (numBefore1 + numBefore2)
+                        if (numBefore1 + numBefore2) / 15 > pairValue:
+                            pairValue = (numBefore1 + numBefore2) / 15
+                            self.Best_Sellers = sellerPair
+                else:
+                    if math.fabs(numBefore1 - numBefore2) == 1:
+                        pairValue = goodPair
                         self.Best_Sellers = sellerPair
-            '''
+                    else:
+                        if (numBefore1 + numBefore2) / 15 > pairValue:
+                            pairValue = (numBefore1 + numBefore2) / 15
+                            self.Best_Sellers = sellerPair
+           '''
+            
 
 
         #Less total distance needs to give a higher value
@@ -340,6 +347,6 @@ class RouteOrder(object):
 
 
 
-        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) * currentRouteType.value
+        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) * self.Route_Type.value
 
         return totalValue

@@ -15,12 +15,12 @@ class PerformanceCalc(object):
         maxTests = 10
         goodRouteCutoff = RouteCalc.Route_Cutoff
 
-        popSize = 100
-        maxPopSize = 100
-        maxStationDistance = 5000
+        popSize = 1000
+        maxPopSize = 1000
+        maxStationDistance = 1000
             
-        routeLen = 3
-        maxRouteLen = 5
+        routeLen = 8
+        maxRouteLen = 8
 
         while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize)
