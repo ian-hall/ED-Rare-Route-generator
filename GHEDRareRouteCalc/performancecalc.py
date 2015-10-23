@@ -11,15 +11,15 @@ import bisect
 
 class PerformanceCalc(object):
     @classmethod
-    def CheckPerformance(self,allSystems):
+    def CheckPerformance(self,systemsList):
         maxTests = 10
         goodRouteCutoff = RouteCalc.Route_Cutoff
 
-        popSize = 1000
-        maxPopSize = 1000
+        popSize = 100
+        maxPopSize = 100
         maxStationDistance = 1000
             
-        routeLen = 8
+        routeLen = 3
         maxRouteLen = 8
 
         while routeLen <= maxRouteLen:
@@ -30,7 +30,7 @@ class PerformanceCalc(object):
                 #print("Test: {0}".format(testNum))
                 solved = False
                 startTime = time.time()
-                routeTuple = RouteCalc.GeneticSolverStart(popSize,allSystems,maxStationDistance,routeLen, True)
+                routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsList,routeLen, True)
                 endTime = time.time()
                 elapsed = endTime - startTime
                 bestRoute = routeTuple[0]

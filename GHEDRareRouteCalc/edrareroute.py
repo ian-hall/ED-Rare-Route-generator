@@ -9,8 +9,8 @@ from enum import Enum,unique
 
 @unique
 class RouteType(Enum):
-    Other = 1
-    Cluster = 2
+    Other = 2
+    Cluster = 2.1
     Spread = 2.3
 class EDRareRoute(object):
     def __init__(self,systemList: []):
@@ -205,6 +205,13 @@ class RouteOrder(object):
         pairValue = -999
         goodPair = 6
         potentialPair = 2
+
+        #TODO: Change logic here: We have index of the sellers, check systems immediately before/after and:
+        #   If system right before a seller can sell to it, and it is a cluster type, good
+        #   "" , and it is spread type, bad
+        # Two systems back can sell, and cluster, good depending on route length
+        # '', and spread, good
+
         for sellerPair in self.__SellLocs:
             loc1 = sellerPair[0]
             loc2 = sellerPair[1]
@@ -348,5 +355,7 @@ class RouteOrder(object):
 
 
         totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) * self.Route_Type.value
+        if weightedCost < 1 or weightedDistance < 1 or weightedSupply < 1:
+            totalValue = totalValue * 0.7
 
         return totalValue

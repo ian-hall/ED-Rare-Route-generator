@@ -11,6 +11,7 @@ import itertools
 import sys
 import math
 import re
+import time
 
 
 def __ValidateLine(currentLine, lineNum):
@@ -71,7 +72,6 @@ def __ValidateLine(currentLine, lineNum):
     return EDSystem(supplyCap, avgSupply, itemCost, itemName,
                     distToStation, stationName, systemName, index,
                     distToOthers)
-
 if __name__ == '__main__':
     cleanedCSV = []
     allSystems = []
@@ -137,9 +137,10 @@ if __name__ == '__main__':
     bruteSystems.append(allSystems[8])   #Alt
     bruteSystems.append(allSystems[91])  #Tio
 
-    maxStationDistance = 700
-    systemsNoPermit = [system for system in allSystems if system.Station_Distance <= maxStationDistance
-                                                             and "permit" not in system.System_Name]
+    maxStationDistance = 4500
+    systemsSubset = [system for system in allSystems if system.Station_Distance <= maxStationDistance
+                                                                and "permit" not in system.System_Name]
+    routeSize = 5
 
 
     '''
@@ -150,12 +151,11 @@ if __name__ == '__main__':
     exitTestLoop = False
     testNum = 0
     maxTests = 20
+    popSize = 1000
     while not exitTestLoop and testNum < maxTests:
         testNum += 1
         print("Test: {0}".format(testNum))
-        routeSize = 3
-        popSize = 10
-        routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsNoPermit,routeSize, False)
+        routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsSubset,routeSize, False)
         bestRoute = routeTuple[0]
         print("Best route found had value {0}".format(bestRoute.Fitness_Value))
         if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
@@ -163,33 +163,33 @@ if __name__ == '__main__':
             print("\tFound after {0} generations.".format(routeTuple[1]))
             exitTestLoop = True
     '''
-    '''
+    
     #Brute
     #stupid slow
-    routeSize = 3
-    maxStationDistance = 999999999
+    bruteStart = time.time()
     routes = RouteCalc.Brute(bruteSystems,routeSize)
+    bruteEnd = time.time()
     print("\t****possible routes****")
     if routes.__len__() > 0:
         for route in routes:
             print(route)
     else:
         print("no routes =(")
-    '''
-    #PerformanceCalc.CheckPerformance(allSystems)
+    
+    #PerformanceCalc.CheckPerformance(systemsSubset)
     #PerformanceCalc.SelectionTester(500)
 
     #Yaso Kondi loop
     #Indices based on live spreadsheet, no duplicates
     ykLoopList = []
-    ykLoopList.append(allSystems[106]) #Yaso
-    ykLoopList.append(allSystems[81])  #Quech
     ykLoopList.append(allSystems[21])  #Coq
     ykLoopList.append(allSystems[8])   #Alt
     ykLoopList.append(allSystems[32])  #Eth
     ykLoopList.append(allSystems[13])  #Az
     ykLoopList.append(allSystems[35])  #George
     ykLoopList.append(allSystems[94])  #Utg
+    ykLoopList.append(allSystems[106]) #Yaso
+    ykLoopList.append(allSystems[81])  #Quech
     #print("\n\nYK Loop")
     #print(EDRareRoute(ykLoopList))
 
@@ -208,7 +208,6 @@ if __name__ == '__main__':
     #print(EDRareRoute(genRoute8))
 
     test8 = []
-    test8.append(allSystems[8]) #Alt
     test8.append(allSystems[40])#Hec
     test8.append(allSystems[5]) #Agan
     test8.append(allSystems[64])#Leesti
@@ -216,6 +215,7 @@ if __name__ == '__main__':
     test8.append(allSystems[76])#Ngur
     test8.append(allSystems[14])#Balt
     test8.append(allSystems[20])#Chi Er
+    test8.append(allSystems[8]) #Alt
     #print("\nBad 8 system route, poor seller spacing")
     #print(EDRareRoute(test8))
 
@@ -264,11 +264,67 @@ if __name__ == '__main__':
 
     #Orr Usz Witch 39 Hec Lee 
 
-    #pathetic attempt at multiprocessing
-    from multiprocessing import Pool, Queue
-    import multiprocessing
+    #pathetic attempt at multithreading
+    #Can only map around 20,000,000 before memory cap
 
-    multiprocessing.freeze_support()
-    routePerms = itertools.permutations(bruteSystems,7)
-    with Pool(4) as p:
-        p.map(RouteCalc.MP_Helper,routePerms)
+    from multiprocessing import Pool
+    from multiprocessing.dummy import Pool as ThreadPool
+    poolSize = 3
+    
+    t1Start = time.time()
+    routePerms = itertools.permutations(bruteSystems,routeSize)
+    with ThreadPool(poolSize) as p:
+        results = p.map(RouteCalc.T_Helper,routePerms)
+    results = [val for val in results if val]
+    sortedResults = sorted(results,key=operator.attrgetter('Fitness_Value'))
+    t1End = time.time()
+    for route in sortedResults:
+        print(route)
+    
+    
+    print("other brute")
+    tempBrute = list()
+    fullResults = list()
+    t2Start = time.time()
+    for route in itertools.permutations(bruteSystems,routeSize):
+        if tempBrute.__len__() < 20000000:
+            tempBrute.append(route)
+        else:
+            with Pool(poolSize) as p:
+                results = p.map(RouteCalc.T_Helper,tempBrute)
+            fullResults.extend([val for val in results if val])
+            tempBrute = [route]
+    with Pool(poolSize) as p:
+        results = p.map(RouteCalc.T_Helper,tempBrute)
+    fullResults.extend([val for val in results if val])
+    sortedResults = sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
+    t2End = time.time()
+    for route in sortedResults:
+        print(route)
+
+    bruteElapsed = bruteEnd - bruteStart
+    t1Elapsed = t1End - t1Start
+    t2Elapsed = t2End - t2Start
+
+    print("Brute time: {0}".format(bruteElapsed))
+    print("Thread time(full): {0}".format(t1Elapsed))
+    print("Thread time(split): {0}".format(t2Elapsed))
+    
+
+
+    '''
+    def Do(stuff):
+        for i in stuff:
+            print(i)
+
+    tempI = list()
+    for i in range(57):
+        if tempI.__len__() < 7:
+            tempI.append(i)
+        else:
+            print("Doing work now")
+            Do(tempI)
+            tempI = [i]
+    print("Doing work now")
+    Do(tempI)
+    '''

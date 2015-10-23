@@ -217,22 +217,27 @@ class RouteCalc(object):
 
     @classmethod
     def Brute(self, validSystems: [], routeLength):
-        
         goodRoutes = []
-        goodRouteCutoff = RouteCalc.Route_Cutoff
         
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
+        num = 0
         for route in itertools.permutations(validSystems,routeLength):
+            num += 1
             current = EDRareRoute(route)
-            if current.Fitness_Value >= self.Route_Cutoff:
+            if current.Fitness_Value > RouteCalc.Route_Cutoff:
                 goodRoutes.append(current)
+            #if current.Fitness_Value > 18:
+            #    print(num)
+            #    return [current]
         
         return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))
-    
+
     @classmethod
-    def MP_Helper(self,route):
+    def T_Helper(self,route):
         newRoute = EDRareRoute(route)
         if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
-            print(newRoute)
+            return newRoute
+        else:
+            return None
