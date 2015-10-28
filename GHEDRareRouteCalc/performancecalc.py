@@ -13,14 +13,12 @@ class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,systemsList):
         maxTests = 10
-        goodRouteCutoff = RouteCalc.Route_Cutoff
 
         popSize = 100
         maxPopSize = 100
-        maxStationDistance = 1000
             
         routeLen = 3
-        maxRouteLen = 8
+        maxRouteLen = 5
 
         while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize)
@@ -34,7 +32,7 @@ class PerformanceCalc(object):
                 endTime = time.time()
                 elapsed = endTime - startTime
                 bestRoute = routeTuple[0]
-                if bestRoute.Fitness_Value >= goodRouteCutoff:
+                if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
                     solved = True
 
                 stats.Times.append(elapsed)
@@ -48,11 +46,12 @@ class PerformanceCalc(object):
     @classmethod
     def SelectionTester(self, size: int):
         #Just copying from routecalc because i'm bad
+        mult = 546
         for run in range(0,50000):
             population = []
             for i in range(0,size):
                 population.append(random.uniform(1,20))
-            upperVal = math.ceil(size * 1.2)
+            upperVal = size * mult
             total = sum([val for val in population])
 
             selectionValues = [population[0]/total * upperVal]

@@ -1,6 +1,6 @@
 ﻿__author__ = 'Ian'
 from edsystem import EDSystem
-from edrareroute import EDRareRoute
+from edrareroute import EDRareRoute, RouteType
 from routecalc import RouteCalc
 from performancecalc import PerformanceCalc
 from urllib import request
@@ -72,11 +72,12 @@ def __ValidateLine(currentLine, lineNum):
     return EDSystem(supplyCap, avgSupply, itemCost, itemName,
                     distToStation, stationName, systemName, index,
                     distToOthers)
+
 if __name__ == '__main__':
     cleanedCSV = []
     allSystems = []
 
-
+    
     with open('ED2.csv') as csvFile:
         reader = csv.reader(csvFile)
         breakout = False
@@ -136,48 +137,56 @@ if __name__ == '__main__':
     bruteSystems.append(allSystems[102]) #Witch
     bruteSystems.append(allSystems[8])   #Alt
     bruteSystems.append(allSystems[91])  #Tio
+    bruteSystems.append(allSystems[21])  #Coq
+    bruteSystems.append(allSystems[32])  #Eth
+    bruteSystems.append(allSystems[13])  #Az
+    bruteSystems.append(allSystems[94])  #Utg
+    bruteSystems.append(allSystems[106]) #Yaso
+    bruteSystems.append(allSystems[81])  #Quech
 
-    maxStationDistance = 4500
-    systemsSubset = [system for system in allSystems if system.Station_Distance <= maxStationDistance
-                                                                and "permit" not in system.System_Name]
-    routeSize = 5
-
-
+    
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    '''
+
+    maxStationDistance = 4500
+    systemsSubset = [system for system in allSystems if system.Station_Distance <= maxStationDistance
+                                                        and "permit" not in system.System_Name]
+    routeSize = 4
+    
     #Genetic
     exitTestLoop = False
     testNum = 0
     maxTests = 20
-    popSize = 1000
+    popSize = 100
+    geneticStart = time.time()
     while not exitTestLoop and testNum < maxTests:
         testNum += 1
         print("Test: {0}".format(testNum))
         routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsSubset,routeSize, False)
+        geneticEnd = time.time()
         bestRoute = routeTuple[0]
         print("Best route found had value {0}".format(bestRoute.Fitness_Value))
         if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
             print(bestRoute)
-            print("\tFound after {0} generations.".format(routeTuple[1]))
+            print("Generations: {0}".format(routeTuple[1]))
+            print("Time: {0}s".format((geneticEnd-geneticStart)))
             exitTestLoop = True
-    '''
     
+    '''
     #Brute
-    #stupid slow
     bruteStart = time.time()
     routes = RouteCalc.Brute(bruteSystems,routeSize)
     bruteEnd = time.time()
-    print("\t****possible routes****")
     if routes.__len__() > 0:
         for route in routes:
             print(route)
     else:
         print("no routes =(")
-    
+    print("Routes found in {0}s".format((bruteEnd-bruteStart)))
+    '''
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.SelectionTester(500)
+    #PerformanceCalc.SelectionTester(5000)
 
     #Yaso Kondi loop
     #Indices based on live spreadsheet, no duplicates
@@ -266,7 +275,7 @@ if __name__ == '__main__':
 
     #pathetic attempt at multithreading
     #Can only map around 20,000,000 before memory cap
-
+    '''
     from multiprocessing import Pool
     from multiprocessing.dummy import Pool as ThreadPool
     poolSize = 3
@@ -280,51 +289,4 @@ if __name__ == '__main__':
     t1End = time.time()
     for route in sortedResults:
         print(route)
-    
-    
-    print("other brute")
-    tempBrute = list()
-    fullResults = list()
-    t2Start = time.time()
-    for route in itertools.permutations(bruteSystems,routeSize):
-        if tempBrute.__len__() < 20000000:
-            tempBrute.append(route)
-        else:
-            with Pool(poolSize) as p:
-                results = p.map(RouteCalc.T_Helper,tempBrute)
-            fullResults.extend([val for val in results if val])
-            tempBrute = [route]
-    with Pool(poolSize) as p:
-        results = p.map(RouteCalc.T_Helper,tempBrute)
-    fullResults.extend([val for val in results if val])
-    sortedResults = sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
-    t2End = time.time()
-    for route in sortedResults:
-        print(route)
-
-    bruteElapsed = bruteEnd - bruteStart
-    t1Elapsed = t1End - t1Start
-    t2Elapsed = t2End - t2Start
-
-    print("Brute time: {0}".format(bruteElapsed))
-    print("Thread time(full): {0}".format(t1Elapsed))
-    print("Thread time(split): {0}".format(t2Elapsed))
-    
-
-
-    '''
-    def Do(stuff):
-        for i in stuff:
-            print(i)
-
-    tempI = list()
-    for i in range(57):
-        if tempI.__len__() < 7:
-            tempI.append(i)
-        else:
-            print("Doing work now")
-            Do(tempI)
-            tempI = [i]
-    print("Doing work now")
-    Do(tempI)
     '''

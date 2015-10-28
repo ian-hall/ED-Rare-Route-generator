@@ -9,9 +9,9 @@ from enum import Enum,unique
 
 @unique
 class RouteType(Enum):
-    Other = 2
-    Cluster = 2.1
-    Spread = 2.3
+    Other = 1
+    Cluster = 1.15
+    Spread = 1.3
 class EDRareRoute(object):
     def __init__(self,systemList: []):
         #Range of route lengths that are allowed, need at least 3 systems for the genetic alg to work
@@ -36,8 +36,7 @@ class EDRareRoute(object):
             total distance of the route
             number of systems that are valid selling points
         TODO:
-            maybe replace this whole thing with RouteOrder since
-                i'm not doing another genetic thing here
+            maybe replace this whole thing with RouteOrder
             Print a list of all possible seller pairs if more than 1 exists.
         '''   
 
@@ -66,38 +65,9 @@ class EDRareRoute(object):
                 for system in self.Sellers_Per_Station[seller]:
                     sellersPerCombo.append(system)
             if set(sellersPerCombo) == set(self.__Route):
-                #combosWithAllSystems.append(combo)
                 if abs(self.Sellers_Per_Station[combo[0]].__len__() - self.Sellers_Per_Station[combo[1]].__len__()) <= 1:
-                    #if set.intersection(
                     combosWithAllSystems.append(combo)
-        '''
-        #Want to remove combos with a difference greater than 1
-        maxDifference = math.floor(self.__Route.__len__() / 2)
-        while combosWithAllSystems.__len__ != 0:
-            combosToRemove = []
-            for combo in combosWithAllSystems:
-                numSellers = self.Sellers_Per_Station[combo[0]].__len__()
-                badCombo = False
-                for system in combo:
-                    numToCheck = self.Sellers_Per_Station[system].__len__()
-                    leftOver = math.fabs(numSellers - numToCheck)
-                    if leftOver > maxDifference:
-                        badCombo = True
-                if badCombo:
-                    combosToRemove.append(combo)
-            
-            if combosToRemove.__len__() == combosWithAllSystems.__len__():
-                #This means we are about to remove every combo, we don't want that
-                break   
-            for combo in combosToRemove:
-                combosWithAllSystems.remove(combo)    
-            maxDifference -= 1
-        #Need to add 1 to get the difference before all were eliminated
-        maxDifference += 1
 
-        if maxDifference > 1:
-            combosWithAllSystems = []
-        '''
         return combosWithAllSystems
         
 

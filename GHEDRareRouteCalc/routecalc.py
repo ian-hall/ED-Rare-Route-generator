@@ -6,12 +6,15 @@ import sys
 import operator
 import itertools
 import bisect
+from multiprocessing import Pool
 
 class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 14
+    Route_Cutoff = 10
+    __Selection_Mult = 5
+    __Pool_Size = 3
     @classmethod
     def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent):
         '''
@@ -24,6 +27,7 @@ class RouteCalc(object):
             print("Not enough systems for a route...")
             return
 
+        tempPopulation = []
         for i in range(0,popSize):
             tempSystemList = []
             for j in range(0,routeLength):
@@ -33,9 +37,13 @@ class RouteCalc(object):
                 while tempSystemList.count(tempSystem) != 0:
                     tempSystem = random.choice(validSystems)
                 tempSystemList.append(tempSystem)
-            population.append(EDRareRoute(tempSystemList))
+            #population.append(EDRareRoute(tempSystemList))
+            tempPopulation.append(tempSystemList)
 
-        return self.__GeneticSolver(population,validSystems, silent)
+        with Pool(RouteCalc.__Pool_Size) as p:
+            population = p.map(self.GeneticHelper,tempPopulation)
+
+        return self.__GeneticSolver(population,validSystems,silent)
 
     @classmethod
     def __GeneticSolver(self,startingPopulation: [], validSystems: [], silent):
@@ -58,12 +66,14 @@ class RouteCalc(object):
         #Just keep track of the single best route
         bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
 
-        #Want the program to keep running until it finds something, which it will eventually.
+        #Want the program to keep running until it finds something, which it will eventually (maybe).
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
         mutationIncrease = 0.43
-        timeBetweenIncrease = 1200
+        timeBetweenIncrease = 500
         lastIncrease = currentGeneration
+        numIncreases = 0
+        maxIncreases = 2
 
         #Force an exit if X generations pass with no improvement
         maxGensSinceLast = 3*timeBetweenIncrease
@@ -97,6 +107,7 @@ class RouteCalc(object):
                 break
 
             #Should probably check to make sure this stops at 1 but I guess it doesnt really matter since random() always returns < 1
+            #TODO: Change this to instead replace a percentage of population members with the lowest fitness vals
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
@@ -105,12 +116,17 @@ class RouteCalc(object):
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
             
-            
+            tempPop = []
             for i in range(0,currentPopulation.__len__()):
                 child = self.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
                     child = self.__Mutate(child,validSystems)
                 nextPopulation.append(EDRareRoute(child))
+                #tempPop.append(child)
+
+            #TODO: Find the memory error
+            #with Pool(RouteCalc.Pool_Size) as p:
+                #nextPopulation = p.map(self.GeneticHelper,tempPop)
 
             currentPopulation = nextPopulation
 
@@ -121,18 +137,11 @@ class RouteCalc(object):
         '''
         We rank each route relative to the others in the population.
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is
-        120% the size of the population
+        X times the population size, set by __Selection_Mult
         '''
         #percentages = []
-        upperVal = math.ceil(population.__len__() * 1.2)
-        total = sum([route.Fitness_Value for route in population])
-        
-        #for value in [route.Fitness_Value for route in population]:
-        #    percentages.append(value/total * 1000)
-               
-        #selectionValues = [percentages[0]]
-        #for i in range(1,percentages.__len__()):
-        #    selectionValues.append(percentages[i] + selectionValues[i-1])
+        upperVal = population.__len__() * RouteCalc.__Selection_Mult
+        total = sum([route.Fitness_Value for route in population])     
 
         selectionValues = [population[0].Fitness_Value/total * upperVal]
         for i in range(1,population.__len__()):
@@ -147,24 +156,14 @@ class RouteCalc(object):
         '''
         Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
-        Upper end of rand.uni is equal to 120% the size of the population
+        Upper end of rand.uni is X times the population size, set by __Selection_Mult
         '''
               
         #Get the parents
         parents = []
         while parents.__len__() != 2:
-            value = random.uniform(0,math.ceil(population.__len__() * 1.2))
+            value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
             parents.append(population[bisect.bisect(selectionValues,value)])
-            '''
-            i = 0
-            while True:
-                currentSelection = None
-                if value <= selectionValues[i]:
-                    currentSelection = population[i]
-                    parents.append(currentSelection)
-                    break
-                i += 1
-            '''
         #Create the new child
         route1 = parents[0].GetRoute()
         route2 = parents[1].GetRoute()
@@ -198,7 +197,7 @@ class RouteCalc(object):
         
         #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()
-        if mutateType < 0.1:
+        if mutateType < 0.15:
             #shuffle route
             random.shuffle(tempRoute)
         else:
@@ -217,27 +216,39 @@ class RouteCalc(object):
 
     @classmethod
     def Brute(self, validSystems: [], routeLength):
-        goodRoutes = []
-        
         if validSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
-        num = 0
-        for route in itertools.permutations(validSystems,routeLength):
-            num += 1
-            current = EDRareRoute(route)
-            if current.Fitness_Value > RouteCalc.Route_Cutoff:
-                goodRoutes.append(current)
-            #if current.Fitness_Value > 18:
-            #    print(num)
-            #    return [current]
         
-        return sorted(goodRoutes,key=operator.attrgetter('Fitness_Value'))
+        tempBrute = []
+        fullResults = []
+        num = 0
+        print("Starting brute force method...")
+        for sysList in itertools.permutations(validSystems,routeLength):
+            if tempBrute.__len__() < 10000000:
+                tempBrute.append(sysList)
+                num += 1
+            else:
+                print("Processing: {0}".format(num))
+                with Pool(RouteCalc.__Pool_Size) as p:
+                    results = p.map(self.BruteHelper,tempBrute)
+                fullResults.extend([val for val in results if val])
+                tempBrute = [sysList]
+                num += 1
+        print("Processing: {0}".format(num))
+        with Pool(RouteCalc.__Pool_Size) as p:
+            results = p.map(self.BruteHelper,tempBrute)
+        fullResults.extend([val for val in results if val])
+        return sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
 
     @classmethod
-    def T_Helper(self,route):
+    def BruteHelper(self,route):
         newRoute = EDRareRoute(route)
         if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
             return newRoute
         else:
             return None
+
+    @classmethod
+    def GeneticHelper(self,route):
+        return EDRareRoute(route)
