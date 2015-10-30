@@ -12,18 +12,22 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 10
-    __Selection_Mult = 5
+    Route_Cutoff = 9.85
+    __Selection_Mult = .5
     __Pool_Size = 3
+    __ValidSystems = []
     @classmethod
     def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
+
+        TODO: Unbreak this, probably something with selection methods and mutation??
         '''
         population = []
-
-        if validSystems.__len__() < routeLength:
+        RouteCalc.__ValidSystems = validSystems
+        
+        if RouteCalc.__ValidSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
 
@@ -41,12 +45,12 @@ class RouteCalc(object):
             tempPopulation.append(tempSystemList)
 
         with Pool(RouteCalc.__Pool_Size) as p:
-            population = p.map(self.GeneticHelper,tempPopulation)
+            population = p.map(self.RouteCreatorThread,tempPopulation)
 
-        return self.__GeneticSolver(population,validSystems,silent)
+        return self.__GeneticSolver(population,silent)
 
     @classmethod
-    def __GeneticSolver(self,startingPopulation: [], validSystems: [], silent):
+    def __GeneticSolver(self,startingPopulation: [], silent):
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parent states. These states
@@ -111,6 +115,24 @@ class RouteCalc(object):
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
+                currentPopulation = sorted(currentPopulation,key=operator.attrgetter('Fitness_Value'))
+                #Replace a percentage of the routes with lowest values, maybe make this smart to not include adding systems already commonly in the top routes
+                numReplace = math.ceil(currentPopulation.__len__() * .5)
+                tempPop = []
+                for i in range(0,numReplace):
+                    tempSystemList = []
+                    for j in range(0,bestRoute.GetRoute().__len__()):
+                        tempSystem = random.choice(RouteCalc.__ValidSystems)                   
+                        #Need to avoid duplicates
+                        while tempSystemList.count(tempSystem) != 0:
+                            tempSystem = random.choice(RouteCalc.__ValidSystems)
+                        tempSystemList.append(tempSystem)
+                    #population.append(EDRareRoute(tempSystemList))
+                    tempPop.append(tempSystemList)
+                for i in range(0,numReplace):
+                    currentPopulation[i] = EDRareRoute(tempPop[i])
+
+
                 if not silent:
                     print("\tCurrent mutation chance: {0}".format(mutationChance))
 
@@ -120,13 +142,13 @@ class RouteCalc(object):
             for i in range(0,currentPopulation.__len__()):
                 child = self.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
-                    child = self.__Mutate(child,validSystems)
+                    child = self.__Mutate(child)
                 nextPopulation.append(EDRareRoute(child))
                 #tempPop.append(child)
 
             #TODO: Find the memory error
             #with Pool(RouteCalc.Pool_Size) as p:
-                #nextPopulation = p.map(self.GeneticHelper,tempPop)
+                #nextPopulation = p.map(self.RouteCreatorThread,tempPop)
 
             currentPopulation = nextPopulation
 
@@ -192,31 +214,37 @@ class RouteCalc(object):
         return newRoute
         
     @classmethod
-    def __Mutate(self,route: [], validSystems: []):
+    def __Mutate(self,route: []):
         tempRoute = [val for val in route]
         
         #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()
-        if mutateType < 0.15:
+        if mutateType < 0.1:
             #shuffle route
             random.shuffle(tempRoute)
         else:
             #change up to half the systems in a route
             #TODO: Avoid replacing the same system more than once
             numSystemsToChange = random.randrange(1,math.ceil(tempRoute.__len__()/2))
+            changedSystems = []
             for i in range(0, numSystemsToChange):
+                
                 systemToChange = random.randrange(tempRoute.__len__())
-                newSystem = random.choice(validSystems)            
-                #Need to avoid duplicates
+                while changedSystems.count(systemToChange) != 0 :
+                    systemToChange = random.randrange(tempRoute.__len__())
+                changedSystems.append(systemToChange)
+                
+                newSystem = random.choice(RouteCalc.__ValidSystems)            
                 while tempRoute.count(newSystem) != 0:
-                    newSystem = random.choice(validSystems) 
+                    newSystem = random.choice(RouteCalc.__ValidSystems) 
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
 
     @classmethod
     def Brute(self, validSystems: [], routeLength):
-        if validSystems.__len__() < routeLength:
+        RouteCalc.__ValidSystems = validSystems
+        if RouteCalc.__ValidSystems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
         
@@ -224,7 +252,7 @@ class RouteCalc(object):
         fullResults = []
         num = 0
         print("Starting brute force method...")
-        for sysList in itertools.permutations(validSystems,routeLength):
+        for sysList in itertools.permutations(RouteCalc.__ValidSystems,routeLength):
             if tempBrute.__len__() < 10000000:
                 tempBrute.append(sysList)
                 num += 1
@@ -250,5 +278,5 @@ class RouteCalc(object):
             return None
 
     @classmethod
-    def GeneticHelper(self,route):
+    def RouteCreatorThread(self,route):
         return EDRareRoute(route)

@@ -115,45 +115,46 @@ if __name__ == '__main__':
         station is then NOT added to the list.
         '''   
         if allSystems.count(currentSystem) != 0:
-            dupes = []
+            #dupes = []
             for system in allSystems:
                 if system == currentSystem:
                     system.AddRares(currentSystem)
-                    dupes.append(system)
+                    #dupes.append(system)
         else:
             allSystems.append(currentSystem)
 
     bruteSystems = []
-    bruteSystems.append(allSystems[62])  #Lave
-    bruteSystems.append(allSystems[64])  #Leesti
-    bruteSystems.append(allSystems[79])  #Orr
-    bruteSystems.append(allSystems[93])  #Usz
-    bruteSystems.append(allSystems[108]) #Zee
+    bruteSystems.append(allSystems[61])  #Lave
+    bruteSystems.append(allSystems[63])  #Leesti
+    bruteSystems.append(allSystems[78])  #Orr
+    bruteSystems.append(allSystems[92])  #Usz
+    bruteSystems.append(allSystems[25])  #Diso
+    bruteSystems.append(allSystems[107]) #Zee
     bruteSystems.append(allSystems[0])   #39 T
-    bruteSystems.append(allSystems[33])  #Fuj
-    bruteSystems.append(allSystems[35])  #George
-    bruteSystems.append(allSystems[26])  #Diso
-    bruteSystems.append(allSystems[70])  #Momus
-    bruteSystems.append(allSystems[102]) #Witch
-    bruteSystems.append(allSystems[8])   #Alt
-    bruteSystems.append(allSystems[91])  #Tio
-    bruteSystems.append(allSystems[21])  #Coq
-    bruteSystems.append(allSystems[32])  #Eth
-    bruteSystems.append(allSystems[13])  #Az
-    bruteSystems.append(allSystems[94])  #Utg
-    bruteSystems.append(allSystems[106]) #Yaso
-    bruteSystems.append(allSystems[81])  #Quech
+    bruteSystems.append(allSystems[32])  #Fuj
+    bruteSystems.append(allSystems[34])  #George
+    bruteSystems.append(allSystems[69])  #Momus
+    bruteSystems.append(allSystems[101]) #Witch
+    bruteSystems.append(allSystems[7])   #Alt
+    ''''''
+    #bruteSystems.append(allSystems[90])  #Tio
+    #bruteSystems.append(allSystems[20])  #Coq
+    #bruteSystems.append(allSystems[31])  #Eth
+    #bruteSystems.append(allSystems[12])  #Az
+    #bruteSystems.append(allSystems[93])  #Utg
+    #bruteSystems.append(allSystems[105]) #Yaso
+    #bruteSystems.append(allSystems[80])  #Quech
 
-    
+
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
 
-    maxStationDistance = 4500
-    systemsSubset = [system for system in allSystems if system.Station_Distance <= maxStationDistance
+    maxStationDistance = 1000
+    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
                                                         and "permit" not in system.System_Name]
-    routeSize = 4
-    
+    routeSize = 8
+    '''
     #Genetic
     exitTestLoop = False
     testNum = 0
@@ -172,7 +173,7 @@ if __name__ == '__main__':
             print("Generations: {0}".format(routeTuple[1]))
             print("Time: {0}s".format((geneticEnd-geneticStart)))
             exitTestLoop = True
-    
+    '''
     '''
     #Brute
     bruteStart = time.time()
@@ -185,108 +186,119 @@ if __name__ == '__main__':
         print("no routes =(")
     print("Routes found in {0}s".format((bruteEnd-bruteStart)))
     '''
-    #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.SelectionTester(5000)
+    PerformanceCalc.CheckPerformance(systemsSubset)
+    #PerformanceCalc.SelectionTester(50)
 
     #Yaso Kondi loop
     #Indices based on live spreadsheet, no duplicates
     ykLoopList = []
-    ykLoopList.append(allSystems[21])  #Coq
-    ykLoopList.append(allSystems[8])   #Alt
-    ykLoopList.append(allSystems[32])  #Eth
-    ykLoopList.append(allSystems[13])  #Az
-    ykLoopList.append(allSystems[35])  #George
-    ykLoopList.append(allSystems[94])  #Utg
-    ykLoopList.append(allSystems[106]) #Yaso
-    ykLoopList.append(allSystems[81])  #Quech
+    ykLoopList.append(allSystems[20])  #Coq
+    ykLoopList.append(allSystems[7])   #Alt
+    ykLoopList.append(allSystems[31])  #Eth
+    ykLoopList.append(allSystems[12])  #Az
+    ykLoopList.append(allSystems[34])  #George
+    ykLoopList.append(allSystems[93])  #Utg
+    ykLoopList.append(allSystems[105]) #Yaso
+    ykLoopList.append(allSystems[80])  #Quech
     #print("\n\nYK Loop")
     #print(EDRareRoute(ykLoopList))
 
     #8 system round found by program
     #indices based on live spreadsheet, no duplicates
-    genRoute8 = []
-    genRoute8.append(allSystems[20]) #Chi Er
-    genRoute8.append(allSystems[8])  #Alt
-    genRoute8.append(allSystems[16]) #Bast
-    genRoute8.append(allSystems[91]) #Tio
-    genRoute8.append(allSystems[14]) #Baltah
-    genRoute8.append(allSystems[49]) #Iru
-    genRoute8.append(allSystems[58]) #Karsu
-    genRoute8.append(allSystems[24]) #Delta P
+    bad8_1 = []
+    bad8_1.append(allSystems[19]) #Chi Er
+    bad8_1.append(allSystems[7])  #Alt
+    bad8_1.append(allSystems[15]) #Bast
+    bad8_1.append(allSystems[90]) #Tio
+    bad8_1.append(allSystems[13]) #Baltah
+    bad8_1.append(allSystems[48]) #Iru
+    bad8_1.append(allSystems[57]) #Karsu
+    bad8_1.append(allSystems[23]) #Delta P
     #print("\n\nBad 8 System route, low item cost")
-    #print(EDRareRoute(genRoute8))
+    #print(EDRareRoute(bad8_1))
 
-    test8 = []
-    test8.append(allSystems[40])#Hec
-    test8.append(allSystems[5]) #Agan
-    test8.append(allSystems[64])#Leesti
-    test8.append(allSystems[11])#Any
-    test8.append(allSystems[76])#Ngur
-    test8.append(allSystems[14])#Balt
-    test8.append(allSystems[20])#Chi Er
-    test8.append(allSystems[8]) #Alt
-    #print("\nBad 8 system route, poor seller spacing")
-    #print(EDRareRoute(test8))
+    good8_1 = []
+    good8_1.append(allSystems[39])#Hec
+    good8_1.append(allSystems[4]) #Agan
+    good8_1.append(allSystems[63])#Leesti
+    good8_1.append(allSystems[10])#Any
+    good8_1.append(allSystems[75])#Ngur
+    good8_1.append(allSystems[13])#Balt
+    good8_1.append(allSystems[19])#Chi Er
+    good8_1.append(allSystems[7]) #Alt
+    #print("\nActually maybe a good route?")
+    #print(EDRareRoute(good8_1))
 
     #5 system test
-    test5 = []
-    test5.append(allSystems[49]) #Iru
-    test5.append(allSystems[76]) #ngur
-    test5.append(allSystems[64]) #Leesti
-    test5.append(allSystems[5])  #Agan
-    test5.append(allSystems[8])  #Alt
+    bad5_1 = []
+    bad5_1.append(allSystems[48]) #Iru
+    bad5_1.append(allSystems[75]) #ngur
+    bad5_1.append(allSystems[63]) #Leesti
+    bad5_1.append(allSystems[4])  #Agan
+    bad5_1.append(allSystems[7])  #Alt
     #print("\nBad 5 system route, poor systems distance")
-    #print(EDRareRoute(test5))
+    #print(EDRareRoute(bad5_1))
 
 
-    test4 = []
-    test4.append(allSystems[33])  #Fuj
-    test4.append(allSystems[0])   #39 T
-    test4.append(allSystems[26])  #Diso
-    test4.append(allSystems[64])  #Leesti
+    good4_1 = []
+    good4_1.append(allSystems[32])  #Fuj
+    good4_1.append(allSystems[0])   #39 T
+    good4_1.append(allSystems[25])  #Diso
+    good4_1.append(allSystems[63])  #Leesti
     #print("\nGood 4 system route")
-    #print(EDRareRoute(test4))
+    #print(EDRareRoute(good4_1))
 
-    systems11_1 = []
-    systems11_1.append(allSystems[108]) #Zee
-    systems11_1.append(allSystems[84])  #Rus
-    systems11_1.append(allSystems[5])   #Agan
-    systems11_1.append(allSystems[64])  #Leesti
-    systems11_1.append(allSystems[62])  #Lave
-    systems11_1.append(allSystems[76])  #Ngur
-    systems11_1.append(allSystems[49])  #Iru
-    systems11_1.append(allSystems[18])  #CD-75
-    systems11_1.append(allSystems[91])  #Tio
-    systems11_1.append(allSystems[28])  #Epsi
-    systems11_1.append(allSystems[8])   #Alt
+    bad11_1 = []
+    bad11_1.append(allSystems[107]) #Zee
+    bad11_1.append(allSystems[83])  #Rus
+    bad11_1.append(allSystems[4])   #Agan
+    bad11_1.append(allSystems[63])  #Leesti
+    bad11_1.append(allSystems[61])  #Lave
+    bad11_1.append(allSystems[75])  #Ngur
+    bad11_1.append(allSystems[48])  #Iru
+    bad11_1.append(allSystems[17])  #CD-75
+    bad11_1.append(allSystems[90])  #Tio
+    bad11_1.append(allSystems[27])  #Epsi
+    bad11_1.append(allSystems[7])   #Alt
     #print("\nBad 11 system route, poor system distances")
-    #print(EDRareRoute(systems11_1))
+    #print(EDRareRoute(bad11_1))
 
-    another5 = []
-    another5.append(allSystems[64])  #Leesti
-    another5.append(allSystems[26])  #Dis
-    another5.append(allSystems[79])  #Orr
-    another5.append(allSystems[94])  #Utg
-    another5.append(allSystems[87])  #Tan
+    good5_1 = []
+    good5_1.append(allSystems[63])  #Leesti
+    good5_1.append(allSystems[25])  #Dis
+    good5_1.append(allSystems[78])  #Orr
+    good5_1.append(allSystems[93])  #Utg
+    good5_1.append(allSystems[86])  #Tan
     #print("\nGood 5, multiple bad sell locations")
-    #print(EDRareRoute(another5))
+    #print(EDRareRoute(good5_1))
 
-    #Orr Usz Witch 39 Hec Lee 
+    good5_2 = []
+    good5_2.append(allSystems[86])  #Tan
+    good5_2.append(allSystems[78])  #Orr
+    good5_2.append(allSystems[25])  #Dis
+    good5_2.append(allSystems[61])  #Lave
+    good5_2.append(allSystems[93])  #Utg
+    #print("\nProbably okay 5")
+    #print(EDRareRoute(good5_2))
 
-    #pathetic attempt at multithreading
-    #Can only map around 20,000,000 before memory cap
-    '''
-    from multiprocessing import Pool
-    from multiprocessing.dummy import Pool as ThreadPool
-    poolSize = 3
-    
-    t1Start = time.time()
-    routePerms = itertools.permutations(bruteSystems,routeSize)
-    with ThreadPool(poolSize) as p:
-        results = p.map(RouteCalc.T_Helper,routePerms)
-    results = [val for val in results if val]
-    sortedResults = sorted(results,key=operator.attrgetter('Fitness_Value'))
-    t1End = time.time()
-    for route in sortedResults:
-        print(route)
-    '''
+    bad6_1 = []
+    bad6_1.append(allSystems[56])  #Kare
+    bad6_1.append(allSystems[26])  #Ele
+    bad6_1.append(allSystems[7])   #Alt
+    bad6_1.append(allSystems[93])  #Utg
+    bad6_1.append(allSystems[39])  #Hec
+    bad6_1.append(allSystems[77])  #Ocho
+    #print("\nShould be bad 6")
+    #print(EDRareRoute(bad6_1))
+
+    good6_1 = []
+    good6_1.append(allSystems[78])  #Orr
+    good6_1.append(allSystems[87])  #Tar
+    good6_1.append(allSystems[86])  #Tan
+    good6_1.append(allSystems[93])  #Utg
+    good6_1.append(allSystems[63])  #Leesti
+    #good6_1.append(allSystems[61])  #Lave
+    #print(EDRareRoute(good6_1))
+
+    #Good 'other' route
+    #aeriel karsuki jaroua leesti epsilon altair

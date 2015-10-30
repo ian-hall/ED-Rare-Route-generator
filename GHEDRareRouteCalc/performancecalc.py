@@ -12,7 +12,7 @@ import bisect
 class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,systemsList):
-        maxTests = 10
+        maxTests = 20
 
         popSize = 100
         maxPopSize = 100
@@ -46,7 +46,7 @@ class PerformanceCalc(object):
     @classmethod
     def SelectionTester(self, size: int):
         #Just copying from routecalc because i'm bad
-        mult = 546
+        mult = .001
         for run in range(0,50000):
             population = []
             for i in range(0,size):
