@@ -12,13 +12,13 @@ import bisect
 class PerformanceCalc(object):
     @classmethod
     def CheckPerformance(self,systemsList):
-        maxTests = 20
+        maxTests = 10
 
-        popSize = 100
-        maxPopSize = 100
+        popSize = 1000
+        maxPopSize = 1000
             
-        routeLen = 3
-        maxRouteLen = 5
+        routeLen = 6
+        maxRouteLen = 8
 
         while routeLen <= maxRouteLen:
             stats = PerformanceMetrics(routeLen,popSize)

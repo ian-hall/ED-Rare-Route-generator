@@ -12,7 +12,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 9.85
+    Route_Cutoff = 9.5
     __Selection_Mult = .5
     __Pool_Size = 3
     __ValidSystems = []
@@ -22,7 +22,7 @@ class RouteCalc(object):
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
 
-        TODO: Unbreak this, probably something with selection methods and mutation??
+        TODO: Make sure this is actually working now like I think it is
         '''
         population = []
         RouteCalc.__ValidSystems = validSystems

@@ -14,7 +14,7 @@ import re
 import time
 
 
-def __ValidateLine(currentLine, lineNum):
+def __ValidateLine(currentLine, lineNum: int):
     '''
     0 - Max Cap
     1 - Supply Rate
@@ -73,6 +73,35 @@ def __ValidateLine(currentLine, lineNum):
                     distToStation, stationName, systemName, index,
                     distToOthers)
 
+def __RunGenetic(systems: 'list of EDSystem instance', routeLength: int, popSize: int, silent: bool):
+    exitTestLoop = False
+    testNum = 0
+    maxTests = 20
+    geneticStart = time.time()
+    while not exitTestLoop and testNum < maxTests:
+        testNum += 1
+        print("Test: {0}".format(testNum))
+        routeTuple = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent)
+        geneticEnd = time.time()
+        bestRoute = routeTuple[0]
+        print("Best route found had value {0}".format(bestRoute.Fitness_Value))
+        if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
+            print(bestRoute)
+            print("Generations: {0}".format(routeTuple[1]))
+            print("Time: {0}s".format((geneticEnd-geneticStart)))
+            exitTestLoop = True
+
+def __RunBrute(systems: 'list of EDSystem instance', routeLength: int):
+    bruteStart = time.time()
+    routes = RouteCalc.Brute(systems,routeLength)
+    bruteEnd = time.time()
+    if routes.__len__() > 0:
+        for route in routes:
+            print(route)
+    else:
+        print("no routes =(")
+    print("Routes found in {0}s".format((bruteEnd-bruteStart)))
+
 if __name__ == '__main__':
     cleanedCSV = []
     allSystems = []
@@ -115,11 +144,9 @@ if __name__ == '__main__':
         station is then NOT added to the list.
         '''   
         if allSystems.count(currentSystem) != 0:
-            #dupes = []
             for system in allSystems:
                 if system == currentSystem:
                     system.AddRares(currentSystem)
-                    #dupes.append(system)
         else:
             allSystems.append(currentSystem)
 
@@ -153,40 +180,11 @@ if __name__ == '__main__':
     maxStationDistance = 1000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
                                                         and "permit" not in system.System_Name]
-    routeSize = 8
-    '''
-    #Genetic
-    exitTestLoop = False
-    testNum = 0
-    maxTests = 20
-    popSize = 100
-    geneticStart = time.time()
-    while not exitTestLoop and testNum < maxTests:
-        testNum += 1
-        print("Test: {0}".format(testNum))
-        routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsSubset,routeSize, False)
-        geneticEnd = time.time()
-        bestRoute = routeTuple[0]
-        print("Best route found had value {0}".format(bestRoute.Fitness_Value))
-        if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
-            print(bestRoute)
-            print("Generations: {0}".format(routeTuple[1]))
-            print("Time: {0}s".format((geneticEnd-geneticStart)))
-            exitTestLoop = True
-    '''
-    '''
-    #Brute
-    bruteStart = time.time()
-    routes = RouteCalc.Brute(bruteSystems,routeSize)
-    bruteEnd = time.time()
-    if routes.__len__() > 0:
-        for route in routes:
-            print(route)
-    else:
-        print("no routes =(")
-    print("Routes found in {0}s".format((bruteEnd-bruteStart)))
-    '''
-    PerformanceCalc.CheckPerformance(systemsSubset)
+    length = 9
+    popSize = 1000
+    __RunGenetic(systemsSubset,length,popSize,False)
+    #__RunBrute(bruteSystems,length)
+    #PerformanceCalc.CheckPerformance(systemsSubset)
     #PerformanceCalc.SelectionTester(50)
 
     #Yaso Kondi loop
@@ -297,8 +295,18 @@ if __name__ == '__main__':
     good6_1.append(allSystems[86])  #Tan
     good6_1.append(allSystems[93])  #Utg
     good6_1.append(allSystems[63])  #Leesti
-    #good6_1.append(allSystems[61])  #Lave
+    good6_1.append(allSystems[61])  #Lave
+    #print("Good 6, but chosen sellers could be better")
     #print(EDRareRoute(good6_1))
 
     #Good 'other' route
     #aeriel karsuki jaroua leesti epsilon altair
+
+    bad5_2 = []
+    bad5_2.append(allSystems[25])  #Dis
+    bad5_2.append(allSystems[106]) #Zaon
+    bad5_2.append(allSystems[63])  #Leesti
+    bad5_2.append(allSystems[0])   #39 T
+    bad5_2.append(allSystems[39])  #Hec
+    #print(" \"Good\" 5, one station with bad distance")
+    #print(EDRareRoute(bad5_2))
