@@ -22,8 +22,7 @@ class EDSystem( object ):
 
     def __key(self):
         '''
-        Use system/station name for key because we want stations that sell
-        multiple rares to be treated as one entry. 
+        All stations/rares in a system will count as one EDSystems
         '''
         return self.System_Name
     
@@ -36,7 +35,7 @@ class EDSystem( object ):
     def __eq__(self, other):
         return self.__key() == other.__key()
     
-    def AddRares(self, newRares):
+    def AddRares(self, newRares: 'EDSystem'):
         self.Supply.extend(newRares.Supply)
         self.Cost.extend(newRares.Cost)
         self.Items.extend(newRares.Items)

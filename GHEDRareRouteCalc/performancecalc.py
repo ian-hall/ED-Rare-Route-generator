@@ -1,5 +1,5 @@
 ﻿from edsystem import EDSystem
-from edrareroute import EDRareRoute
+from edrareroute import EDRareRoute, RouteType
 from routecalc import RouteCalc
 import operator
 import random
@@ -14,76 +14,38 @@ class PerformanceCalc(object):
     def CheckPerformance(self,systemsList):
         maxTests = 10
 
-        popSize = 1000
-        maxPopSize = 1000
-            
-        routeLen = 6
-        maxRouteLen = 8
+        minPopSize = 500
+        maxPopSize = 600
+        popSizeStep = 100
+        popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        while routeLen <= maxRouteLen:
-            stats = PerformanceMetrics(routeLen,popSize)
-            testNum = 0
-            while testNum < maxTests:
-                testNum += 1
-                #print("Test: {0}".format(testNum))
-                solved = False
-                startTime = time.time()
-                routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsList,routeLen, True)
-                endTime = time.time()
-                elapsed = endTime - startTime
-                bestRoute = routeTuple[0]
-                if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
-                    solved = True
+        minLength = 8
+        maxLength = 8
+        lengths = range(minLength,maxLength+1,1)
 
-                stats.Times.append(elapsed)
-                stats.Solved.append(solved)
-                stats.Gens.append(routeTuple[1])
+        
+        for routeLength in lengths:
+            for popSize in popSizes:
+                stats = PerformanceMetrics(routeLength,popSize)
+                #testNum = 0
+                for testNum in range(maxTests):
+                    #testNum += 1
+                    #print("Test: {0}".format(testNum))
+                    solved = False
+                    startTime = time.time()
+                    routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsList,routeLength, True)
+                    endTime = time.time()
+                    elapsed = endTime - startTime
+                    bestRoute = routeTuple[0]
+                    if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
+                        stats.Types.append(routeTuple[0].Route_Type)
+                        solved = True
 
-            print(stats)
-            #popSize += 10
-            routeLen += 1
+                    stats.Times.append(elapsed)
+                    stats.Solved.append(solved)
+                    stats.Gens.append(routeTuple[1])
 
-    @classmethod
-    def SelectionTester(self, size: int):
-        #Just copying from routecalc because i'm bad
-        mult = .001
-        for run in range(0,50000):
-            population = []
-            for i in range(0,size):
-                population.append(random.uniform(1,20))
-            upperVal = size * mult
-            total = sum([val for val in population])
-
-            selectionValues = [population[0]/total * upperVal]
-            for i in range(1,population.__len__()):
-                percentTotal = population[i]/total * upperVal
-                selectionValues.append(percentTotal + selectionValues[i-1])
-
-            if abs(upperVal - selectionValues[-1]) >= 0.0001:
-                print("fail")
-
-            parentsBisect = []
-            parentsLoop = []
-            while parentsBisect.__len__() != 2:
-                value = random.uniform(0,upperVal)
-                parentsBisect.append(bisect.bisect(selectionValues,value))
-            
-                i = 0
-                while True:
-                    currentSelection = None
-                    if value <= selectionValues[i]:
-                        parentsLoop.append(i)
-                        break
-                    i += 1
-
-
-            if not (parentsBisect[0] == parentsLoop[0] and parentsBisect[1] == parentsLoop[1]):
-                print("fail")
-                print("b0: " + parentsBisect[0])
-                print("l0: " + parentsLoop[0])
-                print("b1: " + parentsBisect[1])
-                print("b2: " + parentsLoop[1])
-                
+                print(stats)
 
 class PerformanceMetrics(object):
     def __init__(self,length,popSize):
@@ -92,6 +54,7 @@ class PerformanceMetrics(object):
         self.Times = []
         self.Solved = []
         self.Gens = []
+        self.Types = []
 
     def __str__(self):
         strList = []
@@ -124,6 +87,10 @@ class PerformanceMetrics(object):
         strList.append("\n\tSolved Percentage: {0}".format(percentSolved))
         strList.append("\n\tAvg time to solve: {0}".format(avgTimeSolved))
         strList.append("\n\tAvg generations to solve: {0}".format(avgGensSolved))
+        strList.append("\n\tSolution Types:")
+        strList.append("\n\t\t{0}: {1}".format(RouteType.Other.name,self.Types.count(RouteType.Other)))
+        strList.append("\n\t\t{0}: {1}".format(RouteType.Spread.name,self.Types.count(RouteType.Spread)))
+        strList.append("\n\t\t{0}: {1}".format(RouteType.Cluster.name,self.Types.count(RouteType.Cluster)))
         strList.append("\n\tAvg time for unsolved: {0}".format(avgTimeUnsolved))
         strList.append("\n\tAvg generations for unsolved: {0}".format(avgGensUnsolved))
 

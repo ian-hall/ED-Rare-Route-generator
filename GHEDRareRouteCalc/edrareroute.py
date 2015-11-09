@@ -1,24 +1,18 @@
 ﻿from edsystem import EDSystem
-import random
-import collections
 import itertools
 import math
-import sys
-import operator
 from enum import Enum,unique
 
 @unique
 class RouteType(Enum):
-    Other = 1
-    Cluster = 1.3
-    Spread = 1.5
+    Other = 0
+    Cluster = 1
+    Spread = 2
 class EDRareRoute(object):
     def __init__(self,systemList: []):
-        #Range of route lengths that are allowed, need at least 3 systems for the genetic alg to work
-        if systemList.__len__() > 11 or systemList.__len__() < 3:
-            raise Exception("Error: Route needs to have length [3-11]")
         self.__Route = systemList
         self.__Seller_Min = 160
+        self.Total_Distance = 0
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Best_Sellers = None
         self.Route_Type = None
@@ -30,24 +24,22 @@ class EDRareRoute(object):
     def __CalcFitness(self):
         routeLength = self.__Route.__len__()     
        
-
-        # Max good distance for a route should avg around Xly a jump 
-        maxGoodDistance = routeLength * 110
-        totalDistance = 0
-        clusterShortLY = 45
+        clusterShortLY = 50
         clusterLongLY = 155
         spreadMinLY = 0
-        spreadMaxLY = 115
+        spreadMaxLY = 120
         maxJumpRangeLY = 230
         clusterShort = 0
         clusterLong = 0
         spreadJumps = 0
+        longestJump = -999
 
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
-            totalDistance += jumpDistance
+            self.Total_Distance += jumpDistance
+            longestJump = jumpDistance if jumpDistance > longestJump else longestJump
             if jumpDistance <= clusterShortLY:
                 clusterShort += 1
             if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
@@ -70,7 +62,6 @@ class EDRareRoute(object):
 
         pairValue = -999
         goodPair = 6
-        potentialPair = 2
 
         #TODO: Make sure this is actually right
 
@@ -90,48 +81,50 @@ class EDRareRoute(object):
                 if (systemDistance != math.floor(routeLength/2) and systemDistance != math.ceil(routeLength/2)):
                     continue
 
-            #TODO: Condense this into a single loop 
+            #TODO: Fix spacing
             system1Sellers = []
-            firstIndex = -999
+            system1LastIndex = -999
+            system2Sellers = []
+            system2LastIndex = -999
             for i in range(1,routeLength):
-                index = (i + system1Index) % routeLength
-                currentSystem = self.__Route[index]
+                system1IndexToCheck = (i + system1Index) % routeLength
+                currentSystem = self.__Route[system1IndexToCheck]
                 if system1.System_Distances[currentSystem.Index] >= self.__Seller_Min:
-                    if firstIndex > 0:
+                    if system1LastIndex > 0:
                         if system1Sellers[-1]:
                             system1Sellers.append(True)
-                            allSystemsSellable[index] = 1
+                            allSystemsSellable[system1IndexToCheck] = 1
                         else:
                             system1Sellers.append(False)
                     else:
-                        firstIndex = index
+                        system1LastIndex = system1IndexToCheck
                         system1Sellers.append(True)
-                        allSystemsSellable[index] = 1
+                        allSystemsSellable[system1IndexToCheck] = 1
                 else:
                     system1Sellers.append(False)
+
+          
+            #for i in range(1,routeLength):
+                system2IndexToCheck = (i + system2Index) % routeLength
+                currentSystem = self.__Route[system2IndexToCheck]
+                if system2.System_Distances[currentSystem.Index] >= self.__Seller_Min:
+                    if system2LastIndex > 0:
+                        if system2Sellers[-1]:
+                            system2Sellers.append(True)
+                            allSystemsSellable[system2IndexToCheck] = 1
+                        else:
+                            system2Sellers.append(False)
+                    else:
+                        system2LastIndex = system2IndexToCheck
+                        system2Sellers.append(True)
+                        allSystemsSellable[system2IndexToCheck] = 1
+                else:
+                    system2Sellers.append(False)
+            
             num1 = 0
             for val in system1Sellers:
                 if val:
                     num1 += 1
-          
-            system2Sellers = []
-            firstIndex = -999
-            for i in range(1,routeLength):
-                index = (i + system2Index) % routeLength
-                currentSystem = self.__Route[index]
-                if system2.System_Distances[currentSystem.Index] >= self.__Seller_Min:
-                    if firstIndex > 0:
-                        if system2Sellers[-1]:
-                            system2Sellers.append(True)
-                            allSystemsSellable[index] = 1
-                        else:
-                            system2Sellers.append(False)
-                    else:
-                        firstIndex = index
-                        system2Sellers.append(True)
-                        allSystemsSellable[index] = 1
-                else:
-                    system2Sellers.append(False)
             num2 = 0
             for val in system2Sellers:
                 if val:
@@ -157,23 +150,27 @@ class EDRareRoute(object):
                     pairValue = sum(allSystemsSellable) / 15
                     self.Best_Sellers = systemPair
             
-        #If no combo of systems yields good seller spacing, or not all systems accounted for in the best pair, return here
+        #If no combo of systems yields good seller spacing, or not all systems accounted for in the best pair(?), return here
         if not self.Best_Sellers:
             return 0.01
         
+        maxGoodDistance = routeLength * 100
         #Less total distance needs to give a higher value
-        weightedDistance = maxGoodDistance/totalDistance
-        magicSupply = routeLength * 12
-        weightedSupply = self.Total_Supply/magicSupply
+        weightedDistance = (maxGoodDistance/self.Total_Distance) * 2
+        
+        minSupply = routeLength * 12
+        weightedSupply = math.log(self.Total_Supply,minSupply) * 2
   
         avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
-        #"normalize" this by taking log base 1000 of avg
+        #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
 
 
-        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) * self.Route_Type.value
-        if weightedCost < 1 or weightedDistance < 1 or weightedSupply < 1:
+        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) #* self.Route_Type.value
+        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
+            totalValue = totalValue * 0.5
+        if longestJump > maxJumpRangeLY:
             totalValue = totalValue * 0.7
 
         return totalValue
@@ -212,7 +209,8 @@ class EDRareRoute(object):
             for system in self.__Route:
                strList.append('{0}\n'.format(system))
 
-        strList.append("\n\nTotal goods: {0}".format(self.Total_Supply))
+        strList.append("\nTotal distance: {0}ly".format(self.Total_Distance))
+        strList.append("\nTotal goods: {0}".format(self.Total_Supply))
         strList.append("\nAvg cost: {0}".format(avgCost))
-        strList.append("\nType: {0}".format(self.Route_Type))
+        strList.append("\nType: {0}".format(self.Route_Type.name))
         return ''.join(strList)

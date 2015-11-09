@@ -12,7 +12,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 9.5
+    Route_Cutoff = 11.6
     __Selection_Mult = .5
     __Pool_Size = 3
     __ValidSystems = []
@@ -24,6 +24,10 @@ class RouteCalc(object):
 
         TODO: Make sure this is actually working now like I think it is
         '''
+        #Route len 14 found with cutoff at 11
+        if routeLength < 3 or routeLength > 14:
+            raise Exception("Routes need length between 3 and 15")
+
         population = []
         RouteCalc.__ValidSystems = validSystems
         
@@ -41,11 +45,11 @@ class RouteCalc(object):
                 while tempSystemList.count(tempSystem) != 0:
                     tempSystem = random.choice(validSystems)
                 tempSystemList.append(tempSystem)
-            #population.append(EDRareRoute(tempSystemList))
-            tempPopulation.append(tempSystemList)
+            population.append(EDRareRoute(tempSystemList))
+            #tempPopulation.append(tempSystemList)
 
-        with Pool(RouteCalc.__Pool_Size) as p:
-            population = p.map(self.RouteCreatorThread,tempPopulation)
+        #with Pool(RouteCalc.__Pool_Size) as p:
+        #    population = p.map(self.RouteCreatorThread,tempPopulation)
 
         return self.__GeneticSolver(population,silent)
 
@@ -73,7 +77,7 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually (maybe).
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.43
+        mutationIncrease = 0.25
         timeBetweenIncrease = 500
         lastIncrease = currentGeneration
         numIncreases = 0
@@ -112,6 +116,7 @@ class RouteCalc(object):
 
             #Should probably check to make sure this stops at 1 but I guess it doesnt really matter since random() always returns < 1
             #TODO: Change this to instead replace a percentage of population members with the lowest fitness vals
+            #       Maybe move this after the population undergoes reproduction/mutation since it wont touch the high value routes
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
@@ -187,6 +192,7 @@ class RouteCalc(object):
             value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
             parents.append(population[bisect.bisect(selectionValues,value)])
         #Create the new child
+        #TODO: Change this so the 2nd parent chosen starts at the pivot instead of 0
         route1 = parents[0].GetRoute()
         route2 = parents[1].GetRoute()
         pivot = random.randrange(1,route1.__len__()-1)

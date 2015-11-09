@@ -83,13 +83,14 @@ def __RunGenetic(systems: 'list of EDSystem instance', routeLength: int, popSize
         print("Test: {0}".format(testNum))
         routeTuple = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent)
         geneticEnd = time.time()
-        bestRoute = routeTuple[0]
-        print("Best route found had value {0}".format(bestRoute.Fitness_Value))
-        if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
-            print(bestRoute)
-            print("Generations: {0}".format(routeTuple[1]))
-            print("Time: {0}s".format((geneticEnd-geneticStart)))
-            exitTestLoop = True
+        if routeTuple:
+            bestRoute = routeTuple[0]
+            print("Best route found had value {0}".format(bestRoute.Fitness_Value))
+            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
+                print(bestRoute)
+                print("Generations: {0}".format(routeTuple[1]))
+                print("Time: {0}s".format((geneticEnd-geneticStart)))
+                exitTestLoop = True
 
 def __RunBrute(systems: 'list of EDSystem instance', routeLength: int):
     bruteStart = time.time()
@@ -139,9 +140,7 @@ if __name__ == '__main__':
     for i in range(1,cleanedCSV.__len__()-1):
         currentSystem = __ValidateLine(cleanedCSV[i],i)
         '''
-        If a system/station is already in the allSystems list we will simply add
-        the rare items from the found station to the station in the list. The found
-        station is then NOT added to the list.
+        Putting all systems with multiple stations/rares/whatever into one EDSystem object
         '''   
         if allSystems.count(currentSystem) != 0:
             for system in allSystems:
@@ -163,29 +162,28 @@ if __name__ == '__main__':
     bruteSystems.append(allSystems[69])  #Momus
     bruteSystems.append(allSystems[101]) #Witch
     bruteSystems.append(allSystems[7])   #Alt
-    ''''''
-    #bruteSystems.append(allSystems[90])  #Tio
-    #bruteSystems.append(allSystems[20])  #Coq
-    #bruteSystems.append(allSystems[31])  #Eth
-    #bruteSystems.append(allSystems[12])  #Az
-    #bruteSystems.append(allSystems[93])  #Utg
-    #bruteSystems.append(allSystems[105]) #Yaso
-    #bruteSystems.append(allSystems[80])  #Quech
-
+    
+    bruteSystems.append(allSystems[90])  #Tio
+    bruteSystems.append(allSystems[20])  #Coq
+    bruteSystems.append(allSystems[31])  #Eth
+    bruteSystems.append(allSystems[12])  #Az
+    bruteSystems.append(allSystems[93])  #Utg
+    bruteSystems.append(allSystems[105]) #Yaso
+    bruteSystems.append(allSystems[80])  #Quech
 
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
 
-    maxStationDistance = 1000
+    maxStationDistance = 5000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
                                                         and "permit" not in system.System_Name]
-    length = 9
-    popSize = 1000
-    __RunGenetic(systemsSubset,length,popSize,False)
+    length = 6
+    popSize = 600
+    silent = True
+    __RunGenetic(systemsSubset,length,popSize,not silent)
     #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.SelectionTester(50)
 
     #Yaso Kondi loop
     #Indices based on live spreadsheet, no duplicates
@@ -296,7 +294,7 @@ if __name__ == '__main__':
     good6_1.append(allSystems[93])  #Utg
     good6_1.append(allSystems[63])  #Leesti
     good6_1.append(allSystems[61])  #Lave
-    #print("Good 6, but chosen sellers could be better")
+    #print("\nGood 6, but chosen sellers could be better")
     #print(EDRareRoute(good6_1))
 
     #Good 'other' route
@@ -308,5 +306,8 @@ if __name__ == '__main__':
     bad5_2.append(allSystems[63])  #Leesti
     bad5_2.append(allSystems[0])   #39 T
     bad5_2.append(allSystems[39])  #Hec
-    #print(" \"Good\" 5, one station with bad distance")
+    #print("\n\"Good\" 5, one station with bad distance")
     #print(EDRareRoute(bad5_2))
+
+    #Good 10 system route:
+    #Helv Eth Alt Cd-75 Phia Coq Yaso Utg Balt Leest
