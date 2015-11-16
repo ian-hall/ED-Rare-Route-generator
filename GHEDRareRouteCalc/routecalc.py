@@ -12,7 +12,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.6
+    Route_Cutoff = 11.5
     __Selection_Mult = .5
     __Pool_Size = 3
     __ValidSystems = []
@@ -230,7 +230,6 @@ class RouteCalc(object):
             random.shuffle(tempRoute)
         else:
             #change up to half the systems in a route
-            #TODO: Avoid replacing the same system more than once
             numSystemsToChange = random.randrange(1,math.ceil(tempRoute.__len__()/2))
             changedSystems = []
             for i in range(0, numSystemsToChange):

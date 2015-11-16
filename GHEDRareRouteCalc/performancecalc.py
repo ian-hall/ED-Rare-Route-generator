@@ -15,12 +15,12 @@ class PerformanceCalc(object):
         maxTests = 10
 
         minPopSize = 500
-        maxPopSize = 600
-        popSizeStep = 100
+        maxPopSize = 500
+        popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
         minLength = 8
-        maxLength = 8
+        maxLength = 9
         lengths = range(minLength,maxLength+1,1)
 
         
@@ -39,6 +39,7 @@ class PerformanceCalc(object):
                     bestRoute = routeTuple[0]
                     if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
                         stats.Types.append(routeTuple[0].Route_Type)
+                        stats.Values.append(routeTuple[0].Fitness_Value)
                         solved = True
 
                     stats.Times.append(elapsed)
@@ -55,6 +56,7 @@ class PerformanceMetrics(object):
         self.Solved = []
         self.Gens = []
         self.Types = []
+        self.Values = []
 
     def __str__(self):
         strList = []
@@ -77,21 +79,24 @@ class PerformanceMetrics(object):
                 totalGensUnsolved += self.Gens[i]
 
         percentSolved = (numSolved/numEntries) * 100
+        avgSolvedValue = sum(self.Values)/self.Values.__len__() if numSolved > 0 else 0
         avgTimeSolved = totalTimeSolved/numSolved if numSolved > 0 else 0
         avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
         avgGensSolved = totalGensSolved/numSolved if numSolved > 0 else 0 
         avgGensUnsolved = totalGensUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0  
 
-        strList.append("Route Length {0}:".format(self.Route_Length))
-        strList.append("\nPop size {0}".format(self.Pop_Size))
-        strList.append("\n\tSolved Percentage: {0}".format(percentSolved))
-        strList.append("\n\tAvg time to solve: {0}".format(avgTimeSolved))
-        strList.append("\n\tAvg generations to solve: {0}".format(avgGensSolved))
-        strList.append("\n\tSolution Types:")
-        strList.append("\n\t\t{0}: {1}".format(RouteType.Other.name,self.Types.count(RouteType.Other)))
-        strList.append("\n\t\t{0}: {1}".format(RouteType.Spread.name,self.Types.count(RouteType.Spread)))
-        strList.append("\n\t\t{0}: {1}".format(RouteType.Cluster.name,self.Types.count(RouteType.Cluster)))
-        strList.append("\n\tAvg time for unsolved: {0}".format(avgTimeUnsolved))
-        strList.append("\n\tAvg generations for unsolved: {0}".format(avgGensUnsolved))
+        strList.append("\nRoute Length {0}, Pop Size {1}".format(self.Route_Length,self.Pop_Size))
+        strList.append("\n\tSolved {0}%".format(percentSolved))
+        if numSolved > 0:
+            strList.append("\n\tAvg solved value: {0}".format(avgSolvedValue))
+            strList.append("\n\tAvg time(solved): {0}".format(avgTimeSolved))
+            strList.append("\n\tAvg generations(solved): {0}".format(avgGensSolved))
+            strList.append("\n\tSolution Types:")
+            strList.append("\n\t\t{0}: {1}".format(RouteType.Other.name,self.Types.count(RouteType.Other)))
+            strList.append("\n\t\t{0}: {1}".format(RouteType.Spread.name,self.Types.count(RouteType.Spread)))
+            strList.append("\n\t\t{0}: {1}".format(RouteType.Cluster.name,self.Types.count(RouteType.Cluster)))
+        if numSolved != self.Solved.__len__():
+            strList.append("\n\tAvg time(fail): {0}".format(avgTimeUnsolved))
+            strList.append("\n\tAvg generations(fail): {0}".format(avgGensUnsolved))
 
         return ''.join(strList)

@@ -108,7 +108,7 @@ if __name__ == '__main__':
     allSystems = []
 
     
-    with open('ED2.csv') as csvFile:
+    with open('RareGoods.csv') as csvFile:
         reader = csv.reader(csvFile)
         breakout = False
         for line in reader:
@@ -163,13 +163,13 @@ if __name__ == '__main__':
     bruteSystems.append(allSystems[101]) #Witch
     bruteSystems.append(allSystems[7])   #Alt
     
-    bruteSystems.append(allSystems[90])  #Tio
-    bruteSystems.append(allSystems[20])  #Coq
-    bruteSystems.append(allSystems[31])  #Eth
-    bruteSystems.append(allSystems[12])  #Az
-    bruteSystems.append(allSystems[93])  #Utg
-    bruteSystems.append(allSystems[105]) #Yaso
-    bruteSystems.append(allSystems[80])  #Quech
+    #bruteSystems.append(allSystems[90])  #Tio
+    #bruteSystems.append(allSystems[20])  #Coq
+    #bruteSystems.append(allSystems[31])  #Eth
+    #bruteSystems.append(allSystems[12])  #Az
+    #bruteSystems.append(allSystems[93])  #Utg
+    #bruteSystems.append(allSystems[105]) #Yaso
+    #bruteSystems.append(allSystems[80])  #Quech
 
     '''
     TODO: Allow users to enter the values for size/station distance.
@@ -178,12 +178,12 @@ if __name__ == '__main__':
     maxStationDistance = 5000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
                                                         and "permit" not in system.System_Name]
-    length = 6
-    popSize = 600
+    length = 8
+    popSize = 500
     silent = True
-    __RunGenetic(systemsSubset,length,popSize,not silent)
+    #__RunGenetic(systemsSubset,length,popSize,not silent)
     #__RunBrute(bruteSystems,length)
-    #PerformanceCalc.CheckPerformance(systemsSubset)
+    PerformanceCalc.CheckPerformance(systemsSubset)
 
     #Yaso Kondi loop
     #Indices based on live spreadsheet, no duplicates
@@ -306,7 +306,7 @@ if __name__ == '__main__':
     bad5_2.append(allSystems[63])  #Leesti
     bad5_2.append(allSystems[0])   #39 T
     bad5_2.append(allSystems[39])  #Hec
-    #print("\n\"Good\" 5, one station with bad distance")
+    #print("\n\"Good\" 5")
     #print(EDRareRoute(bad5_2))
 
     #Good 10 system route:

@@ -26,7 +26,6 @@ class EDRareRoute(object):
        
         clusterShortLY = 50
         clusterLongLY = 155
-        spreadMinLY = 0
         spreadMaxLY = 120
         maxJumpRangeLY = 230
         clusterShort = 0
@@ -44,7 +43,7 @@ class EDRareRoute(object):
                 clusterShort += 1
             if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
                 clusterLong += 1 
-            if jumpDistance >= spreadMinLY and jumpDistance <= spreadMaxLY:
+            if jumpDistance <= spreadMaxLY:
                 spreadJumps += 1 
 
         self.Route_Type = RouteType.Other
@@ -154,6 +153,8 @@ class EDRareRoute(object):
         if not self.Best_Sellers:
             return 0.01
         
+        #TODO: Routes of length 3 will always be poor because of the >160 constraint on selling distance
+        #       so maybe make a special case for them
         maxGoodDistance = routeLength * 100
         #Less total distance needs to give a higher value
         weightedDistance = (maxGoodDistance/self.Total_Distance) * 2

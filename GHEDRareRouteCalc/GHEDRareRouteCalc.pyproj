@@ -35,7 +35,7 @@
     <Compile Include="routecalc.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ED2.csv" />
+    <Content Include="RareGoods.csv" />
   </ItemGroup>
   <Import Condition="Exists($(PtvsTargetsFile))" Project="$(PtvsTargetsFile)" />
   <Import Condition="!Exists($(PtvsTargetsFile))" Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
