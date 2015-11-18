@@ -149,165 +149,85 @@ if __name__ == '__main__':
         else:
             allSystems.append(currentSystem)
 
+    systemsDict = {}
+    for system in allSystems:
+        systemsDict[system.System_Name] = system
+
+    commonSystems = {}
+    commonSystems['Lave']   = allSystems[61]
+    commonSystems['Leesti'] = allSystems[63]
+    commonSystems['Orr']    = allSystems[78]
+    commonSystems['Usz']    = allSystems[92]
+    commonSystems['Diso']   = allSystems[25]
+    commonSystems['Zee']    = allSystems[107]
+    commonSystems['39 T']   = allSystems[0]
+    commonSystems['Fujin']  = allSystems[32]
+    commonSystems['George'] = allSystems[34]
+    commonSystems['Momus']  = allSystems[69]
+    commonSystems['Witch']  = allSystems[101]
+    commonSystems['Alt']    = allSystems[7]
+    commonSystems['Tio']    = allSystems[90]
+    commonSystems['Coq']    = allSystems[20]
+    commonSystems['Eth']    = allSystems[31]
+    commonSystems['AZ C']   = allSystems[12]
+    commonSystems['Utg']    = allSystems[93]
+    commonSystems['Yaso']   = allSystems[105]
+    commonSystems['Quech']  = allSystems[80]
+    commonSystems['Chi Er'] = allSystems[19]
+    commonSystems['Bast']   = allSystems[15]
+    commonSystems['Baltah'] = allSystems[13]
+    commonSystems['Iru']    = allSystems[48]
+    commonSystems['Karsu']  = allSystems[57]
+    commonSystems['Delta P']= allSystems[23]
+    commonSystems['Hec']    = allSystems[39]
+    commonSystems['Agan']   = allSystems[4]
+    commonSystems['Any']    = allSystems[10]
+    commonSystems['Ngur']   = allSystems[75]
+    commonSystems['Tanm']   = allSystems[86]  
+    commonSystems['Tara']   = allSystems[87]
+    commonSystems['Zoan']   = allSystems[106]
+    commonSystems['Kare']   = allSystems[56]
+    commonSystems['Eleu']   = allSystems[26]
+    commonSystems['Ocho']   = allSystems[77] 
+    commonSystems['Rusa']   = allSystems[83]  
+    commonSystems['CD-75']  = allSystems[17] 
+    commonSystems['Epsi']   = allSystems[27]
+
+
     bruteSystems = []
-    bruteSystems.append(allSystems[61])  #Lave
-    bruteSystems.append(allSystems[63])  #Leesti
-    bruteSystems.append(allSystems[78])  #Orr
-    bruteSystems.append(allSystems[92])  #Usz
-    bruteSystems.append(allSystems[25])  #Diso
-    bruteSystems.append(allSystems[107]) #Zee
-    bruteSystems.append(allSystems[0])   #39 T
-    bruteSystems.append(allSystems[32])  #Fuj
-    bruteSystems.append(allSystems[34])  #George
-    bruteSystems.append(allSystems[69])  #Momus
-    bruteSystems.append(allSystems[101]) #Witch
-    bruteSystems.append(allSystems[7])   #Alt
+    bruteSystems.append(commonSystems['Lave'])  
+    bruteSystems.append(commonSystems['Leesti'])
+    bruteSystems.append(commonSystems['Orr'])  
+    bruteSystems.append(commonSystems['Usz'])  
+    bruteSystems.append(commonSystems['Diso'])  
+    bruteSystems.append(commonSystems['Zee']) 
+    bruteSystems.append(commonSystems['39 T'])   
+    bruteSystems.append(commonSystems['Fujin'])  
+    bruteSystems.append(commonSystems['George'])  
+    bruteSystems.append(commonSystems['Momus'])  
+    bruteSystems.append(commonSystems['Witch']) 
+    bruteSystems.append(commonSystems['Alt'])  
     
-    #bruteSystems.append(allSystems[90])  #Tio
-    #bruteSystems.append(allSystems[20])  #Coq
-    #bruteSystems.append(allSystems[31])  #Eth
-    #bruteSystems.append(allSystems[12])  #Az
-    #bruteSystems.append(allSystems[93])  #Utg
-    #bruteSystems.append(allSystems[105]) #Yaso
-    #bruteSystems.append(allSystems[80])  #Quech
+    #bruteSystems.append(commonSystems[90])  #Tio
+    #bruteSystems.append(commonSystems[20])  #Coq
+    #bruteSystems.append(commonSystems[31])  #Eth
+    #bruteSystems.append(commonSystems[12])  #Az
+    #bruteSystems.append(commonSystems[93])  #Utg
+    #bruteSystems.append(commonSystems[105]) #Yaso
+    #bruteSystems.append(commonSystems[80])  #Quech
 
     '''
     TODO: Allow users to enter the values for size/station distance.
+          Better way to pick out systems used in bruteSystems and lists below
     '''
 
-    maxStationDistance = 5000
+    maxStationDistance = 100000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
                                                         and "permit" not in system.System_Name]
-    length = 8
-    popSize = 500
+    length = 6
+    popSize = 50
     silent = True
     #__RunGenetic(systemsSubset,length,popSize,not silent)
-    #__RunBrute(bruteSystems,length)
-    PerformanceCalc.CheckPerformance(systemsSubset)
-
-    #Yaso Kondi loop
-    #Indices based on live spreadsheet, no duplicates
-    ykLoopList = []
-    ykLoopList.append(allSystems[20])  #Coq
-    ykLoopList.append(allSystems[7])   #Alt
-    ykLoopList.append(allSystems[31])  #Eth
-    ykLoopList.append(allSystems[12])  #Az
-    ykLoopList.append(allSystems[34])  #George
-    ykLoopList.append(allSystems[93])  #Utg
-    ykLoopList.append(allSystems[105]) #Yaso
-    ykLoopList.append(allSystems[80])  #Quech
-    #print("\n\nYK Loop")
-    #print(EDRareRoute(ykLoopList))
-
-    #8 system round found by program
-    #indices based on live spreadsheet, no duplicates
-    bad8_1 = []
-    bad8_1.append(allSystems[19]) #Chi Er
-    bad8_1.append(allSystems[7])  #Alt
-    bad8_1.append(allSystems[15]) #Bast
-    bad8_1.append(allSystems[90]) #Tio
-    bad8_1.append(allSystems[13]) #Baltah
-    bad8_1.append(allSystems[48]) #Iru
-    bad8_1.append(allSystems[57]) #Karsu
-    bad8_1.append(allSystems[23]) #Delta P
-    #print("\n\nBad 8 System route, low item cost")
-    #print(EDRareRoute(bad8_1))
-
-    good8_1 = []
-    good8_1.append(allSystems[39])#Hec
-    good8_1.append(allSystems[4]) #Agan
-    good8_1.append(allSystems[63])#Leesti
-    good8_1.append(allSystems[10])#Any
-    good8_1.append(allSystems[75])#Ngur
-    good8_1.append(allSystems[13])#Balt
-    good8_1.append(allSystems[19])#Chi Er
-    good8_1.append(allSystems[7]) #Alt
-    #print("\nActually maybe a good route?")
-    #print(EDRareRoute(good8_1))
-
-    #5 system test
-    bad5_1 = []
-    bad5_1.append(allSystems[48]) #Iru
-    bad5_1.append(allSystems[75]) #ngur
-    bad5_1.append(allSystems[63]) #Leesti
-    bad5_1.append(allSystems[4])  #Agan
-    bad5_1.append(allSystems[7])  #Alt
-    #print("\nBad 5 system route, poor systems distance")
-    #print(EDRareRoute(bad5_1))
-
-
-    good4_1 = []
-    good4_1.append(allSystems[32])  #Fuj
-    good4_1.append(allSystems[0])   #39 T
-    good4_1.append(allSystems[25])  #Diso
-    good4_1.append(allSystems[63])  #Leesti
-    #print("\nGood 4 system route")
-    #print(EDRareRoute(good4_1))
-
-    bad11_1 = []
-    bad11_1.append(allSystems[107]) #Zee
-    bad11_1.append(allSystems[83])  #Rus
-    bad11_1.append(allSystems[4])   #Agan
-    bad11_1.append(allSystems[63])  #Leesti
-    bad11_1.append(allSystems[61])  #Lave
-    bad11_1.append(allSystems[75])  #Ngur
-    bad11_1.append(allSystems[48])  #Iru
-    bad11_1.append(allSystems[17])  #CD-75
-    bad11_1.append(allSystems[90])  #Tio
-    bad11_1.append(allSystems[27])  #Epsi
-    bad11_1.append(allSystems[7])   #Alt
-    #print("\nBad 11 system route, poor system distances")
-    #print(EDRareRoute(bad11_1))
-
-    good5_1 = []
-    good5_1.append(allSystems[63])  #Leesti
-    good5_1.append(allSystems[25])  #Dis
-    good5_1.append(allSystems[78])  #Orr
-    good5_1.append(allSystems[93])  #Utg
-    good5_1.append(allSystems[86])  #Tan
-    #print("\nGood 5, multiple bad sell locations")
-    #print(EDRareRoute(good5_1))
-
-    good5_2 = []
-    good5_2.append(allSystems[86])  #Tan
-    good5_2.append(allSystems[78])  #Orr
-    good5_2.append(allSystems[25])  #Dis
-    good5_2.append(allSystems[61])  #Lave
-    good5_2.append(allSystems[93])  #Utg
-    #print("\nProbably okay 5")
-    #print(EDRareRoute(good5_2))
-
-    bad6_1 = []
-    bad6_1.append(allSystems[56])  #Kare
-    bad6_1.append(allSystems[26])  #Ele
-    bad6_1.append(allSystems[7])   #Alt
-    bad6_1.append(allSystems[93])  #Utg
-    bad6_1.append(allSystems[39])  #Hec
-    bad6_1.append(allSystems[77])  #Ocho
-    #print("\nShould be bad 6")
-    #print(EDRareRoute(bad6_1))
-
-    good6_1 = []
-    good6_1.append(allSystems[78])  #Orr
-    good6_1.append(allSystems[87])  #Tar
-    good6_1.append(allSystems[86])  #Tan
-    good6_1.append(allSystems[93])  #Utg
-    good6_1.append(allSystems[63])  #Leesti
-    good6_1.append(allSystems[61])  #Lave
-    #print("\nGood 6, but chosen sellers could be better")
-    #print(EDRareRoute(good6_1))
-
-    #Good 'other' route
-    #aeriel karsuki jaroua leesti epsilon altair
-
-    bad5_2 = []
-    bad5_2.append(allSystems[25])  #Dis
-    bad5_2.append(allSystems[106]) #Zaon
-    bad5_2.append(allSystems[63])  #Leesti
-    bad5_2.append(allSystems[0])   #39 T
-    bad5_2.append(allSystems[39])  #Hec
-    #print("\n\"Good\" 5")
-    #print(EDRareRoute(bad5_2))
-
-    #Good 10 system route:
-    #Helv Eth Alt Cd-75 Phia Coq Yaso Utg Balt Leest
+    __RunBrute(bruteSystems,length)
+    #PerformanceCalc.CheckPerformance(systemsSubset)
+    #PerformanceCalc.TestSystems(commonSystems)

@@ -153,9 +153,10 @@ class EDRareRoute(object):
         if not self.Best_Sellers:
             return 0.01
         
-        #TODO: Routes of length 3 will always be poor because of the >160 constraint on selling distance
-        #       so maybe make a special case for them
+        #Special case for shorter routes
         maxGoodDistance = routeLength * 100
+        if routeLength < 6:
+            maxGoodDistance = maxGoodDistance * 1.2
         #Less total distance needs to give a higher value
         weightedDistance = (maxGoodDistance/self.Total_Distance) * 2
         
