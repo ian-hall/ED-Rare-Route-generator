@@ -6,7 +6,7 @@ class EDSystem( object ):
     TODO:  pretty printing so you don't see the braces around the lists
     '''
     def __init__(self, supplyCap, avgSupply, itemCost, itemName, distToStation,
-                       stationName, systemName, stationIndex, distToOthers: []):
+                       stationName, systemName, stationIndex, distToOthers: [], permit: bool):
         self.Max_Supply = supplyCap # Float
         self.Supply = [avgSupply] # Float
         self.Cost = [itemCost] # Int
@@ -16,6 +16,8 @@ class EDSystem( object ):
         self.System_Name = systemName # String
         self.Index = stationIndex # Int
         self.System_Distances = distToOthers # List of Floats
+        self.Location = dict(x=0, y=0, z=0)
+        self.PermitReq = permit
 
     def __str__(self):
         return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,self.Station_Name,self.Items, self.Cost, self.Max_Supply)

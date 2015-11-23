@@ -14,13 +14,13 @@ class PerformanceCalc(object):
     def CheckPerformance(self,systemsList):
         maxTests = 10
 
-        minPopSize = 50
-        maxPopSize = 100
+        minPopSize = 100
+        maxPopSize = 300
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 7
-        maxLength = 9
+        minLength = 8
+        maxLength = 8
         lengths = range(minLength,maxLength+1,1)
 
         
@@ -51,102 +51,102 @@ class PerformanceCalc(object):
     def TestSystems(self,systemsDict):
         #Yaso Kondi loop
         ykLoopList = []
-        ykLoopList.append(systemsDict['Coq'])  
-        ykLoopList.append(systemsDict['Alt'])   
-        ykLoopList.append(systemsDict['Eth'])  
-        ykLoopList.append(systemsDict['AZ C'])  
-        ykLoopList.append(systemsDict['George'])  
-        ykLoopList.append(systemsDict['Utg'])  
-        ykLoopList.append(systemsDict['Yaso']) 
-        ykLoopList.append(systemsDict['Quech'])  
+        ykLoopList.append(systemsDict['Coquim'])  
+        ykLoopList.append(systemsDict['Altair'])   
+        ykLoopList.append(systemsDict['Ethgreze'])  
+        ykLoopList.append(systemsDict['AZ Cancri'])  
+        ykLoopList.append(systemsDict['George Pantazis'])  
+        ykLoopList.append(systemsDict['Utgaroar'])  
+        ykLoopList.append(systemsDict['Yaso Kondi']) 
+        ykLoopList.append(systemsDict['Quechua'])  
         print("\n\nYK Loop")
         print(EDRareRoute(ykLoopList))
 
         good4_1 = []
         good4_1.append(systemsDict['Fujin'])  
-        good4_1.append(systemsDict['39 T'])   
+        good4_1.append(systemsDict['39 Tauri'])   
         good4_1.append(systemsDict['Diso'])  
         good4_1.append(systemsDict['Leesti'])  
         print(EDRareRoute(good4_1))
        
         good5_1 = []
-        good5_1.append(systemsDict['Iru']) 
-        good5_1.append(systemsDict['Ngur']) 
+        good5_1.append(systemsDict['Irukama']) 
+        good5_1.append(systemsDict['Ngurii']) 
         good5_1.append(systemsDict['Leesti']) 
-        good5_1.append(systemsDict['Agan'])  
-        good5_1.append(systemsDict['Alt'])  
+        good5_1.append(systemsDict['Aganippe'])  
+        good5_1.append(systemsDict['Altair'])  
         print(EDRareRoute(good5_1))
 
         good5_2 = []
         good5_2.append(systemsDict['Leesti'])  
         good5_2.append(systemsDict['Diso'])  
-        good5_2.append(systemsDict['Orr'])  
-        good5_2.append(systemsDict['Utg'])  
-        good5_2.append(systemsDict['Tanm'])
+        good5_2.append(systemsDict['Orrere'])  
+        good5_2.append(systemsDict['Utgaroar'])  
+        good5_2.append(systemsDict['Tanmark'])
         print(EDRareRoute(good5_2))
 
         good5_3 = []
-        good5_3.append(systemsDict['Tanm'])  
-        good5_3.append(systemsDict['Orr'])  
+        good5_3.append(systemsDict['Tanmark'])  
+        good5_3.append(systemsDict['Orrere'])  
         good5_3.append(systemsDict['Diso'])  
         good5_3.append(systemsDict['Lave'])  
-        good5_3.append(systemsDict['Utg'])  
+        good5_3.append(systemsDict['Utgaroar'])  
         print(EDRareRoute(good5_3))
 
         good6_1 = []
-        good6_1.append(systemsDict['Orr'])
-        good6_1.append(systemsDict['Tara'])  
-        good6_1.append(systemsDict['Tanm'])  
-        good6_1.append(systemsDict['Utg'])  
+        good6_1.append(systemsDict['Orrere'])
+        good6_1.append(systemsDict['Tarach Tor'])  
+        good6_1.append(systemsDict['Tanmark'])  
+        good6_1.append(systemsDict['Utgaroar'])  
         good6_1.append(systemsDict['Leesti'])  
         good6_1.append(systemsDict['Lave'])  
         print(EDRareRoute(good6_1))   
          
         good8_1 = []
-        good8_1.append(systemsDict['Hec'])
-        good8_1.append(systemsDict['Agan']) 
+        good8_1.append(systemsDict['Hecate'])
+        good8_1.append(systemsDict['Aganippe']) 
         good8_1.append(systemsDict['Leesti'])
-        good8_1.append(systemsDict['Any'])
-        good8_1.append(systemsDict['Ngur'])
-        good8_1.append(systemsDict['Baltah'])
-        good8_1.append(systemsDict['Chi Er'])
-        good8_1.append(systemsDict['Alt']) 
+        good8_1.append(systemsDict['Any Na'])
+        good8_1.append(systemsDict['Ngurii'])
+        good8_1.append(systemsDict["Baltah'Sine"])
+        good8_1.append(systemsDict['Chi Eridani'])
+        good8_1.append(systemsDict['Altair']) 
         print(EDRareRoute(good8_1))
         
         bad6_1 = []
-        bad6_1.append(systemsDict['Kare'])  #Kare
-        bad6_1.append(systemsDict['Eleu'])  #Ele
-        bad6_1.append(systemsDict['Alt'])   #Alt
-        bad6_1.append(systemsDict['Utg'])  #Utg
-        bad6_1.append(systemsDict['Hec'])  #Hec
-        bad6_1.append(systemsDict['Ocho'])  #Ocho
+        bad6_1.append(systemsDict['Karetii'])
+        bad6_1.append(systemsDict['Eleu'])
+        bad6_1.append(systemsDict['Altair']) 
+        bad6_1.append(systemsDict['Utgaroar'])
+        bad6_1.append(systemsDict['Hecate'])
+        bad6_1.append(systemsDict['Ochoeng'])
         print("\nNot all systems accounted for in sellers")
         print(EDRareRoute(bad6_1))
         
         bad8_1 = []
-        bad8_1.append(systemsDict['Chi Er']) 
-        bad8_1.append(systemsDict['Alt'])  
+        bad8_1.append(systemsDict['Chi Eridani']) 
+        bad8_1.append(systemsDict['Altair'])  
         bad8_1.append(systemsDict['Bast']) 
-        bad8_1.append(systemsDict['Tio']) 
-        bad8_1.append(systemsDict['Baltah']) 
-        bad8_1.append(systemsDict['Iru']) 
-        bad8_1.append(systemsDict['Karsu']) 
-        bad8_1.append(systemsDict['Delta P'])
+        bad8_1.append(systemsDict['Tiolce']) 
+        bad8_1.append(systemsDict["Baltah'Sine"]) 
+        bad8_1.append(systemsDict['Irukama']) 
+        bad8_1.append(systemsDict['Karsuki Ti']) 
+        bad8_1.append(systemsDict['Delta Phoenicis'])
         print("\nLow item cost")
         print(EDRareRoute(bad8_1))
 
         bad11_1 = []
-        bad11_1.append(systemsDict['Zee']) #Zee
-        bad11_1.append(systemsDict['Rusa'])  #Rus
-        bad11_1.append(systemsDict['Agan'])   #Agan
-        bad11_1.append(systemsDict['Leesti'])  #Leesti
-        bad11_1.append(systemsDict['Lave'])  #Lave
-        bad11_1.append(systemsDict['Ngur'])  #Ngur
-        bad11_1.append(systemsDict['Iru'])  #Iru
-        bad11_1.append(systemsDict['CD-75'])  #CD-75
-        bad11_1.append(systemsDict['Tio'])  #Tio
-        bad11_1.append(systemsDict['Epsi'])  #Epsi
-        bad11_1.append(systemsDict['Alt'])   #Alt
+        bad11_1.append(systemsDict['Zeessze'])
+        bad11_1.append(systemsDict['Rusani'])  
+        bad11_1.append(systemsDict['Aganippe'])   
+        bad11_1.append(systemsDict['Leesti'])  
+        bad11_1.append(systemsDict['Lave'])  
+        bad11_1.append(systemsDict['Ngurii'])  
+        bad11_1.append(systemsDict['Irukama'])  
+        bad11_1.append(systemsDict['CD-75 661'])  
+        bad11_1.append(systemsDict['Tiolce'])  
+        bad11_1.append(systemsDict['Epsilon Indi'])
+        bad11_1.append(systemsDict['Altair'])
         print("\nPoor system distances")
         print(EDRareRoute(bad11_1))
 

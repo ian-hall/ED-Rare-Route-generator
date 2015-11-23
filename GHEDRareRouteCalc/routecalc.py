@@ -13,7 +13,7 @@ class RouteCalc(object):
     Class for calculating rare trade routes
     '''
     Route_Cutoff = 11.5
-    __Selection_Mult = .5
+    __Selection_Mult = .25
     __Pool_Size = 3
     __ValidSystems = []
     @classmethod
@@ -24,9 +24,8 @@ class RouteCalc(object):
 
         TODO: Make sure this is actually working now like I think it is
         '''
-        #Route len 14 found with cutoff at 11
         if routeLength < 3 or routeLength > 14:
-            raise Exception("Routes need length between 3 and 15")
+            raise Exception("Routes need length between 3 and 14")
 
         population = []
         RouteCalc.__ValidSystems = validSystems
@@ -104,7 +103,10 @@ class RouteCalc(object):
                 bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
                 #Reset mutation chance when finding a new best route
-                mutationChance = baseMutation
+                if mutationChance != baseMutation:
+                    mutationChance = baseMutation
+                    if not silent:
+                        print("\tResetting mutation chance")
 
             #Exit if we are at least at the Route_Cutoff value and going to increase the mutation chance this gen
             if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
@@ -115,8 +117,7 @@ class RouteCalc(object):
                 break
 
             #Should probably check to make sure this stops at 1 but I guess it doesnt really matter since random() always returns < 1
-            #TODO: Change this to instead replace a percentage of population members with the lowest fitness vals
-            #       Maybe move this after the population undergoes reproduction/mutation since it wont touch the high value routes
+            #TODO: Maybe move this after the population undergoes reproduction/mutation since it wont touch the high value routes
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
@@ -151,9 +152,9 @@ class RouteCalc(object):
                 nextPopulation.append(EDRareRoute(child))
                 #tempPop.append(child)
 
-            #TODO: Find the memory error
-            #with Pool(RouteCalc.Pool_Size) as p:
-                #nextPopulation = p.map(self.RouteCreatorThread,tempPop)
+            #TODO: Find the slowness (probably just overhead from map)
+            #with Pool(RouteCalc.__Pool_Size) as p:
+            #    nextPopulation = p.map(self.RouteCreatorThread,tempPop)
 
             currentPopulation = nextPopulation
 
@@ -257,7 +258,8 @@ class RouteCalc(object):
         fullResults = []
         num = 0
         print("Starting brute force method...")
-        for sysList in itertools.permutations(RouteCalc.__ValidSystems,routeLength):
+        #Combinations instead of permutations because we are playing "fast" and loose here
+        for sysList in itertools.combinations(RouteCalc.__ValidSystems,routeLength):
             if tempBrute.__len__() < 10000000:
                 tempBrute.append(sysList)
                 num += 1

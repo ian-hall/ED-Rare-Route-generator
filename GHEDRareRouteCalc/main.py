@@ -13,7 +13,7 @@ import math
 import re
 import time
 
-
+#------------------------------------------------------------------------------
 def __ValidateLine(currentLine, lineNum: int):
     '''
     0 - Max Cap
@@ -25,7 +25,7 @@ def __ValidateLine(currentLine, lineNum: int):
     6 - System
     7 on - distance to other systems
 
-    first/last line: headings
+    first/last full lines: headings
 
     Last 3 columns are garbage also
 
@@ -33,14 +33,15 @@ def __ValidateLine(currentLine, lineNum: int):
     supplyCap       = currentLine[0]
     avgSupply       = currentLine[1]
     itemCost        = currentLine[2]
-    itemName        = currentLine[3]
+    itemName        = currentLine[3].strip()
     distToStation   = currentLine[4]
-    stationName     = currentLine[5]
-    systemName      = currentLine[6]
+    stationName     = currentLine[5].strip()
+    systemName      = currentLine[6].strip()
     index           = lineNum-1
     distToOthers    = []
     for j in range(7,headers.__len__()-3):
         distToOthers.append(currentLine[j])
+    permit = False
         
     if supplyCap == 'ND':
         supplyCap = 1
@@ -69,18 +70,24 @@ def __ValidateLine(currentLine, lineNum: int):
     for i in range(0,distToOthers.__len__()):
         distToOthers[i] = float(distToOthers[i])
 
+    #Remove '(permit)' from systems and truncate ending spaces
+    if systemName.endswith('(permit)'):
+        permit = True
+        systemName = systemName.partition('(permit)')[0].strip()
+
+
     return EDSystem(supplyCap, avgSupply, itemCost, itemName,
                     distToStation, stationName, systemName, index,
-                    distToOthers)
-
-def __RunGenetic(systems: 'list of EDSystem instance', routeLength: int, popSize: int, silent: bool):
+                    distToOthers,permit)
+#------------------------------------------------------------------------------
+def __RunGenetic(systems, routeLength: int, popSize: int, silent: bool):
     exitTestLoop = False
-    testNum = 0
-    maxTests = 20
+    runNum = 0
+    maxRuns = 20
     geneticStart = time.time()
-    while not exitTestLoop and testNum < maxTests:
-        testNum += 1
-        print("Test: {0}".format(testNum))
+    while not exitTestLoop and runNum < maxRuns:
+        runNum += 1
+        print("Run: {0}".format(runNum))
         routeTuple = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent)
         geneticEnd = time.time()
         if routeTuple:
@@ -91,8 +98,8 @@ def __RunGenetic(systems: 'list of EDSystem instance', routeLength: int, popSize
                 print("Generations: {0}".format(routeTuple[1]))
                 print("Time: {0}s".format((geneticEnd-geneticStart)))
                 exitTestLoop = True
-
-def __RunBrute(systems: 'list of EDSystem instance', routeLength: int):
+#------------------------------------------------------------------------------
+def __RunBrute(systems, routeLength: int):
     bruteStart = time.time()
     routes = RouteCalc.Brute(systems,routeLength)
     bruteEnd = time.time()
@@ -102,7 +109,9 @@ def __RunBrute(systems: 'list of EDSystem instance', routeLength: int):
     else:
         print("no routes =(")
     print("Routes found in {0}s".format((bruteEnd-bruteStart)))
-
+#------------------------------------------------------------------------------
+# Main starts here
+#------------------------------------------------------------------------------
 if __name__ == '__main__':
     cleanedCSV = []
     allSystems = []
@@ -153,81 +162,68 @@ if __name__ == '__main__':
     for system in allSystems:
         systemsDict[system.System_Name] = system
 
-    commonSystems = {}
-    commonSystems['Lave']   = allSystems[61]
-    commonSystems['Leesti'] = allSystems[63]
-    commonSystems['Orr']    = allSystems[78]
-    commonSystems['Usz']    = allSystems[92]
-    commonSystems['Diso']   = allSystems[25]
-    commonSystems['Zee']    = allSystems[107]
-    commonSystems['39 T']   = allSystems[0]
-    commonSystems['Fujin']  = allSystems[32]
-    commonSystems['George'] = allSystems[34]
-    commonSystems['Momus']  = allSystems[69]
-    commonSystems['Witch']  = allSystems[101]
-    commonSystems['Alt']    = allSystems[7]
-    commonSystems['Tio']    = allSystems[90]
-    commonSystems['Coq']    = allSystems[20]
-    commonSystems['Eth']    = allSystems[31]
-    commonSystems['AZ C']   = allSystems[12]
-    commonSystems['Utg']    = allSystems[93]
-    commonSystems['Yaso']   = allSystems[105]
-    commonSystems['Quech']  = allSystems[80]
-    commonSystems['Chi Er'] = allSystems[19]
-    commonSystems['Bast']   = allSystems[15]
-    commonSystems['Baltah'] = allSystems[13]
-    commonSystems['Iru']    = allSystems[48]
-    commonSystems['Karsu']  = allSystems[57]
-    commonSystems['Delta P']= allSystems[23]
-    commonSystems['Hec']    = allSystems[39]
-    commonSystems['Agan']   = allSystems[4]
-    commonSystems['Any']    = allSystems[10]
-    commonSystems['Ngur']   = allSystems[75]
-    commonSystems['Tanm']   = allSystems[86]  
-    commonSystems['Tara']   = allSystems[87]
-    commonSystems['Zoan']   = allSystems[106]
-    commonSystems['Kare']   = allSystems[56]
-    commonSystems['Eleu']   = allSystems[26]
-    commonSystems['Ocho']   = allSystems[77] 
-    commonSystems['Rusa']   = allSystems[83]  
-    commonSystems['CD-75']  = allSystems[17] 
-    commonSystems['Epsi']   = allSystems[27]
-
+    import json
+    #The JSON file linked to from the rareroute csv/spreadsheet. Not going to include because lol 23mb text file
+    with open('edsystems.json') as jsonFile:
+        jsonSystems = json.load(jsonFile)
+    
+    #TODO: Find which systems aren't showing, also find a better way to represent permit systems (ie remove ((permit)) from system names)
+    for val in jsonSystems['systems']:
+        if val['name'] in systemsDict:
+            currentSystem = systemsDict[val['name']]
+            currentSystem.Location['x'] = float(val['coord'][0])
+            currentSystem.Location['y'] = float(val['coord'][1])
+            currentSystem.Location['z'] = float(val['coord'][2])
 
     bruteSystems = []
-    bruteSystems.append(commonSystems['Lave'])  
-    bruteSystems.append(commonSystems['Leesti'])
-    bruteSystems.append(commonSystems['Orr'])  
-    bruteSystems.append(commonSystems['Usz'])  
-    bruteSystems.append(commonSystems['Diso'])  
-    bruteSystems.append(commonSystems['Zee']) 
-    bruteSystems.append(commonSystems['39 T'])   
-    bruteSystems.append(commonSystems['Fujin'])  
-    bruteSystems.append(commonSystems['George'])  
-    bruteSystems.append(commonSystems['Momus'])  
-    bruteSystems.append(commonSystems['Witch']) 
-    bruteSystems.append(commonSystems['Alt'])  
-    
-    #bruteSystems.append(commonSystems[90])  #Tio
-    #bruteSystems.append(commonSystems[20])  #Coq
-    #bruteSystems.append(commonSystems[31])  #Eth
-    #bruteSystems.append(commonSystems[12])  #Az
-    #bruteSystems.append(commonSystems[93])  #Utg
-    #bruteSystems.append(commonSystems[105]) #Yaso
-    #bruteSystems.append(commonSystems[80])  #Quech
+    bruteSystems.append(systemsDict['Lave'])  
+    bruteSystems.append(systemsDict['Leesti'])
+    bruteSystems.append(systemsDict['Orrere'])  
+    bruteSystems.append(systemsDict['Uszaa'])  
+    bruteSystems.append(systemsDict['Diso'])  
+    bruteSystems.append(systemsDict['Zeessze']) 
+    bruteSystems.append(systemsDict['39 Tauri'])   
+    bruteSystems.append(systemsDict['Fujin'])  
+    bruteSystems.append(systemsDict['George Pantazis'])  
+    bruteSystems.append(systemsDict['Momus Reach'])  
+    bruteSystems.append(systemsDict['Witchhaul']) 
+    bruteSystems.append(systemsDict['Altair'])     
+    bruteSystems.append(systemsDict['Tiolce'])  
+    bruteSystems.append(systemsDict['Coquim'])  
+    bruteSystems.append(systemsDict['Ethgreze'])  
+    bruteSystems.append(systemsDict['AZ Cancri'])  
+    bruteSystems.append(systemsDict['Utgaroar'])  
+    bruteSystems.append(systemsDict['Yaso Kondi']) 
+    bruteSystems.append(systemsDict['Quechua'])  
 
     '''
     TODO: Allow users to enter the values for size/station distance.
-          Better way to pick out systems used in bruteSystems and lists below
-    '''
 
-    maxStationDistance = 100000
+    '''
+    maxStationDistance = 10000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
-                                                        and "permit" not in system.System_Name]
-    length = 6
-    popSize = 50
+                                                        and not system.PermitReq]
+    length = 8
+    popSize = 500
     silent = True
     #__RunGenetic(systemsSubset,length,popSize,not silent)
-    __RunBrute(bruteSystems,length)
+    #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.TestSystems(commonSystems)
+    #PerformanceCalc.TestSystems(systemsDict)
+
+    ykLoc = systemsDict['Yaso Kondi'].Location
+    leestiLoc = systemsDict['Leesti'].Location
+
+    testLocsX = [ykLoc['x'],leestiLoc['x']]
+    testLocsY = [ykLoc['y'],leestiLoc['y']]
+
+    xMin = min(testLocsX)
+    xMax = max(testLocsX)
+    yMin = min(testLocsY)
+    yMax = max(testLocsY)
+
+    xDif = xMax - xMin
+    yDif = yMax - yMin
+
+    print(xDif)
+    print(yDif)
