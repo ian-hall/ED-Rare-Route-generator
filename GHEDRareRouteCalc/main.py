@@ -1,5 +1,5 @@
 ﻿__author__ = 'Ian'
-from edsystem import EDSystem, Point
+from edsystem import EDSystem, DisplayLocation
 from edrareroute import EDRareRoute, RouteType
 from routecalc import RouteCalc
 from performancecalc import PerformanceCalc
@@ -178,19 +178,19 @@ if __name__ == '__main__':
             currentSystem.Location['z'] = float(val['coord'][2])
 
     bruteSystems = []
-    bruteSystems.append(systemsDict['Lave'])  
-    bruteSystems.append(systemsDict['Leesti'])
-    bruteSystems.append(systemsDict['Orrere'])  
-    bruteSystems.append(systemsDict['Uszaa'])  
-    bruteSystems.append(systemsDict['Diso'])
-    bruteSystems.append(systemsDict['Zeessze']) 
-    bruteSystems.append(systemsDict['39 Tauri'])   
-    bruteSystems.append(systemsDict['Fujin'])  
+    #bruteSystems.append(systemsDict['Lave'])  
+    #bruteSystems.append(systemsDict['Leesti'])
+    #bruteSystems.append(systemsDict['Orrere'])  
+    #bruteSystems.append(systemsDict['Uszaa'])  
+    #bruteSystems.append(systemsDict['Diso'])
+    #bruteSystems.append(systemsDict['Zeessze']) 
+    #bruteSystems.append(systemsDict['39 Tauri'])   
+    #bruteSystems.append(systemsDict['Fujin'])  
     bruteSystems.append(systemsDict['George Pantazis'])  
-    bruteSystems.append(systemsDict['Momus Reach'])  
-    bruteSystems.append(systemsDict['Witchhaul']) 
+    #bruteSystems.append(systemsDict['Momus Reach'])  
+    #bruteSystems.append(systemsDict['Witchhaul']) 
     bruteSystems.append(systemsDict['Altair'])     
-    bruteSystems.append(systemsDict['Tiolce'])  
+    #bruteSystems.append(systemsDict['Tiolce'])  
     bruteSystems.append(systemsDict['Coquim'])  
     bruteSystems.append(systemsDict['Ethgreze'])  
     bruteSystems.append(systemsDict['AZ Cancri'])  
@@ -216,12 +216,12 @@ if __name__ == '__main__':
     #       Low end sticks to 0, high end use some kind of ratio
     #       Shift everything over/up to be positive
     #       Fudge values where systems have the same x or y
-    longSide = 80
+    longSide = 75
     shortSide = 25
 
-    testLocs = [system.Location for system in allSystems]
-    xVals = [loc['x'] for loc in testLocs]
-    yVals = [loc['y'] for loc in testLocs]
+    testLocs = [system for system in bruteSystems]
+    xVals = [system.Location['x'] for system in testLocs]
+    yVals = [system.Location['y'] for system in testLocs]
 
     xMin = min(xVals)
     yMin = min(yVals)
@@ -251,14 +251,12 @@ if __name__ == '__main__':
                         xValsNew[i] = longSide
                     else:
                         xValsNew[i] = round((longSide / xMax) * xValsNew[i])
-            #for i in range(yValsNew.__len__()):
                 if yValsNew[i] != 0:
                     if yValsNew[i] == yMax:
                         yValsNew[i] = shortSide
                     else:
                         yValsNew[i] = round((shortSide / yMax) * yValsNew[i])
-            #for i in range(xValsNew.__len__()):
-                points.append(Point(xValsNew[i],yValsNew[i]))
+                points.append(DisplayLocation(xValsNew[i],yValsNew[i],testLocs[i].System_Name))
         else:
             #Just swap x/y to rotate the graph
             for i in range(xValsNew.__len__()):
@@ -267,29 +265,24 @@ if __name__ == '__main__':
                         xValsNew[i] = shortSide
                     else:
                         xValsNew[i] = round((shortSide / xMax) * xValsNew[i])
-            #for i in range(yValsNew.__len__()):
                 if yValsNew[i] != 0:
                     if yValsNew[i] == yMax:
                         yValsNew[i] = longSide
                     else:
                         yValsNew[i] = round((longSide / yMax) * yValsNew[i])
-            #for i in range(xValsNew.__len__()):
-                points.append(Point(yValsNew[i],xValsNew[i]))
-        #TODO: Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
-        #before doing the fudging on the short side. X is long side, Y is short side
-
+                points.append(DisplayLocation(yValsNew[i],xValsNew[i],testLocs[i].System_Name))
+        
+        #Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
+        #before doing the fudging on the short side. L is long side, S is short side
         pointsCounter = Counter(points)
         while sum([v for k,v in pointsCounter.items() if 1 == v]) != points.__len__():
-            #numSame = {}
-            #for k,v in pointsCounter.items():
-            #    if v > 1:
-            #        numSame[k] = v
             for k,v in pointsCounter.items():
-                changed = 0
-                doAdd = True
                 if v > 1:
                     toChange = points.index(k)
-                    points[toChange].L += 1
+                    if points[toChange].L + 1 < longSide:
+                        points[toChange].L += 1
+                    else:
+                        points[toChange].L -= 1
             pointsCounter = Counter(points)
 
         for i in range(points.__len__()):
@@ -297,5 +290,18 @@ if __name__ == '__main__':
                 if i != j:
                     if points[i] == points[j]:
                         print("{0} FAIL".format(points[i]))
-        for val in points:
+        
+        sortedPoints = sorted(points,key=lambda point : (point.S, point.L))
+
+        for val in sortedPoints:
             print(val)
+
+        strList = []
+        for s in range(shortSide+1):
+            for l in range(longSide+1):
+                if DisplayLocation(l,s) in points:
+                    strList.append('F')
+                else:
+                    strList.append('*')
+            strList.append('\n')
+        print(''.join(strList))

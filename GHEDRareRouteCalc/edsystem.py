@@ -46,20 +46,17 @@ class EDSystem( object ):
             self.Station_Name.extend(newRares.Station_Name)
             self.Station_Distance.extend(newRares.Station_Distance)
 
-class Point(object):
-    def __init__(self):
-        self.L = None
-        self.S = None
-
-    def __init__(self, x, y):
-        self.L = x
-        self.S = y
+class DisplayLocation(object):
+    def __init__(self, l, s, name = None):
+        self.L = l
+        self.S = s
+        self.System_Name = name
     
     def __eq__(self, other):
         return (self.L == other.L) and (self.S == other.S)
 
     def __str__(self):
-        return "({0},{1})".format(self.L,self.S)
+        return "{0:>17}: ({1},{2})".format(self.System_Name,self.L,self.S)
 
     def __hash__(self):
         return hash((self.L,self.S))
