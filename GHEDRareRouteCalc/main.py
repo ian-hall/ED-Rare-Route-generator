@@ -12,6 +12,8 @@ import sys
 import math
 import re
 import time
+import json
+import copy
 
 #------------------------------------------------------------------------------
 def __ValidateLine(currentLine, lineNum: int):
@@ -162,7 +164,6 @@ if __name__ == '__main__':
     for system in allSystems:
         systemsDict[system.System_Name] = system
 
-    import json
     #The JSON file linked to from the rareroute csv/spreadsheet. Not going to include because lol 23mb text file
     with open('edsystems.json') as jsonFile:
         jsonSystems = json.load(jsonFile)
@@ -180,7 +181,7 @@ if __name__ == '__main__':
     bruteSystems.append(systemsDict['Leesti'])
     bruteSystems.append(systemsDict['Orrere'])  
     bruteSystems.append(systemsDict['Uszaa'])  
-    bruteSystems.append(systemsDict['Diso'])  
+    bruteSystems.append(systemsDict['Diso'])
     bruteSystems.append(systemsDict['Zeessze']) 
     bruteSystems.append(systemsDict['39 Tauri'])   
     bruteSystems.append(systemsDict['Fujin'])  
@@ -194,16 +195,14 @@ if __name__ == '__main__':
     bruteSystems.append(systemsDict['AZ Cancri'])  
     bruteSystems.append(systemsDict['Utgaroar'])  
     bruteSystems.append(systemsDict['Yaso Kondi']) 
-    bruteSystems.append(systemsDict['Quechua'])  
-
+    bruteSystems.append(systemsDict['Quechua'])
     '''
     TODO: Allow users to enter the values for size/station distance.
-
     '''
     maxStationDistance = 10000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance
                                                         and not system.PermitReq]
-    length = 8
+    length = 4
     popSize = 500
     silent = True
     #__RunGenetic(systemsSubset,length,popSize,not silent)
@@ -211,19 +210,63 @@ if __name__ == '__main__':
     #PerformanceCalc.CheckPerformance(systemsSubset)
     #PerformanceCalc.TestSystems(systemsDict)
 
-    ykLoc = systemsDict['Yaso Kondi'].Location
-    leestiLoc = systemsDict['Leesti'].Location
 
-    testLocsX = [ykLoc['x'],leestiLoc['x']]
-    testLocsY = [ykLoc['y'],leestiLoc['y']]
+    #TODO: Scale x/y values such that we have 80x20
+    #       Low end sticks to 0, high end use some kind of ratio
+    #       Shift everything over/up to be positive
+    #       Fudge values where systems have the same x or y
+    longSide = 80
+    shortSide = 20
 
-    xMin = min(testLocsX)
-    xMax = max(testLocsX)
-    yMin = min(testLocsY)
-    yMax = max(testLocsY)
+    testLocs = [system.Location for system in bruteSystems]
+    xVals = [loc['x'] for loc in testLocs]
+    yVals = [loc['y'] for loc in testLocs]
 
-    xDif = xMax - xMin
-    yDif = yMax - yMin
+    xMin = min(xVals)
+    yMin = min(yVals)
 
-    print(xDif)
-    print(yDif)
+    if xMin < 0:
+        xValsNew = [abs(xMin) + val for val in xVals]
+    else:
+        xValsNew = [val - xMin for val in xVals]
+    if yMin < 0:
+        yValsNew = [abs(yMin) + val for val in yVals]
+    else:
+        yValsNew = [val - yMin for val in yVals]
+
+    xMax = max(xValsNew)
+    yMax = max(yValsNew)
+
+    #Everything is shifted so mins are 0 and max() is the difference between points
+    if xMax == 0 or yMax == 0:
+        print("cannot display")
+    else:
+        if xMax > yMax:
+            for i in range(xValsNew.__len__()):
+                if xValsNew[i] != 0:
+                    if xValsNew[i] == xMax:
+                        xValsNew[i] = longSide
+                    else:
+                        xValsNew[i] = (longSide / xMax) * xValsNew[i]
+            for i in range(yValsNew.__len__()):
+                if yValsNew[i] != 0:
+                    if yValsNew[i] == yMax:
+                        yValsNew[i] = shortSide
+                    else:
+                        yValsNew[i] = (shortSide / yMax) * yValsNew[i]
+        else:
+            #Just swap x/y to rotate the graph
+            for i in range(xValsNew.__len__()):
+                if xValsNew[i] != 0:
+                    if xValsNew[i] == xMax:
+                        xValsNew[i] = shortSide
+                    else:
+                        xValsNew[i] = (shortSide / xMax) * xValsNew[i]
+            for i in range(yValsNew.__len__()):
+                if yValsNew[i] != 0:
+                    if yValsNew[i] == yMax:
+                        yValsNew[i] = longSide
+                    else:
+                        yValsNew[i] = (longSide / yMax) * yValsNew[i]   
+        print(xValsNew)
+        print(yValsNew)
