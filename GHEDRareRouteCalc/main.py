@@ -1,5 +1,5 @@
 ﻿__author__ = 'Ian'
-from edsystem import EDSystem
+from edsystem import EDSystem, Point
 from edrareroute import EDRareRoute, RouteType
 from routecalc import RouteCalc
 from performancecalc import PerformanceCalc
@@ -14,6 +14,7 @@ import re
 import time
 import json
 import copy
+from collections import Counter
 
 #------------------------------------------------------------------------------
 def __ValidateLine(currentLine, lineNum: int):
@@ -211,14 +212,14 @@ if __name__ == '__main__':
     #PerformanceCalc.TestSystems(systemsDict)
 
 
-    #TODO: Scale x/y values such that we have 80x20
+    #TODO: Scale x/y values such that we have domain/range around 30/80
     #       Low end sticks to 0, high end use some kind of ratio
     #       Shift everything over/up to be positive
     #       Fudge values where systems have the same x or y
     longSide = 80
-    shortSide = 20
+    shortSide = 25
 
-    testLocs = [system.Location for system in bruteSystems]
+    testLocs = [system.Location for system in allSystems]
     xVals = [loc['x'] for loc in testLocs]
     yVals = [loc['y'] for loc in testLocs]
 
@@ -236,8 +237,10 @@ if __name__ == '__main__':
 
     xMax = max(xValsNew)
     yMax = max(yValsNew)
+    points = []
 
     #Everything is shifted so mins are 0 and max() is the difference between points
+    #Round stuff to graph it
     if xMax == 0 or yMax == 0:
         print("cannot display")
     else:
@@ -247,13 +250,15 @@ if __name__ == '__main__':
                     if xValsNew[i] == xMax:
                         xValsNew[i] = longSide
                     else:
-                        xValsNew[i] = (longSide / xMax) * xValsNew[i]
-            for i in range(yValsNew.__len__()):
+                        xValsNew[i] = round((longSide / xMax) * xValsNew[i])
+            #for i in range(yValsNew.__len__()):
                 if yValsNew[i] != 0:
                     if yValsNew[i] == yMax:
                         yValsNew[i] = shortSide
                     else:
-                        yValsNew[i] = (shortSide / yMax) * yValsNew[i]
+                        yValsNew[i] = round((shortSide / yMax) * yValsNew[i])
+            #for i in range(xValsNew.__len__()):
+                points.append(Point(xValsNew[i],yValsNew[i]))
         else:
             #Just swap x/y to rotate the graph
             for i in range(xValsNew.__len__()):
@@ -261,12 +266,36 @@ if __name__ == '__main__':
                     if xValsNew[i] == xMax:
                         xValsNew[i] = shortSide
                     else:
-                        xValsNew[i] = (shortSide / xMax) * xValsNew[i]
-            for i in range(yValsNew.__len__()):
+                        xValsNew[i] = round((shortSide / xMax) * xValsNew[i])
+            #for i in range(yValsNew.__len__()):
                 if yValsNew[i] != 0:
                     if yValsNew[i] == yMax:
                         yValsNew[i] = longSide
                     else:
-                        yValsNew[i] = (longSide / yMax) * yValsNew[i]   
-        print(xValsNew)
-        print(yValsNew)
+                        yValsNew[i] = round((longSide / yMax) * yValsNew[i])
+            #for i in range(xValsNew.__len__()):
+                points.append(Point(yValsNew[i],xValsNew[i]))
+        #TODO: Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
+        #before doing the fudging on the short side. X is long side, Y is short side
+
+        pointsCounter = Counter(points)
+        while sum([v for k,v in pointsCounter.items() if 1 == v]) != points.__len__():
+            #numSame = {}
+            #for k,v in pointsCounter.items():
+            #    if v > 1:
+            #        numSame[k] = v
+            for k,v in pointsCounter.items():
+                changed = 0
+                doAdd = True
+                if v > 1:
+                    toChange = points.index(k)
+                    points[toChange].L += 1
+            pointsCounter = Counter(points)
+
+        for i in range(points.__len__()):
+            for j in range(points.__len__()):
+                if i != j:
+                    if points[i] == points[j]:
+                        print("{0} FAIL".format(points[i]))
+        for val in points:
+            print(val)
