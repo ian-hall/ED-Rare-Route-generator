@@ -1,4 +1,5 @@
-﻿from edsystem import EDSystem
+﻿from edsystem import EDSystem, DisplayLocation
+from collections import Counter
 import itertools
 import math
 from enum import Enum,unique
@@ -8,7 +9,11 @@ class RouteType(Enum):
     Other = 0
     Cluster = 1
     Spread = 2
+#------------------------------------------------------------------------------
+###############################################################################
+#------------------------------------------------------------------------------
 class EDRareRoute(object):
+#------------------------------------------------------------------------------
     def __init__(self,systemList: []):
         self.__Route = systemList
         self.__Seller_Min = 160
@@ -17,10 +22,10 @@ class EDRareRoute(object):
         self.Best_Sellers = None
         self.Route_Type = None
         self.Fitness_Value = self.__CalcFitness()
-
+#------------------------------------------------------------------------------
     def GetRoute(self):
         return [val for val in self.__Route]       
-
+#------------------------------------------------------------------------------
     def __CalcFitness(self):
         routeLength = self.__Route.__len__()     
        
@@ -102,8 +107,6 @@ class EDRareRoute(object):
                 else:
                     system1Sellers.append(False)
 
-          
-            #for i in range(1,routeLength):
                 system2IndexToCheck = (i + system2Index) % routeLength
                 currentSystem = self.__Route[system2IndexToCheck]
                 if system2.System_Distances[currentSystem.Index] >= self.__Seller_Min:
@@ -128,11 +131,9 @@ class EDRareRoute(object):
             for val in system2Sellers:
                 if val:
                     num2 += 1
-            
-            
+                     
             if sum(allSystemsSellable) == 0:
                 continue
-
 
             if abs(num2-num1) <= 1:
                 if (num2 + num1) == routeLength:
@@ -169,14 +170,108 @@ class EDRareRoute(object):
 
 
 
-        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply) #* self.Route_Type.value
+        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply)
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         if longestJump > maxJumpRangeLY:
             totalValue = totalValue * 0.7
 
         return totalValue
+#------------------------------------------------------------------------------
+#Maybe this isnt printing out the way I think it is
+    def DrawRoute(self):
+        longSide = 78
+        shortSide = 15
 
+        xVals = [system.Location['x'] for system in self.__Route]
+        yVals = [system.Location['y'] for system in self.__Route]
+
+        xMin = min(xVals)
+        yMin = min(yVals)
+
+        if xMin < 0:
+            xValsNew = [abs(xMin) + val for val in xVals]
+        else:
+            xValsNew = [val - xMin for val in xVals]
+        if yMin < 0:
+            yValsNew = [abs(yMin) + val for val in yVals]
+        else:
+            yValsNew = [val - yMin for val in yVals]
+
+        xMax = max(xValsNew)
+        yMax = max(yValsNew)
+        points = []
+
+        #Everything is shifted so mins are 0 and max() is the difference between points
+        #Round stuff to graph it
+        if xMax == 0 or yMax == 0:
+            print("Unable to draw route")
+            return
+
+        if xMax >= yMax:
+            for i in range(xValsNew.__len__()):
+                if xValsNew[i] != 0:
+                    if xValsNew[i] == xMax:
+                        xValsNew[i] = longSide
+                    else:
+                        xValsNew[i] = round((longSide / xMax) * xValsNew[i])
+                if yValsNew[i] != 0:
+                    if yValsNew[i] == yMax:
+                        yValsNew[i] = shortSide
+                    else:
+                        yValsNew[i] = round((shortSide / yMax) * yValsNew[i])
+                points.append(DisplayLocation(xValsNew[i],yValsNew[i],self.__Route[i].System_Name))
+        else:
+            #Just swap x/y to rotate the graph 90deg clockwise
+            for i in range(xValsNew.__len__()):
+                if xValsNew[i] != 0:
+                    if xValsNew[i] == xMax:
+                        xValsNew[i] = shortSide
+                    else:
+                        xValsNew[i] = round((shortSide / xMax) * xValsNew[i])
+                if yValsNew[i] != 0:
+                    if yValsNew[i] == yMax:
+                        yValsNew[i] = longSide
+                    else:
+                        yValsNew[i] = round((longSide / yMax) * yValsNew[i])
+                points.append(DisplayLocation(yValsNew[i],xValsNew[i],self.__Route[i].System_Name))
+        
+        #Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
+        #before doing the fudging on the short side (maybe). L is long side, S is short side
+        #TODO: Potential infinite loop here with large amounts of clustered systems, need to check for that and move S value too
+        pointsCounter = Counter(points)
+        while sum([v for k,v in pointsCounter.items() if 1 == v]) != points.__len__():
+            for k,v in pointsCounter.items():
+                if v > 1:
+                    toChange = points.index(k)
+                    if points[toChange].L + 1 < longSide:
+                        points[toChange].L += 1
+                    else:
+                        points[toChange].L -= 1
+            pointsCounter = Counter(points)
+
+        for i in range(points.__len__()):
+            for j in range(points.__len__()):
+                if i != j:
+                    if points[i] == points[j]:
+                        print("Unable to draw route")
+                        return
+
+        strList = []
+        for s in range(shortSide+1):
+            for l in range(longSide+1):
+                pointToCheck = DisplayLocation(l,s)
+                if pointToCheck in points:
+                    pIndex = points.index(pointToCheck)
+                    if self.__Route.__len__() < 10:
+                        strList.append('{0}'.format(pIndex + 1))
+                    else:
+                        strList.append('{0}'.format(self.__Route[pIndex].System_Name[0]))
+                else:
+                    strList.append('-')
+            strList.append('\n')
+        print(''.join(strList))
+#------------------------------------------------------------------------------
     def __str__(self):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
@@ -195,6 +290,8 @@ class EDRareRoute(object):
                     strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
                 else:
                     strList.append("{0}: [{1} ({2})]".format(count+1,system.System_Name, system.Station_Name))
+                if system.PermitReq:
+                    strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
             

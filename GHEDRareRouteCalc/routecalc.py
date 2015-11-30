@@ -13,9 +13,10 @@ class RouteCalc(object):
     Class for calculating rare trade routes
     '''
     Route_Cutoff = 11.5
-    __Selection_Mult = .25
+    __Selection_Mult = .2
     __Pool_Size = 3
     __ValidSystems = []
+#------------------------------------------------------------------------------
     @classmethod
     def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent):
         '''
@@ -51,7 +52,7 @@ class RouteCalc(object):
         #    population = p.map(self.RouteCreatorThread,tempPopulation)
 
         return self.__GeneticSolver(population,silent)
-
+#------------------------------------------------------------------------------
     @classmethod
     def __GeneticSolver(self,startingPopulation: [], silent):
         '''
@@ -159,7 +160,7 @@ class RouteCalc(object):
             currentPopulation = nextPopulation
 
         return (bestRoute,currentGeneration)
-
+#------------------------------------------------------------------------------
     @classmethod
     def __CalculateRelativeFitness(self, population: []):
         '''
@@ -178,7 +179,7 @@ class RouteCalc(object):
 
         
         return selectionValues
-    
+#------------------------------------------------------------------------------
     @classmethod
     def __Reproduce(self, population: [], selectionValues: []): 
         '''
@@ -219,7 +220,7 @@ class RouteCalc(object):
                     newRoute.append(toAdd)
 
         return newRoute
-        
+#------------------------------------------------------------------------------ 
     @classmethod
     def __Mutate(self,route: []):
         tempRoute = [val for val in route]
@@ -246,7 +247,7 @@ class RouteCalc(object):
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
-
+#------------------------------------------------------------------------------
     @classmethod
     def Brute(self, validSystems: [], routeLength):
         RouteCalc.__ValidSystems = validSystems
@@ -275,7 +276,7 @@ class RouteCalc(object):
             results = p.map(self.BruteHelper,tempBrute)
         fullResults.extend([val for val in results if val])
         return sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
-
+#------------------------------------------------------------------------------
     @classmethod
     def BruteHelper(self,route):
         newRoute = EDRareRoute(route)
@@ -283,7 +284,7 @@ class RouteCalc(object):
             return newRoute
         else:
             return None
-
+#------------------------------------------------------------------------------
     @classmethod
     def RouteCreatorThread(self,route):
         return EDRareRoute(route)

@@ -1,25 +1,20 @@
 ﻿from edsystem import EDSystem
 from edrareroute import EDRareRoute, RouteType
 from routecalc import RouteCalc
-import operator
-import random
-import itertools
-import sys
-import math
 import time
-import bisect
 
 class PerformanceCalc(object):
+#------------------------------------------------------------------------------
     @classmethod
     def CheckPerformance(self,systemsList):
         maxTests = 10
 
-        minPopSize = 100
+        minPopSize = 300
         maxPopSize = 300
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 8
+        minLength = 7
         maxLength = 8
         lengths = range(minLength,maxLength+1,1)
 
@@ -47,6 +42,7 @@ class PerformanceCalc(object):
                     stats.Gens.append(routeTuple[1])
 
                 print(stats)
+#------------------------------------------------------------------------------
     @classmethod
     def TestSystems(self,systemsDict):
         #Yaso Kondi loop
@@ -61,6 +57,7 @@ class PerformanceCalc(object):
         ykLoopList.append(systemsDict['Quechua'])  
         print("\n\nYK Loop")
         print(EDRareRoute(ykLoopList))
+        EDRareRoute(ykLoopList).DrawRoute()
 
         good4_1 = []
         good4_1.append(systemsDict['Fujin'])  
@@ -149,8 +146,11 @@ class PerformanceCalc(object):
         bad11_1.append(systemsDict['Altair'])
         print("\nPoor system distances")
         print(EDRareRoute(bad11_1))
-
+#------------------------------------------------------------------------------
+###############################################################################
+#------------------------------------------------------------------------------
 class PerformanceMetrics(object):
+#------------------------------------------------------------------------------
     def __init__(self,length,popSize):
         self.Route_Length = length
         self.Pop_Size = popSize
@@ -159,7 +159,7 @@ class PerformanceMetrics(object):
         self.Gens = []
         self.Types = []
         self.Values = []
-
+#------------------------------------------------------------------------------
     def __str__(self):
         strList = []
 
