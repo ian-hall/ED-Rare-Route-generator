@@ -49,16 +49,16 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
 class DisplayLocation(object):
 #------------------------------------------------------------------------------
-    def __init__(self, l, s, name = None):
-        self.L = l
-        self.S = s
+    def __init__(self, col, row, name = None):
+        self.Col = col
+        self.Row = row
         self.System_Name = name
 #------------------------------------------------------------------------------
     def __eq__(self, other):
-        return (self.L == other.L) and (self.S == other.S)
+        return (self.Col == other.Col) and (self.Row == other.Row)
 #------------------------------------------------------------------------------
     def __str__(self):
-        return "{0:>17}: ({1},{2})".format(self.System_Name,self.L,self.S)
+        return "{0:>17}: ({1},{2})".format(self.System_Name,self.Col,self.Row)
 #------------------------------------------------------------------------------
     def __hash__(self):
-        return hash((self.L,self.S))
+        return hash((self.Col,self.Row))

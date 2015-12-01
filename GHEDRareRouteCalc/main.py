@@ -5,7 +5,6 @@ from routecalc import RouteCalc
 from performancecalc import PerformanceCalc
 from urllib import request
 import csv
-import itertools
 import re
 import time
 import json
@@ -115,7 +114,7 @@ def __RunBrute(systems, routeLength: int):
 if __name__ == '__main__':
     cleanedCSV = []
     allSystems = []
-
+    coordLists = {}
     
     with open('RareGoods.csv') as csvFile:
         reader = csv.reader(csvFile)
@@ -123,6 +122,13 @@ if __name__ == '__main__':
         for line in reader:
             for section in line:
                 if section == '':
+                    breakout = True
+                    continue
+                if section == 'x' or section == 'y' or section == 'z':
+                    #This is where I can grab the lines with coords, and then break
+                    #TODO: Potential bug if a route ever gets x/y/z of 0
+                    temp = [float(val) for val in line if val != '' and val.__len__() > 1 and val.__len__() < 10]
+                    coordLists[section] = temp
                     breakout = True
                     break
             if not breakout:
@@ -139,6 +145,12 @@ if __name__ == '__main__':
     for line in reader:
         for section in line:
             if section == '':
+                breakout = True
+                continue
+            if section == 'x' or section == 'y' or section == 'z':
+                #This is where I can grab the lines with coords, and then break
+                temp = [float(val) for val in line if val != '' and val != '\\r' and val.__len__() > 1 and val.__len__() < 10]
+                coordLists[section] = temp
                 breakout = True
                 break
         if not breakout:
@@ -161,7 +173,12 @@ if __name__ == '__main__':
     systemsDict = {}
     for system in allSystems:
         systemsDict[system.System_Name] = system
+        system.Location['x'] = coordLists['x'][system.Index]
+        system.Location['y'] = coordLists['y'][system.Index]
+        system.Location['z'] = coordLists['z'][system.Index]
 
+
+    '''
     #The JSON file linked to from the rareroute csv/spreadsheet. Not going to include because lol 23mb text file
     #TODO: Just rip the coords out of the CSV which I totally knew were there the whole time and didn't just miss
     with open('edsystems.json') as jsonFile:
@@ -173,6 +190,7 @@ if __name__ == '__main__':
             currentSystem.Location['x'] = float(val['coord'][0])
             currentSystem.Location['y'] = float(val['coord'][1])
             currentSystem.Location['z'] = float(val['coord'][2])
+    '''
 
     bruteSystems = []
     bruteSystems.append(systemsDict['Lave'])  
@@ -196,6 +214,7 @@ if __name__ == '__main__':
     bruteSystems.append(systemsDict['Quechua'])
     '''
     TODO: Allow users to enter the values for size/station distance.
+           Also something broke in the last few commits??? or maybe python decided to run slower for some reason
     '''
     maxStationDistance = 5000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
@@ -204,12 +223,12 @@ if __name__ == '__main__':
     silent = True
     #__RunGenetic(systemsSubset,length,popSize,not silent)
     #__RunBrute(bruteSystems,length)
-    #PerformanceCalc.CheckPerformance(systemsSubset)
+    PerformanceCalc.CheckPerformance(systemsSubset)
     #PerformanceCalc.TestSystems(systemsDict)
 
     #Bugged: Quech Mom Hec Usz Lee Dis Orr Tan
 
-    buggedRoute = EDRareRoute([systemsDict['Quechua'], systemsDict['Momus Reach'], systemsDict['Hecate'], systemsDict['Uszaa'], systemsDict['Leesti'],
-                     systemsDict['Diso'], systemsDict['Orrere'], systemsDict['Tanmark']])
-    print(buggedRoute)
-    buggedRoute.DrawRoute()
+    #buggedRoute = EDRareRoute([systemsDict['Quechua'], systemsDict['Momus Reach'], systemsDict['Hecate'], systemsDict['Uszaa'], systemsDict['Leesti'],
+    #                 systemsDict['Diso'], systemsDict['Orrere'], systemsDict['Tanmark']])
+    #print(buggedRoute)
+    #buggedRoute.DrawRoute()

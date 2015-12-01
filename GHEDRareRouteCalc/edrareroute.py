@@ -29,10 +29,10 @@ class EDRareRoute(object):
     def __CalcFitness(self):
         routeLength = self.__Route.__len__()     
        
-        clusterShortLY = 50
-        clusterLongLY = 155
-        spreadMaxLY = 120
-        maxJumpRangeLY = 230
+        clusterShortLY = 45
+        clusterLongLY = 145
+        spreadMaxLY = 115
+        maxJumpRangeLY = 200
         clusterShort = 0
         clusterLong = 0
         spreadJumps = 0
@@ -180,8 +180,8 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
 #Maybe this isnt printing out the way I think it is
     def DrawRoute(self):
-        longSide = 78
-        shortSide = 15
+        maxCols = 78
+        maxRows = 20
 
         xVals = [system.Location['x'] for system in self.__Route]
         yVals = [system.Location['y'] for system in self.__Route]
@@ -212,42 +212,52 @@ class EDRareRoute(object):
             for i in range(xValsNew.__len__()):
                 if xValsNew[i] != 0:
                     if xValsNew[i] == xMax:
-                        xValsNew[i] = longSide
+                        xValsNew[i] = maxCols
                     else:
-                        xValsNew[i] = round((longSide / xMax) * xValsNew[i])
+                        xValsNew[i] = round((maxCols / xMax) * xValsNew[i])
                 if yValsNew[i] != 0:
                     if yValsNew[i] == yMax:
-                        yValsNew[i] = shortSide
+                        yValsNew[i] = maxRows
                     else:
-                        yValsNew[i] = round((shortSide / yMax) * yValsNew[i])
+                        yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
                 points.append(DisplayLocation(xValsNew[i],yValsNew[i],self.__Route[i].System_Name))
         else:
             #Just swap x/y to rotate the graph 90deg clockwise
             for i in range(xValsNew.__len__()):
                 if xValsNew[i] != 0:
                     if xValsNew[i] == xMax:
-                        xValsNew[i] = shortSide
+                        xValsNew[i] = maxRows
                     else:
-                        xValsNew[i] = round((shortSide / xMax) * xValsNew[i])
+                        xValsNew[i] = round((maxRows / xMax) * xValsNew[i])
                 if yValsNew[i] != 0:
                     if yValsNew[i] == yMax:
-                        yValsNew[i] = longSide
+                        yValsNew[i] = maxCols
                     else:
-                        yValsNew[i] = round((longSide / yMax) * yValsNew[i])
+                        yValsNew[i] = round((maxCols / yMax) * yValsNew[i])
                 points.append(DisplayLocation(yValsNew[i],xValsNew[i],self.__Route[i].System_Name))
         
         #Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
         #before doing the fudging on the short side (maybe). L is long side, S is short side
-        #TODO: Potential infinite loop here with large amounts of clustered systems, need to check for that and move S value too
+        #TODO: Make sure switching between L and S sides is working as intended
         pointsCounter = Counter(points)
-        while sum([v for k,v in pointsCounter.items() if 1 == v]) != points.__len__():
+        split = 10
+        loops = 0
+        while sum([v for k,v in pointsCounter.items() if v == 1]) != points.__len__():
             for k,v in pointsCounter.items():
                 if v > 1:
                     toChange = points.index(k)
-                    if points[toChange].L + 1 < longSide:
-                        points[toChange].L += 1
+                    if loops%split == split-1:
+                        if points[toChange].Row + 1 < maxRows:
+                            points[toChange].Row += 1
+                        else:
+                            points[toChange].Row -= 1
                     else:
-                        points[toChange].L -= 1
+                        if points[toChange].Col + 1 < maxCols:
+                            points[toChange].Col += 1
+                        else:
+                            points[toChange].Col -= 1
+
+            loops += 1
             pointsCounter = Counter(points)
 
         for i in range(points.__len__()):
@@ -258,9 +268,9 @@ class EDRareRoute(object):
                         return
 
         strList = []
-        for s in range(shortSide+1):
-            for l in range(longSide+1):
-                pointToCheck = DisplayLocation(l,s)
+        for row in range(maxRows+1):
+            for col in range(maxCols+1):
+                pointToCheck = DisplayLocation(col,row)
                 if pointToCheck in points:
                     pIndex = points.index(pointToCheck)
                     if self.__Route.__len__() < 10:
