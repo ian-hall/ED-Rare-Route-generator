@@ -9,13 +9,13 @@ class PerformanceCalc(object):
     def CheckPerformance(self,systemsList):
         maxTests = 10
 
-        minPopSize = 50
-        maxPopSize = 100
-        popSizeStep = 25
+        minPopSize = 300
+        maxPopSize = 500
+        popSizeStep = 100
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 3
-        maxLength = 5
+        minLength = 7
+        maxLength = 9
         lengths = range(minLength,maxLength+1,1)
 
         

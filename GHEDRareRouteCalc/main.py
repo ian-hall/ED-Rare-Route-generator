@@ -127,6 +127,7 @@ if __name__ == '__main__':
                 if section == 'x' or section == 'y' or section == 'z':
                     #This is where I can grab the lines with coords, and then break
                     #TODO: Potential bug if a route ever gets x/y/z of 0
+                    #       Maybe use the fact that [7] to [len-3] are the distances 
                     temp = [float(val) for val in line if val != '' and val.__len__() > 1 and val.__len__() < 10]
                     coordLists[section] = temp
                     breakout = True
@@ -136,26 +137,26 @@ if __name__ == '__main__':
             breakout = False
     '''
     target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
-    csvFile = request.urlopen(target_url)
-    fileToText = csvFile.read()
-    usableCSV = str(fileToText).split('\\n')
+    with request.urlopen(target_url) as csvFile:
+        fileToText = csvFile.read()
+        usableCSV = str(fileToText).split('\\n')
 
-    reader = csv.reader(usableCSV)
-    breakout = False
-    for line in reader:
-        for section in line:
-            if section == '':
-                breakout = True
-                continue
-            if section == 'x' or section == 'y' or section == 'z':
-                #This is where I can grab the lines with coords, and then break
-                temp = [float(val) for val in line if val != '' and val != '\\r' and val.__len__() > 1 and val.__len__() < 10]
-                coordLists[section] = temp
-                breakout = True
-                break
-        if not breakout:
-            cleanedCSV.append(line)
+        reader = csv.reader(usableCSV)
         breakout = False
+        for line in reader:
+            for section in line:
+                if section == '':
+                    breakout = True
+                    continue
+                if section == 'x' or section == 'y' or section == 'z':
+                    #This is where I can grab the lines with coords, and then break
+                    temp = [float(val) for val in line if val != '' and val != '\\r' and val.__len__() > 1 and val.__len__() < 10]
+                    coordLists[section] = temp
+                    breakout = True
+                    break
+            if not breakout:
+                cleanedCSV.append(line)
+            breakout = False
     '''
     headers = cleanedCSV[0]
     for i in range(1,cleanedCSV.__len__()-1):
@@ -176,21 +177,6 @@ if __name__ == '__main__':
         system.Location['x'] = coordLists['x'][system.Index]
         system.Location['y'] = coordLists['y'][system.Index]
         system.Location['z'] = coordLists['z'][system.Index]
-
-
-    '''
-    #The JSON file linked to from the rareroute csv/spreadsheet. Not going to include because lol 23mb text file
-    #TODO: Just rip the coords out of the CSV which I totally knew were there the whole time and didn't just miss
-    with open('edsystems.json') as jsonFile:
-        jsonSystems = json.load(jsonFile)
-    
-    for val in jsonSystems['systems']:
-        if val['name'] in systemsDict:
-            currentSystem = systemsDict[val['name']]
-            currentSystem.Location['x'] = float(val['coord'][0])
-            currentSystem.Location['y'] = float(val['coord'][1])
-            currentSystem.Location['z'] = float(val['coord'][2])
-    '''
 
     bruteSystems = []
     bruteSystems.append(systemsDict['Lave'])  
@@ -214,21 +200,20 @@ if __name__ == '__main__':
     bruteSystems.append(systemsDict['Quechua'])
     '''
     TODO: Allow users to enter the values for size/station distance.
-           Also something broke in the last few commits??? or maybe python decided to run slower for some reason
+           Also something broke in the last few commits??? or maybe python decided to run slower for some reason?? Brute runs at the same speed, Genetic is slower
     '''
     maxStationDistance = 5000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
+    length = 9
     popSize = 500
     silent = True
     #__RunGenetic(systemsSubset,length,popSize,not silent)
     #__RunBrute(bruteSystems,length)
-    PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.TestSystems(systemsDict)
+    #PerformanceCalc.CheckPerformance(systemsSubset)
+    PerformanceCalc.TestSystems(systemsDict)
 
-    #Bugged: Quech Mom Hec Usz Lee Dis Orr Tan
+    #mirrored route drawing: Tan Tara Utga Iru Jar
 
-    #buggedRoute = EDRareRoute([systemsDict['Quechua'], systemsDict['Momus Reach'], systemsDict['Hecate'], systemsDict['Uszaa'], systemsDict['Leesti'],
-    #                 systemsDict['Diso'], systemsDict['Orrere'], systemsDict['Tanmark']])
-    #print(buggedRoute)
-    #buggedRoute.DrawRoute()
+    mirroredRoute = EDRareRoute([systemsDict['Tanmark'],systemsDict['Tarach Tor'],systemsDict['Utgaroar'],systemsDict['Irukama'],systemsDict['Jaroua']])
+    print(mirroredRoute)
+    mirroredRoute.DrawRoute()

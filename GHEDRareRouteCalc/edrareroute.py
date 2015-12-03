@@ -29,9 +29,9 @@ class EDRareRoute(object):
     def __CalcFitness(self):
         routeLength = self.__Route.__len__()     
        
-        clusterShortLY = 45
+        clusterShortLY = 50
         clusterLongLY = 145
-        spreadMaxLY = 115
+        spreadMaxLY = 110
         maxJumpRangeLY = 200
         clusterShort = 0
         clusterLong = 0
@@ -178,7 +178,9 @@ class EDRareRoute(object):
 
         return totalValue
 #------------------------------------------------------------------------------
-#Maybe this isnt printing out the way I think it is
+    #TODO: Fix Printing out
+    #       If greater distance between y points, row order is fine
+    #       If greater distance between x points, row order is reversed 
     def DrawRoute(self):
         maxCols = 78
         maxRows = 20
