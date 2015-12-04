@@ -180,10 +180,12 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     #TODO: Fix Printing out
     #       If greater distance between y points, row order is fine
-    #       If greater distance between x points, row order is reversed 
+    #       If greater distance between x points, row order is reversed
+    #       Column order seems fine in all cases 
+    #       Because computers like to start 0,0 at the top-left instead of wherever I thought it was
     def DrawRoute(self):
         maxCols = 78
-        maxRows = 20
+        maxRows = 19
 
         xVals = [system.Location['x'] for system in self.__Route]
         yVals = [system.Location['y'] for system in self.__Route]
@@ -211,6 +213,7 @@ class EDRareRoute(object):
             return
 
         if xMax >= yMax:
+            #yVals for row, xVals for col
             for i in range(xValsNew.__len__()):
                 if xValsNew[i] != 0:
                     if xValsNew[i] == xMax:
@@ -222,9 +225,10 @@ class EDRareRoute(object):
                         yValsNew[i] = maxRows
                     else:
                         yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
-                points.append(DisplayLocation(xValsNew[i],yValsNew[i],self.__Route[i].System_Name))
+                points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],name=self.__Route[i].System_Name))
         else:
-            #Just swap x/y to rotate the graph 90deg clockwise
+            #Just swap x/y to rotate the graph 90deg clockwise, so xVals for row, yVals for col
+            #This also fixes the whole reversed rows thing going on
             for i in range(xValsNew.__len__()):
                 if xValsNew[i] != 0:
                     if xValsNew[i] == xMax:
@@ -236,11 +240,10 @@ class EDRareRoute(object):
                         yValsNew[i] = maxCols
                     else:
                         yValsNew[i] = round((maxCols / yMax) * yValsNew[i])
-                points.append(DisplayLocation(yValsNew[i],xValsNew[i],self.__Route[i].System_Name))
+                points.append(DisplayLocation(row=xValsNew[i],col=yValsNew[i],name=self.__Route[i].System_Name))
         
         #Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
         #before doing the fudging on the short side (maybe). L is long side, S is short side
-        #TODO: Make sure switching between L and S sides is working as intended
         pointsCounter = Counter(points)
         split = 10
         loops = 0
@@ -270,9 +273,16 @@ class EDRareRoute(object):
                         return
 
         strList = []
-        for row in range(maxRows+1):
-            for col in range(maxCols+1):
-                pointToCheck = DisplayLocation(col,row)
+        rowRange = None
+        if xMax >= yMax:
+            rowRange = range(maxRows,-1,-1)
+        else:
+            rowRange = range(maxRows+1)
+        colRange = range(maxCols+1)
+
+        for row in rowRange:
+            for col in colRange:
+                pointToCheck = DisplayLocation(row,col)
                 if pointToCheck in points:
                     pIndex = points.index(pointToCheck)
                     if self.__Route.__len__() < 10:

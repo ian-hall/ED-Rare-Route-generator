@@ -65,6 +65,7 @@ class PerformanceCalc(object):
         good4_1.append(systemsDict['Diso'])  
         good4_1.append(systemsDict['Leesti'])  
         print(EDRareRoute(good4_1))
+        EDRareRoute(good4_1).DrawRoute()
        
         good5_1 = []
         good5_1.append(systemsDict['Irukama']) 
