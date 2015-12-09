@@ -7,15 +7,15 @@ class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def CheckPerformance(self,systemsList):
-        maxTests = 10
+        maxTests = 20
 
-        minPopSize = 300
-        maxPopSize = 500
+        minPopSize = 500
+        maxPopSize = 600
         popSizeStep = 100
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 7
-        maxLength = 9
+        minLength = 8
+        maxLength = 8
         lengths = range(minLength,maxLength+1,1)
 
         
@@ -65,7 +65,6 @@ class PerformanceCalc(object):
         good4_1.append(systemsDict['Diso'])  
         good4_1.append(systemsDict['Leesti'])  
         print(EDRareRoute(good4_1))
-        EDRareRoute(good4_1).DrawRoute()
        
         good5_1 = []
         good5_1.append(systemsDict['Irukama']) 
@@ -98,7 +97,7 @@ class PerformanceCalc(object):
         good6_1.append(systemsDict['Utgaroar'])  
         good6_1.append(systemsDict['Leesti'])  
         good6_1.append(systemsDict['Lave'])  
-        print(EDRareRoute(good6_1))   
+        print(EDRareRoute(good6_1)) 
          
         good8_1 = []
         good8_1.append(systemsDict['Hecate'])
@@ -118,9 +117,9 @@ class PerformanceCalc(object):
         bad6_1.append(systemsDict['Utgaroar'])
         bad6_1.append(systemsDict['Hecate'])
         bad6_1.append(systemsDict['Ochoeng'])
-        print("\nNot all systems accounted for in sellers")
+        print("\nNo 2 systems to sell all goods at")
         print(EDRareRoute(bad6_1))
-        
+                
         bad8_1 = []
         bad8_1.append(systemsDict['Chi Eridani']) 
         bad8_1.append(systemsDict['Altair'])  

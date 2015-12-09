@@ -178,11 +178,7 @@ class EDRareRoute(object):
 
         return totalValue
 #------------------------------------------------------------------------------
-    #TODO: Fix Printing out
-    #       If greater distance between y points, row order is fine
-    #       If greater distance between x points, row order is reversed
-    #       Column order seems fine in all cases 
-    #       Because computers like to start 0,0 at the top-left instead of wherever I thought it was
+    #Draws the route
     def DrawRoute(self):
         maxCols = 78
         maxRows = 19
@@ -275,8 +271,10 @@ class EDRareRoute(object):
         strList = []
         rowRange = None
         if xMax >= yMax:
+            print('x')
             rowRange = range(maxRows,-1,-1)
         else:
+            print('y')
             rowRange = range(maxRows+1)
         colRange = range(maxCols+1)
 

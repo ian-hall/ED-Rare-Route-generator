@@ -202,18 +202,12 @@ if __name__ == '__main__':
     TODO: Allow users to enter the values for size/station distance.
            Also something broke in the last few commits??? or maybe python decided to run slower for some reason?? Brute runs at the same speed, Genetic is slower
     '''
-    maxStationDistance = 5000
+    maxStationDistance = 700
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 9
-    popSize = 500
+    length = 6
+    popSize = 100
     silent = True
-    #__RunGenetic(systemsSubset,length,popSize,not silent)
-    #__RunBrute(bruteSystems,length)
+    __RunGenetic(systemsSubset,length,popSize,not silent)
+    #__RunBrute(systemsSubset,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    PerformanceCalc.TestSystems(systemsDict)
-
-    #mirrored route drawing: Tan Tara Utga Iru Jar
-
-    mirroredRoute = EDRareRoute([systemsDict['Tanmark'],systemsDict['Tarach Tor'],systemsDict['Utgaroar'],systemsDict['Irukama'],systemsDict['Jaroua']])
-    print(mirroredRoute)
-    mirroredRoute.DrawRoute()
+    #PerformanceCalc.TestSystems(systemsDict)

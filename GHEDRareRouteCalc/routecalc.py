@@ -2,7 +2,6 @@
 from edrareroute import EDRareRoute
 import random
 import math
-import sys
 import operator
 import itertools
 import bisect
@@ -12,7 +11,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.4
+    Route_Cutoff = 11.5
     __Selection_Mult = .25
     __Pool_Size = 3
     __ValidSystems = []
@@ -77,21 +76,21 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually (maybe).
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.25
-        timeBetweenIncrease = 500
+        mutationIncrease = 0.35
+        timeBetweenIncrease = 400
         lastIncrease = currentGeneration
         numIncreases = 0
         maxIncreases = 2
 
         #Force an exit if X generations pass with no improvement
-        maxGensSinceLast = 3*timeBetweenIncrease
+        maxGensSinceLast = (maxIncreases+1)*timeBetweenIncrease
 
         while True:    
             possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
 
             if not silent:
-                if (currentGeneration%500) == 0:
-                    print("Generation: {0}".format(currentGeneration))
+                #if (currentGeneration%500) == 0:
+                #    print("Generation: {0}".format(currentGeneration))
                 if currentGeneration == 1:
                     print("Starting value: {0}".format(possibleRoute.Fitness_Value))
 
@@ -100,14 +99,14 @@ class RouteCalc(object):
 
             if possibleRoute.Fitness_Value > bestRoute.Fitness_Value:
                 if not silent:
-                    print("\t{0} -> {1}".format(currentGeneration,possibleRoute.Fitness_Value))
+                    print("{0:>7}-> {1}".format(currentGeneration,possibleRoute.Fitness_Value))
                 bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
                 #Reset mutation chance when finding a new best route
                 if mutationChance != baseMutation:
                     mutationChance = baseMutation
                     if not silent:
-                        print("\tResetting mutation chance")
+                        print("\tmutation chance reset to {0}".format(mutationChance))
 
             #Exit if we are at least at the Route_Cutoff value and going to increase the mutation chance this gen
             if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
@@ -124,7 +123,7 @@ class RouteCalc(object):
                 lastIncrease = currentGeneration
                 currentPopulation = sorted(currentPopulation,key=operator.attrgetter('Fitness_Value'))
                 #Replace a percentage of the routes with lowest values, maybe make this smart to not include adding systems already commonly in the top routes
-                numReplace = math.ceil(currentPopulation.__len__() * .5)
+                numReplace = math.ceil(currentPopulation.__len__() * .75)
                 tempPop = []
                 for i in range(0,numReplace):
                     tempSystemList = []
@@ -141,7 +140,7 @@ class RouteCalc(object):
 
 
                 if not silent:
-                    print("\tCurrent mutation chance: {0}".format(mutationChance))
+                    print("{0:>7}-> mutation chance: {1}".format(currentGeneration,mutationChance))
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
             
@@ -200,7 +199,7 @@ class RouteCalc(object):
         pivot = random.randrange(1,route1.__len__()-1)
         newRoute = []
 
-        if random.randrange(sys.maxsize)%2 == 0:
+        if random.randrange(290)%2 == 0:
             for i in range(0,pivot):
                 newRoute.append(route1[i])
             for i in range(0,route2.__len__()):
