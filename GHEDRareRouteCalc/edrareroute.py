@@ -293,6 +293,7 @@ class EDRareRoute(object):
         print(''.join(strList))
 #------------------------------------------------------------------------------
     def __str__(self):
+        #TODO: Set up some kind of flag on worst value from supply/distance/cost
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
@@ -328,8 +329,8 @@ class EDRareRoute(object):
             for system in self.__Route:
                strList.append('{0}\n'.format(system))
 
-        strList.append("\nTotal distance: {0}ly".format(self.Total_Distance))
-        strList.append("\nTotal goods: {0}".format(self.Total_Supply))
-        strList.append("\nAvg cost: {0}".format(avgCost))
+        strList.append("\nTotal distance: {0:.3f}ly".format(self.Total_Distance))
+        strList.append("\nTotal goods: {0:.2f}".format(self.Total_Supply))
+        strList.append("\nAvg cost: {0:.2f}".format(avgCost))
         strList.append("\nType: {0}".format(self.Route_Type.name))
         return ''.join(strList)

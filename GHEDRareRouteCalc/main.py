@@ -11,6 +11,7 @@ import json
 
 #------------------------------------------------------------------------------
 def __ValidateLine(currentLine, lineNum: int):
+    #TODO: When getting max cap/supply rate, if one does not have a value use the other
     '''
     0 - Max Cap
     1 - Supply Rate
@@ -70,6 +71,10 @@ def __ValidateLine(currentLine, lineNum: int):
     if systemName.endswith('(permit)'):
         permit = True
         systemName = systemName.partition('(permit)')[0].strip()
+
+    if supplyCap == 1 or avgSupply == 1:
+        supplyCap = max([supplyCap,avgSupply])
+        avgSupply = supplyCap
 
 
     return EDSystem(supplyCap, avgSupply, itemCost, itemName,
@@ -200,12 +205,11 @@ if __name__ == '__main__':
     bruteSystems.append(systemsDict['Quechua'])
     '''
     TODO: Allow users to enter the values for size/station distance.
-           Also something broke in the last few commits??? or maybe python decided to run slower for some reason?? Brute runs at the same speed, Genetic is slower
     '''
-    maxStationDistance = 700
+    maxStationDistance = 5000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 6
-    popSize = 100
+    length = 8
+    popSize = 500
     silent = True
     __RunGenetic(systemsSubset,length,popSize,not silent)
     #__RunBrute(systemsSubset,length)

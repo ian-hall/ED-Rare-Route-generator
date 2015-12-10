@@ -11,7 +11,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.5
+    Route_Cutoff = 11.35
     __Selection_Mult = .25
     __Pool_Size = 3
     __ValidSystems = []
@@ -89,24 +89,22 @@ class RouteCalc(object):
             possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness_Value'))
 
             if not silent:
-                #if (currentGeneration%500) == 0:
-                #    print("Generation: {0}".format(currentGeneration))
                 if currentGeneration == 1:
-                    print("Starting value: {0}".format(possibleRoute.Fitness_Value))
+                    print("Starting value: {0:.5f}".format(possibleRoute.Fitness_Value))
 
             currentGeneration += 1
             nextPopulation = []
 
             if possibleRoute.Fitness_Value > bestRoute.Fitness_Value:
                 if not silent:
-                    print("{0:>7}-> {1}".format(currentGeneration,possibleRoute.Fitness_Value))
+                    print("{0:>7}-> {1:.5f}".format(currentGeneration,possibleRoute.Fitness_Value))
                 bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
                 #Reset mutation chance when finding a new best route
                 if mutationChance != baseMutation:
                     mutationChance = baseMutation
                     if not silent:
-                        print("\tmutation chance reset to {0}".format(mutationChance))
+                        print("{0:>7}-> mutation chance: {1:.1f}%".format("",mutationChance*100))
 
             #Exit if we are at least at the Route_Cutoff value and going to increase the mutation chance this gen
             if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
@@ -117,7 +115,6 @@ class RouteCalc(object):
                 break
 
             #Should probably check to make sure this stops at 1 but I guess it doesnt really matter since random() always returns < 1
-            #TODO: Maybe move this after the population undergoes reproduction/mutation since it wont touch the high value routes
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
@@ -140,7 +137,7 @@ class RouteCalc(object):
 
 
                 if not silent:
-                    print("{0:>7}-> mutation chance: {1}".format(currentGeneration,mutationChance))
+                    print("{0:>7}-> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
             
@@ -277,8 +274,8 @@ class RouteCalc(object):
         return sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
 #------------------------------------------------------------------------------
     @classmethod
-    def BruteHelper(self,route):
-        newRoute = EDRareRoute(route)
+    def BruteHelper(self,systemList):
+        newRoute = EDRareRoute(systemList)
         if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
             return newRoute
         else:
