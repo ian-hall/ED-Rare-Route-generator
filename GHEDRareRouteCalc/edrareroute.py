@@ -305,7 +305,7 @@ class EDRareRoute(object):
                     if system.System_Distances[distToCheck.Index] >= self.__Seller_Min:
                         tempSellers.append(distToCheck)
                 sellersPerSystem[system] = tempSellers
-            strList.append("\n\tRoute Value:{0}\n".format(self.Fitness_Value))
+            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.Fitness_Value))
             for system in self.__Route:
                 if system in self.Best_Sellers:
                     strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))

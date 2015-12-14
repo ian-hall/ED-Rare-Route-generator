@@ -93,13 +93,14 @@ def __RunGenetic(systems, routeLength: int, popSize: int, silent: bool):
         geneticEnd = time.time()
         if routeTuple:
             bestRoute = routeTuple[0]
-            print("Best route found had value {0}".format(bestRoute.Fitness_Value))
             if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
-                print(bestRoute)
-                print("Generations: {0}".format(routeTuple[1]))
-                print("Time: {0}s".format((geneticEnd-geneticStart)))
-                bestRoute.DrawRoute()
                 exitTestLoop = True
+            else:
+                print("No good route found".format(bestRoute.Fitness_Value))
+            print(bestRoute)
+            print("Generations: {0}".format(routeTuple[1]))
+            print("Time: {0}s".format((geneticEnd-geneticStart)))
+            bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
 def __RunBrute(systems, routeLength: int):
     bruteStart = time.time()
@@ -113,6 +114,14 @@ def __RunBrute(systems, routeLength: int):
     else:
         print("no routes =(")
     print("Time: {0}s".format((bruteEnd-bruteStart)))
+#------------------------------------------------------------------------------
+def __TryFloat(val):
+    try:
+        float(val)
+        return True
+    except:
+        return False
+
 #------------------------------------------------------------------------------
 # Main starts here
 #------------------------------------------------------------------------------
@@ -133,7 +142,7 @@ if __name__ == '__main__':
                     #This is where I can grab the lines with coords, and then break
                     #TODO: Potential bug if a route ever gets x/y/z of 0
                     #       Maybe use the fact that [7] to [len-3] are the distances 
-                    temp = [float(val) for val in line if val != '' and val.__len__() > 1 and val.__len__() < 10]
+                    temp = [float(val) for val in line if __TryFloat(val)]#val != '' and val.__len__() > 1 and val.__len__() < 10 ]
                     coordLists[section] = temp
                     breakout = True
                     break
@@ -209,9 +218,9 @@ if __name__ == '__main__':
     maxStationDistance = 5000
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
     length = 8
-    popSize = 500
+    popSize = 555
     silent = True
-    __RunGenetic(systemsSubset,length,popSize,not silent)
+    #__RunGenetic(systemsSubset,length,popSize,not silent)
     #__RunBrute(systemsSubset,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
     #PerformanceCalc.TestSystems(systemsDict)

@@ -196,7 +196,7 @@ class RouteCalc(object):
         pivot = random.randrange(1,route1.__len__()-1)
         newRoute = []
 
-        if random.randrange(290)%2 == 0:
+        if random.randrange(286)%2 == 0:
             for i in range(0,pivot):
                 newRoute.append(route1[i])
             for i in range(0,route2.__len__()):
