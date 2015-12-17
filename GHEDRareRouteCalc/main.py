@@ -139,10 +139,7 @@ if __name__ == '__main__':
                     breakout = True
                     continue
                 if section == 'x' or section == 'y' or section == 'z':
-                    #This is where I can grab the lines with coords, and then break
-                    #TODO: Potential bug if a route ever gets x/y/z of 0
-                    #       Maybe use the fact that [7] to [len-3] are the distances 
-                    temp = [float(val) for val in line if __TryFloat(val)]#val != '' and val.__len__() > 1 and val.__len__() < 10 ]
+                    temp = [float(val) for val in line if __TryFloat(val)]
                     coordLists[section] = temp
                     breakout = True
                     break
@@ -163,8 +160,7 @@ if __name__ == '__main__':
                     breakout = True
                     continue
                 if section == 'x' or section == 'y' or section == 'z':
-                    #This is where I can grab the lines with coords, and then break
-                    temp = [float(val) for val in line if val != '' and val != '\\r' and val.__len__() > 1 and val.__len__() < 10]
+                    temp = [float(val) for val in line if __TryFloat(val)]
                     coordLists[section] = temp
                     breakout = True
                     break
@@ -220,7 +216,9 @@ if __name__ == '__main__':
     length = 8
     popSize = 555
     silent = True
-    #__RunGenetic(systemsSubset,length,popSize,not silent)
-    #__RunBrute(systemsSubset,length)
+    __RunGenetic(systemsSubset,length,popSize,not silent)
+    #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
     #PerformanceCalc.TestSystems(systemsDict)
+
+    #EDRareRoute(allSystems).DrawRoute()

@@ -180,8 +180,8 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     #Draws the route
     def DrawRoute(self):
-        maxCols = 78
-        maxRows = 19
+        maxCols = 53
+        maxRows = 20
 
         xVals = [system.Location['x'] for system in self.__Route]
         yVals = [system.Location['y'] for system in self.__Route]
@@ -208,38 +208,38 @@ class EDRareRoute(object):
             print("Unable to draw route")
             return
 
-        if xMax >= yMax:
+        #if True: #xMax >= yMax:
             #yVals for row, xVals for col
-            for i in range(xValsNew.__len__()):
-                if xValsNew[i] != 0:
-                    if xValsNew[i] == xMax:
-                        xValsNew[i] = maxCols
-                    else:
-                        xValsNew[i] = round((maxCols / xMax) * xValsNew[i])
-                if yValsNew[i] != 0:
-                    if yValsNew[i] == yMax:
-                        yValsNew[i] = maxRows
-                    else:
-                        yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
-                points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],name=self.__Route[i].System_Name))
-        else:
-            #Just swap x/y to rotate the graph 90deg clockwise, so xVals for row, yVals for col
-            #This also fixes the whole reversed rows thing going on
-            for i in range(xValsNew.__len__()):
-                if xValsNew[i] != 0:
-                    if xValsNew[i] == xMax:
-                        xValsNew[i] = maxRows
-                    else:
-                        xValsNew[i] = round((maxRows / xMax) * xValsNew[i])
-                if yValsNew[i] != 0:
-                    if yValsNew[i] == yMax:
-                        yValsNew[i] = maxCols
-                    else:
-                        yValsNew[i] = round((maxCols / yMax) * yValsNew[i])
-                points.append(DisplayLocation(row=xValsNew[i],col=yValsNew[i],name=self.__Route[i].System_Name))
+        for i in range(xValsNew.__len__()):
+            if xValsNew[i] != 0:
+                if xValsNew[i] == xMax:
+                    xValsNew[i] = maxCols
+                else:
+                    xValsNew[i] = round((maxCols / xMax) * xValsNew[i])
+            if yValsNew[i] != 0:
+                if yValsNew[i] == yMax:
+                    yValsNew[i] = maxRows
+                else:
+                    yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
+            points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],name=self.__Route[i].System_Name))
+        #else:
+        #    #Just swap x/y to rotate the graph 90deg clockwise, so xVals for row, yVals for col
+        #    #This also fixes the whole reversed rows thing going on
+        #    for i in range(xValsNew.__len__()):
+        #        if xValsNew[i] != 0:
+        #            if xValsNew[i] == xMax:
+        #                xValsNew[i] = maxRows
+        #            else:
+        #                xValsNew[i] = round((maxRows / xMax) * xValsNew[i])
+        #        if yValsNew[i] != 0:
+        #            if yValsNew[i] == yMax:
+        #                yValsNew[i] = maxCols
+        #            else:
+        #                yValsNew[i] = round((maxCols / yMax) * yValsNew[i])
+        #        points.append(DisplayLocation(row=xValsNew[i],col=yValsNew[i],name=self.__Route[i].System_Name))
         
-        #Fudge numbers so we dont have same x/y points for systems, suffle on the long side first and then check again
-        #before doing the fudging on the short side (maybe). L is long side, S is short side
+        #Fudge numbers so we dont have same x/y points for systems, shift on the cols most of the time, then a row
+        #if we get in some kind of loop. (really only one group of systems this applies to)
         pointsCounter = Counter(points)
         split = 10
         loops = 0
@@ -270,12 +270,12 @@ class EDRareRoute(object):
 
         strList = []
         rowRange = None
-        if xMax >= yMax:
-            print('x')
-            rowRange = range(maxRows,-1,-1)
-        else:
-            print('y')
-            rowRange = range(maxRows+1)
+        #if True:# xMax >= yMax:
+        #print('x')
+        rowRange = range(maxRows,-1,-1)
+        #else:
+        #    print('y')
+        #    rowRange = range(maxRows+1)
         colRange = range(maxCols+1)
 
         for row in rowRange:

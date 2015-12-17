@@ -11,7 +11,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.35
+    Route_Cutoff = 11.4
     __Selection_Mult = .25
     __Pool_Size = 3
     __ValidSystems = []
@@ -263,13 +263,13 @@ class RouteCalc(object):
             else:
                 print("Processing: {0}".format(num))
                 with Pool(RouteCalc.__Pool_Size) as p:
-                    results = p.map(self.BruteHelper,tempBrute)
+                    results = p.map(RouteCalc.BruteHelper,tempBrute)
                 fullResults.extend([val for val in results if val])
                 tempBrute = [sysList]
                 num += 1
         print("Processing: {0}".format(num))
         with Pool(RouteCalc.__Pool_Size) as p:
-            results = p.map(self.BruteHelper,tempBrute)
+            results = p.map(RouteCalc.BruteHelper,tempBrute)
         fullResults.extend([val for val in results if val])
         return sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
 #------------------------------------------------------------------------------
