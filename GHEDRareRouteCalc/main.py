@@ -10,8 +10,7 @@ import time
 import json
 
 #------------------------------------------------------------------------------
-def __ValidateLine(currentLine, lineNum: int):
-    #TODO: When getting max cap/supply rate, if one does not have a value use the other
+def __ValidateLine(currentLine, lineNum: int) -> EDSystem:
     '''
     0 - Max Cap
     1 - Supply Rate
@@ -79,12 +78,12 @@ def __ValidateLine(currentLine, lineNum: int):
 
     return EDSystem(supplyCap, avgSupply, itemCost, itemName,
                     distToStation, stationName, systemName, index,
-                    distToOthers,permit)
+                    distToOthers, permit)
 #------------------------------------------------------------------------------
-def __RunGenetic(systems, routeLength: int, popSize: int, silent: bool):
+def __RunGenetic(systems, routeLength: int, popSize: int, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
-    maxRuns = 20
+    maxRuns = 5
     geneticStart = time.time()
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
@@ -93,9 +92,9 @@ def __RunGenetic(systems, routeLength: int, popSize: int, silent: bool):
         geneticEnd = time.time()
         if routeTuple:
             bestRoute = routeTuple[0]
-            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
+            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and stopShort:
                 exitTestLoop = True
-            else:
+            if bestRoute.Fitness_Value < RouteCalc.Route_Cutoff:
                 print("No good route found".format(bestRoute.Fitness_Value))
             print(bestRoute)
             print("Generations: {0}".format(routeTuple[1]))
@@ -211,14 +210,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 5000
-    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
+    maxStationDistance = 10000
+    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance]
     length = 8
-    popSize = 555
-    silent = True
-    __RunGenetic(systemsSubset,length,popSize,not silent)
-    #__RunBrute(bruteSystems,length)
+    popSize = 300
+    #__RunGenetic(allSystems,length,popSize,silent=False,stopShort=False)
+    #__RunBrute(systemsSubset,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.TestSystems(systemsDict)
+    PerformanceCalc.TestSystems(systemsDict)
 
     #EDRareRoute(allSystems).DrawRoute()

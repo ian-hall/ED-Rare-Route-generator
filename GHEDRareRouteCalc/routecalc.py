@@ -11,7 +11,7 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.4
+    Route_Cutoff = 11.5
     __Selection_Mult = .25
     __Pool_Size = 3
     __ValidSystems = []

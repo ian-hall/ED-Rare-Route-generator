@@ -49,7 +49,7 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
 class DisplayLocation(object):
 #------------------------------------------------------------------------------
-    def __init__(self, row, col, name = None):
+    def __init__(self, row, col, name = ""):
         self.Row = row
         self.Col = col
         self.System_Name = name
