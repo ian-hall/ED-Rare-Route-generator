@@ -19,7 +19,11 @@ class EDSystem( object ):
         self.PermitReq = permit
 #------------------------------------------------------------------------------
     def __str__(self):
-        return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,self.Station_Name,self.Items, self.Cost, self.Max_Supply)
+        if self.PermitReq:
+            return str.format("(P){0}({1}): {2} @ {3}cr (~{4})", self.System_Name,self.Station_Name,self.Items, self.Cost, self.Max_Supply)
+        else:
+            return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,self.Station_Name,self.Items, self.Cost, self.Max_Supply)
+        
 #------------------------------------------------------------------------------
     def __key(self):
         '''

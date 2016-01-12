@@ -150,7 +150,6 @@ if __name__ == '__main__':
     with request.urlopen(target_url) as csvFile:
         fileToText = csvFile.read()
         usableCSV = str(fileToText).split('\\n')
-
         reader = csv.reader(usableCSV)
         breakout = False
         for line in reader:
@@ -210,13 +209,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 10000
-    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance]
+    maxStationDistance = 4000
+    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
     length = 8
-    popSize = 300
-    #__RunGenetic(allSystems,length,popSize,silent=False,stopShort=False)
-    #__RunBrute(systemsSubset,length)
+    popSize = 400
+    __RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False)
+    #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    PerformanceCalc.TestSystems(systemsDict)
+    #PerformanceCalc.TestSystems(systemsDict)
 
     #EDRareRoute(allSystems).DrawRoute()
