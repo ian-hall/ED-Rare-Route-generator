@@ -7,7 +7,6 @@ from urllib import request
 import csv
 import re
 import time
-import json
 
 #------------------------------------------------------------------------------
 def __ValidateLine(currentLine, lineNum: int) -> EDSystem:
@@ -209,13 +208,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 4000
+    maxStationDistance = 700
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
-    popSize = 400
-    __RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False)
+    length = 4
+    popSize = 300
+    #__RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False)
     #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.TestSystems(systemsDict)
+    PerformanceCalc.TestSystems(systemsDict)
 
     #EDRareRoute(allSystems).DrawRoute()

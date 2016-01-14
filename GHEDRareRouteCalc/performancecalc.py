@@ -1,5 +1,5 @@
 ﻿from edsystem import EDSystem
-from edrareroute import EDRareRoute, RouteType
+from edrareroute import EDRareRoute, RouteType, FitnessType
 from routecalc import RouteCalc
 import time
 

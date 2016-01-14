@@ -12,16 +12,24 @@ class RouteType(Enum):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
+@unique
+class FitnessType(Enum):
+    Default = 0
+    Alternative = 1
+#------------------------------------------------------------------------------
+###############################################################################
+#------------------------------------------------------------------------------
 class EDRareRoute(object):
 #------------------------------------------------------------------------------
-    def __init__(self,systemList: []):
+    def __init__(self,systemList: [], fType = FitnessType.Default):
         self.__Route = systemList
         self.__Seller_Min = 155
         self.Total_Distance = 0
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Best_Sellers = None
-        self.Route_Type = None
-        self.Fitness_Value = self.__CalcFitness()
+        self.Route_Type = RouteType.Other #Just default to 'other' as a catch all
+        self.Fitness_Type = fType #Probably can get rid of this once CalcFitAlt is done
+        self.Fitness_Value = self.__CalcFitness() if fType == FitnessType.Default else self.__CalcFitnessAlt()
 #------------------------------------------------------------------------------
     def GetRoute(self):
         return [val for val in self.__Route]       
@@ -53,8 +61,6 @@ class EDRareRoute(object):
                 clusterLong += 1 
             if jumpDistance <= spreadMaxLY:
                 spreadJumps += 1 
-
-        self.Route_Type = RouteType.Other
         
         #Route has 2 groups of systems separated by a long jump
         #Ideally clusterLongJumps would be variable and equal to the number of sellers,
@@ -181,9 +187,38 @@ class EDRareRoute(object):
 
         return totalValue
 #------------------------------------------------------------------------------
+    #TODO: Alternative fitness value based on just accounting for all systems in a route without
+    #      regard to systems positions in the route
+    def __CalcFitnessAlt(self):
+        routeLength = self.__Route.__len__()
+        maxJumpDistance = 100
+        overMax = False
+        for i in range(0,routeLength):
+            currentSystem = self.__Route[i]
+            nextSystem = self.__Route[(i+1)%routeLength]
+            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            if jumpDistance > maxJumpDistance:
+                overMax = True
+            self.Total_Distance += jumpDistance
+        if overMax:
+            return 0.1
+
+        systemsBySeller = {}
+        for seller in self.__Route:
+            systemsBySeller[seller] = []
+            for system in self.__Route:
+                if seller.System_Distances[system.Index] > self.__Seller_Min:
+                    systemsBySeller[seller].append(system)
+        #TODO: Find least number of systems that account for all rares to sell
+        #       Go by groups of 2,3,....to maybe len/2. Stop when we find the
+        #       First occurance of all systems. This should give us the min needed
+        
+        #Place holder so I can actually use this to run the program    
+        from random import uniform
+        return uniform(0,12)
+#------------------------------------------------------------------------------
     #Draws the route
-    #TODO: Maybe keep a list of points for all systems and then display only the points in the route???
-    #           This would probably make everything look too smashed instead of too spread
+    #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
     def DrawRoute(self):
         maxCols = 53
         maxRows = 20
@@ -279,7 +314,7 @@ class EDRareRoute(object):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
-        if self.Best_Sellers:
+        if self.Best_Sellers and self.Fitness_Type == FitnessType.Default:
             sellersPerSystem = {}
             for system in self.__Route:
                 tempSellers = []

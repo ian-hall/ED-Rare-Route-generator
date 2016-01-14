@@ -1,5 +1,5 @@
 ﻿from edsystem import EDSystem
-from edrareroute import EDRareRoute
+from edrareroute import EDRareRoute, FitnessType
 import random
 import math
 import operator
