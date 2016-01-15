@@ -44,7 +44,7 @@ class PerformanceCalc(object):
                 print(stats)
 #------------------------------------------------------------------------------
     @classmethod
-    def TestSystems(self,systemsDict):
+    def TestSystems(self,systemsDict,fitType = FitnessType.Default):
         #Yaso Kondi loop
         ykLoopList = []
         ykLoopList.append(systemsDict['Coquim'])  
@@ -56,7 +56,7 @@ class PerformanceCalc(object):
         ykLoopList.append(systemsDict['Yaso Kondi']) 
         ykLoopList.append(systemsDict['Quechua'])  
         print("\n\nYK Loop")
-        print(EDRareRoute(ykLoopList))
+        print(EDRareRoute(ykLoopList,fitType))
         EDRareRoute(ykLoopList).DrawRoute()
 
         good4_1 = []
@@ -64,7 +64,7 @@ class PerformanceCalc(object):
         good4_1.append(systemsDict['39 Tauri'])   
         good4_1.append(systemsDict['Diso'])  
         good4_1.append(systemsDict['Leesti'])  
-        print(EDRareRoute(good4_1))
+        print(EDRareRoute(good4_1,fitType))
        
         good5_1 = []
         good5_1.append(systemsDict['Irukama']) 
@@ -72,7 +72,7 @@ class PerformanceCalc(object):
         good5_1.append(systemsDict['Leesti']) 
         good5_1.append(systemsDict['Aganippe'])  
         good5_1.append(systemsDict['Altair'])  
-        print(EDRareRoute(good5_1))
+        print(EDRareRoute(good5_1,fitType))
 
         good5_2 = []
         good5_2.append(systemsDict['Leesti'])  
@@ -80,7 +80,7 @@ class PerformanceCalc(object):
         good5_2.append(systemsDict['Orrere'])  
         good5_2.append(systemsDict['Utgaroar'])  
         good5_2.append(systemsDict['Tanmark'])
-        print(EDRareRoute(good5_2))
+        print(EDRareRoute(good5_2,fitType))
 
         good5_3 = []
         good5_3.append(systemsDict['Tanmark'])  
@@ -88,7 +88,7 @@ class PerformanceCalc(object):
         good5_3.append(systemsDict['Diso'])  
         good5_3.append(systemsDict['Lave'])  
         good5_3.append(systemsDict['Utgaroar'])  
-        print(EDRareRoute(good5_3))
+        print(EDRareRoute(good5_3,fitType))
 
         good6_1 = []
         good6_1.append(systemsDict['Orrere'])
@@ -97,7 +97,7 @@ class PerformanceCalc(object):
         good6_1.append(systemsDict['Utgaroar'])  
         good6_1.append(systemsDict['Leesti'])  
         good6_1.append(systemsDict['Lave'])  
-        print(EDRareRoute(good6_1)) 
+        print(EDRareRoute(good6_1,fitType)) 
          
         good8_1 = []
         good8_1.append(systemsDict['Hecate'])
@@ -108,7 +108,7 @@ class PerformanceCalc(object):
         good8_1.append(systemsDict["Baltah'Sine"])
         good8_1.append(systemsDict['Chi Eridani'])
         good8_1.append(systemsDict['Altair']) 
-        print(EDRareRoute(good8_1))
+        print(EDRareRoute(good8_1,fitType))
         
         bad6_1 = []
         bad6_1.append(systemsDict['Karetii'])
@@ -118,7 +118,7 @@ class PerformanceCalc(object):
         bad6_1.append(systemsDict['Hecate'])
         bad6_1.append(systemsDict['Ochoeng'])
         print("\nNo 2 systems to sell all goods at")
-        print(EDRareRoute(bad6_1))
+        print(EDRareRoute(bad6_1,fitType))
                 
         bad8_1 = []
         bad8_1.append(systemsDict['Chi Eridani']) 
@@ -130,7 +130,7 @@ class PerformanceCalc(object):
         bad8_1.append(systemsDict['Karsuki Ti']) 
         bad8_1.append(systemsDict['Delta Phoenicis'])
         print("\nLow item cost")
-        print(EDRareRoute(bad8_1))
+        print(EDRareRoute(bad8_1,fitType))
 
         bad11_1 = []
         bad11_1.append(systemsDict['Zeessze'])
@@ -144,8 +144,9 @@ class PerformanceCalc(object):
         bad11_1.append(systemsDict['Tiolce'])  
         bad11_1.append(systemsDict['Epsilon Indi'])
         bad11_1.append(systemsDict['Altair'])
-        print("\nPoor system distances")
-        print(EDRareRoute(bad11_1))
+        print("\nPoor system distances, Bad system order")
+        print(EDRareRoute(bad11_1,fitType))
+        EDRareRoute(bad11_1).DrawRoute()
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

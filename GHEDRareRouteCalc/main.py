@@ -1,6 +1,6 @@
 ﻿__author__ = 'Ian'
 from edsystem import EDSystem, DisplayLocation
-from edrareroute import EDRareRoute, RouteType
+from edrareroute import EDRareRoute, RouteType, FitnessType
 from routecalc import RouteCalc
 from performancecalc import PerformanceCalc
 from urllib import request
@@ -208,13 +208,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 700
+    maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 4
+    length = 8
     popSize = 300
-    #__RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False)
+    __RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False)
     #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset)
-    PerformanceCalc.TestSystems(systemsDict)
+    #PerformanceCalc.TestSystems(systemsDict)
 
     #EDRareRoute(allSystems).DrawRoute()

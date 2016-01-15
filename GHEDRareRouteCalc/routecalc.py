@@ -38,17 +38,12 @@ class RouteCalc(object):
         for i in range(0,popSize):
             tempSystemList = []
             for j in range(0,routeLength):
-                tempSystem = random.choice(validSystems)
-                   
+                tempSystem = random.choice(validSystems)                  
                 #Need to avoid duplicates
                 while tempSystemList.count(tempSystem) != 0:
                     tempSystem = random.choice(validSystems)
                 tempSystemList.append(tempSystem)
             population.append(EDRareRoute(tempSystemList))
-            #tempPopulation.append(tempSystemList)
-
-        #with Pool(RouteCalc.__Pool_Size) as p:
-        #    population = p.map(self.RouteCreatorThread,tempPopulation)
 
         return self.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------

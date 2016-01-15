@@ -188,20 +188,24 @@ class EDRareRoute(object):
         return totalValue
 #------------------------------------------------------------------------------
     #TODO: Alternative fitness value based on just accounting for all systems in a route without
-    #      regard to systems positions in the route
+    #      regard to system positions in the route
+    #      Expect this to be slow (About 5x slower than above)
     def __CalcFitnessAlt(self):
         routeLength = self.__Route.__len__()
-        maxJumpDistance = 100
-        overMax = False
+        maxJumpDistance = 120
+        longestJump = -1
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
-            if jumpDistance > maxJumpDistance:
-                overMax = True
+            if jumpDistance > longestJump:
+                longestJump = jumpDistance
+            #Return early if jump distance is really long
+            if jumpDistance >= maxJumpDistance * 2:
+                return 0.1
             self.Total_Distance += jumpDistance
-        if overMax:
-            return 0.1
+
+        distanceMult = maxJumpDistance/longestJump
 
         systemsBySeller = {}
         for seller in self.__Route:
@@ -209,13 +213,33 @@ class EDRareRoute(object):
             for system in self.__Route:
                 if seller.System_Distances[system.Index] > self.__Seller_Min:
                     systemsBySeller[seller].append(system)
-        #TODO: Find least number of systems that account for all rares to sell
-        #       Go by groups of 2,3,....to maybe len/2. Stop when we find the
-        #       First occurance of all systems. This should give us the min needed
         
-        #Place holder so I can actually use this to run the program    
+        #TODO: Find least number of systems that account for all rares to sell
+        #       Go by groups of 2,3,....to whatever. Once we find an occurance
+        #       of all systems with a specific group size, minimize that and take
+        #       The systems with the least amount of overlap between them.
+        #       Fitness value is based off greatest difference between sellers of a system,
+        #       total distance, and ...?
+        foundSellers = False
+        for i in range(2,math.ceil(routeLength*0.75)):
+            for systemGroup in itertools.combinations(self.__Route,i):
+                sellersByGroup = []
+                for system in systemGroup:
+                    sellersByGroup.extend(systemsBySeller[system])
+                if set(sellersByGroup) == set(self.__Route):
+                    self.Best_Sellers = systemGroup
+                    foundSellers = True
+                    break
+            if foundSellers:
+                break
+        #Return early if no combinations are found which account for all systems
+        if not foundSellers:
+            return 0.1
+        
+        #Placeholder so I can actually use this to run the program    
         from random import uniform
-        return uniform(0,12)
+        from routecalc import RouteCalc
+        return RouteCalc.Route_Cutoff * distanceMult
 #------------------------------------------------------------------------------
     #Draws the route
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
@@ -314,7 +338,7 @@ class EDRareRoute(object):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
-        if self.Best_Sellers and self.Fitness_Type == FitnessType.Default:
+        if self.Best_Sellers:
             sellersPerSystem = {}
             for system in self.__Route:
                 tempSellers = []
