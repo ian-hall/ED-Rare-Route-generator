@@ -79,7 +79,7 @@ def __ValidateLine(currentLine, lineNum: int) -> EDSystem:
                     distToStation, stationName, systemName, index,
                     distToOthers, permit)
 #------------------------------------------------------------------------------
-def __RunGenetic(systems, routeLength: int, popSize: int, silent: bool, stopShort: bool):
+def __RunGenetic(systems, routeLength: int, popSize: int, silent = False, stopShort = True, fitType = FitnessType.Default):
     exitTestLoop = False
     runNum = 0
     maxRuns = 5
@@ -210,11 +210,11 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
-    popSize = 300
-    __RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False)
+    length = 20
+    popSize = 1000
+    #__RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=True,fitType=FitnessType.Alternative)
     #__RunBrute(bruteSystems,length)
-    #PerformanceCalc.CheckPerformance(systemsSubset)
-    #PerformanceCalc.TestSystems(systemsDict)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
+    PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
 
     #EDRareRoute(allSystems).DrawRoute()

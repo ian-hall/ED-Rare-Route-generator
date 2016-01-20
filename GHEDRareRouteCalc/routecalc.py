@@ -14,23 +14,25 @@ class RouteCalc(object):
     Route_Cutoff = 11.5
     __Selection_Mult = .25
     __Pool_Size = 3
-    __ValidSystems = []
+    __Valid_Systems = []
+    __Fit_Type = FitnessType.Default
 #------------------------------------------------------------------------------
     @classmethod
-    def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent):
+    def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent, fitType = FitnessType.Default):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
 
         TODO: Make sure this is actually working now like I think it is
         '''
-        if routeLength < 3 or routeLength > 14:
+        if routeLength < 3 or routeLength > 20:
             raise Exception("Routes need length between 3 and 14")
+        RouteCalc.__Fit_Type = fitType
 
         population = []
-        RouteCalc.__ValidSystems = validSystems
+        RouteCalc.__Valid_Systems = validSystems
         
-        if RouteCalc.__ValidSystems.__len__() < routeLength:
+        if RouteCalc.__Valid_Systems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
 
@@ -43,7 +45,7 @@ class RouteCalc(object):
                 while tempSystemList.count(tempSystem) != 0:
                     tempSystem = random.choice(validSystems)
                 tempSystemList.append(tempSystem)
-            population.append(EDRareRoute(tempSystemList))
+            population.append(EDRareRoute(tempSystemList,RouteCalc.__Fit_Type))
 
         return self.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
@@ -120,15 +122,15 @@ class RouteCalc(object):
                 for i in range(0,numReplace):
                     tempSystemList = []
                     for j in range(0,bestRoute.GetRoute().__len__()):
-                        tempSystem = random.choice(RouteCalc.__ValidSystems)                   
+                        tempSystem = random.choice(RouteCalc.__Valid_Systems)                   
                         #Need to avoid duplicates
                         while tempSystemList.count(tempSystem) != 0:
-                            tempSystem = random.choice(RouteCalc.__ValidSystems)
+                            tempSystem = random.choice(RouteCalc.__Valid_Systems)
                         tempSystemList.append(tempSystem)
                     #population.append(EDRareRoute(tempSystemList))
                     tempPop.append(tempSystemList)
                 for i in range(0,numReplace):
-                    currentPopulation[i] = EDRareRoute(tempPop[i])
+                    currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
 
 
                 if not silent:
@@ -141,7 +143,7 @@ class RouteCalc(object):
                 child = self.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
                     child = self.__Mutate(child)
-                nextPopulation.append(EDRareRoute(child))
+                nextPopulation.append(EDRareRoute(child,RouteCalc.__Fit_Type))
                 #tempPop.append(child)
 
             #TODO: Find the slowness (probably just overhead from map)
@@ -232,17 +234,18 @@ class RouteCalc(object):
                     systemToChange = random.randrange(tempRoute.__len__())
                 changedSystems.append(systemToChange)
                 
-                newSystem = random.choice(RouteCalc.__ValidSystems)            
+                newSystem = random.choice(RouteCalc.__Valid_Systems)            
                 while tempRoute.count(newSystem) != 0:
-                    newSystem = random.choice(RouteCalc.__ValidSystems) 
+                    newSystem = random.choice(RouteCalc.__Valid_Systems) 
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
 #------------------------------------------------------------------------------
     @classmethod
-    def Brute(self, validSystems: [], routeLength):
-        RouteCalc.__ValidSystems = validSystems
-        if RouteCalc.__ValidSystems.__len__() < routeLength:
+    def Brute(self, validSystems: [], routeLength, fitType = FitnessType.Default):
+        RouteCalc.__Valid_Systems = validSystems
+        RouteCalc.__Fit_Type = fitType
+        if RouteCalc.__Valid_Systems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
         
@@ -251,7 +254,7 @@ class RouteCalc(object):
         num = 0
         print("Starting brute force method...")
         #Combinations instead of permutations because we are playing "fast" and loose here
-        for sysList in itertools.combinations(RouteCalc.__ValidSystems,routeLength):
+        for sysList in itertools.combinations(RouteCalc.__Valid_Systems,routeLength):
             if tempBrute.__len__() < 10000000:
                 tempBrute.append(sysList)
                 num += 1
@@ -270,7 +273,7 @@ class RouteCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def BruteHelper(self,systemList):
-        newRoute = EDRareRoute(systemList)
+        newRoute = EDRareRoute(systemList,RouteCalc.__Fit_Type)
         if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
             return newRoute
         else:
@@ -278,4 +281,4 @@ class RouteCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def RouteCreatorThread(self,route):
-        return EDRareRoute(route)
+        return EDRareRoute(route,RouteCalc.__Fit_Type)
