@@ -23,7 +23,7 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     def __init__(self,systemList: [], fType = FitnessType.Default):
         self.__Route = systemList
-        self.__Seller_Min = 155
+        self.__Seller_Min = 160
         self.Total_Distance = 0
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Best_Sellers = None
@@ -38,7 +38,8 @@ class EDRareRoute(object):
         #TODO: Maybe scale value based on longest distance to station
         #      Some routes come out "backwards", need to flag this 
         #      Set up some kind of flag on worst value from supply/distance/cost
-        routeLength = self.__Route.__len__()     
+        routeLength = self.__Route.__len__()
+        self.Total_Distance = 0     
        
         clusterShortLY = 50
         clusterLongLY = 145
@@ -63,20 +64,15 @@ class EDRareRoute(object):
                 spreadJumps += 1 
         
         #Route has 2 groups of systems separated by a long jump
-        #Ideally clusterLongJumps would be variable and equal to the number of sellers,
-        #but I'm just worrying about 2 sellers for now
         if clusterLong == 2 and (clusterLong + clusterShort) == routeLength:
            self.Route_Type = RouteType.Cluster
 
         #Route has fairly evenly spaced jumps
-        #Maybe a higher multiplier to compensate for the longer distances
         if spreadJumps == routeLength:
             self.Route_Type = RouteType.Spread
 
         pairValue = -999
         goodPair = 6
-
-        #TODO: Make sure this is actually right
 
         for systemPair in itertools.combinations(self.__Route,2):
             system1 = systemPair[0]
@@ -179,7 +175,7 @@ class EDRareRoute(object):
 
 
 
-        totalValue = (pairValue + weightedCost + weightedDistance + weightedSupply)
+        totalValue = (((pairValue/goodPair) * pairValue) + weightedCost + weightedDistance + weightedSupply)
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         if longestJump > maxJumpRangeLY:
@@ -194,6 +190,7 @@ class EDRareRoute(object):
     '''
     def __CalcFitnessAlt(self):
         routeLength = self.__Route.__len__()
+        self.Total_Distance = 0
         distanceScale = 1
         sellersScale = 1
         baseValue = 6
@@ -224,31 +221,33 @@ class EDRareRoute(object):
                 ableToSell -= 1
         sellersScale = ableToSell/routeLength
         
-        #TODO: Find least number of systems that account for all rares to sell
-        #       Go by groups of 2,3,....to whatever. Once we find an occurance
-        #       of all systems with a specific group size, minimize that and take
-        #       The systems with the least amount of overlap between them.
-        #       Fitness value is based off greatest difference between sellers of a system,
-        #       total distance, and ...?
-        #       Maybe do something to favor more sellers, like with long routes even if we can sell at 2 places try to spread out sellers
-        #Skip this part to speed it up if we don't have all systems able to sell
+        #TODO: Return default fit val when number of sellers is 2
+        #       Take into account repeats for sellers
+        #           Eliminate systems where all sellers are accounted for in other systems... 
+        #           Check forward down the list removing repeats
+        
+        #Skip this part if we already know we can't sell all goods
         if sellersScale == 1:
             foundSellers = False
-            for i in range(2,math.ceil(routeLength/2) + 1):
+            for i in range(math.ceil(routeLength/2),1,-1):
                 for systemGroup in itertools.combinations(self.__Route,i):
                     sellersByGroup = []
                     for system in systemGroup:
                         sellersByGroup.extend(systemsBySeller[system])
                     if set(sellersByGroup) == set(self.__Route):
+                        #TODO: At this point, check for repeats. If we have them, keep going smaller maybe
                         self.Best_Sellers = systemGroup
                         foundSellers = True
                         break
                 if foundSellers:
-                    break
-        #Return early if no combinations are found which account for all systems
-        #This is accounted for at the systemsBySeller whatever above I think
-        #if not foundSellers:
-        #    scaleVal = scaleVal * .9
+                    if i == 2:
+                        return self.__CalcFitness()
+                    else:
+                        break
+        else:
+            #Just to reinforce that this is bad
+            sellerScale = sellersScale * .75
+
         maxGoodDistance = routeLength * maxJumpDistance
         if routeLength < 6:
             maxGoodDistance = maxGoodDistance * 1.2

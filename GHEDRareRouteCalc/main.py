@@ -208,13 +208,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 4500
+    maxStationDistance = 700
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 20
-    popSize = 1000
-    #__RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=True,fitType=FitnessType.Alternative)
+    length = 8
+    popSize = 333
+    __RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=True,fitType=FitnessType.Alternative)
     #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
-    PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
+    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
 
     #EDRareRoute(allSystems).DrawRoute()

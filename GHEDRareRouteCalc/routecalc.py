@@ -22,8 +22,6 @@ class RouteCalc(object):
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
-
-        TODO: Make sure this is actually working now like I think it is
         '''
         if routeLength < 3 or routeLength > 20:
             raise Exception("Routes need length between 3 and 14")
@@ -179,37 +177,40 @@ class RouteCalc(object):
         Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
         Upper end of rand.uni is X times the population size, set by __Selection_Mult
-        '''
-              
+        '''      
         #Get the parents
         parents = []
         while parents.__len__() != 2:
             value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
             parents.append(population[bisect.bisect(selectionValues,value)])
         #Create the new child
-        #TODO: Change this so the 2nd parent chosen starts at the pivot instead of 0
         route1 = parents[0].GetRoute()
         route2 = parents[1].GetRoute()
-        pivot = random.randrange(1,route1.__len__()-1)
+        if route1.__len__() != route2.__len__():
+            raise Exception("Routes of uneven length")
+        routeLength = route1.__len__()
+        pivot = random.randrange(1,routeLength-1)
         newRoute = []
 
-        if random.randrange(286)%2 == 0:
+        if random.randrange(282)%2 == 0:
+            #Start with route1
             for i in range(0,pivot):
                 newRoute.append(route1[i])
-            for i in range(0,route2.__len__()):
-                toAdd = route2[i]
+            for i in range(pivot,pivot + routeLength):
+                toAdd = route2[i%routeLength]
                 if newRoute.count(toAdd) != 0:
                     continue
-                if newRoute.__len__() != route2.__len__():
+                if newRoute.__len__() != routeLength:
                     newRoute.append(toAdd)
         else:
+            #Start with route2
             for i in range(0,pivot):
                 newRoute.append(route2[i])
-            for i in range(0,route1.__len__()):
-                toAdd = route1[i]
+            for i in range(pivot, pivot + routeLength):
+                toAdd = route1[i%routeLength]
                 if newRoute.count(toAdd) != 0:
                     continue
-                if newRoute.__len__() != route1.__len__():
+                if newRoute.__len__() != routeLength:
                     newRoute.append(toAdd)
 
         return newRoute
@@ -220,7 +221,7 @@ class RouteCalc(object):
         
         #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()
-        if mutateType < 0.1:
+        if mutateType < 0.2:
             #shuffle route
             random.shuffle(tempRoute)
         else:
@@ -279,6 +280,3 @@ class RouteCalc(object):
         else:
             return None
 #------------------------------------------------------------------------------
-    @classmethod
-    def RouteCreatorThread(self,route):
-        return EDRareRoute(route,RouteCalc.__Fit_Type)
