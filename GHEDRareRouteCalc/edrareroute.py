@@ -1,5 +1,5 @@
 ﻿from edsystem import EDSystem, DisplayLocation
-from collections import Counter
+from collections import Counter, defaultdict
 import itertools
 import math
 from enum import Enum,unique
@@ -27,6 +27,7 @@ class EDRareRoute(object):
         self.Total_Distance = 0
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Best_Sellers = None
+        self.Alt_Sellers = None
         self.Route_Type = RouteType.Other #Just default to 'other' as a catch all
         self.Fitness_Type = fType #Probably can get rid of this once CalcFitAlt is done
         self.Fitness_Value = self.__CalcFitness() if fType == FitnessType.Default else self.__CalcFitnessAlt()
@@ -156,7 +157,7 @@ class EDRareRoute(object):
                     self.Best_Sellers = systemPair
             
         #If no combo of systems yields good seller spacing, or not all systems accounted for in the best pair(?), return here
-        if not self.Best_Sellers:
+        if self.Best_Sellers == None:
             return 0.01
         
         #Special case for shorter routes
@@ -187,6 +188,7 @@ class EDRareRoute(object):
     Alternative fitness value based on just accounting for all systems in a route without
     regard to system positions in the route
     Expect this to be slow once all checking is finished
+    Based on selling to the first system next on the route over the __Seller_Min distance
     '''
     def __CalcFitnessAlt(self):
         #TODO: Maybe step through the route in order, keep track of sold/unsold systems
@@ -229,7 +231,7 @@ class EDRareRoute(object):
         for seller in self.__Route:
             systemsBySeller[seller] = []
             for system in self.__Route:
-                if seller.System_Distances[system.Index] > self.__Seller_Min:
+                if seller.System_Distances[system.Index] >= self.__Seller_Min:
                     systemsBySeller[seller].append(system)
         ableToSell = routeLength
         for k,v in systemsBySeller.items():
@@ -245,20 +247,31 @@ class EDRareRoute(object):
         
         #Skip this part if we already know we can't sell all goods
         if sellersScale == 1:
-            foundSellers = False
-            for i in range(math.ceil(routeLength/2),1,-1):
-                for systemGroup in itertools.combinations(self.__Route,i):
-                    sellersByGroup = []
-                    for system in systemGroup:
-                        sellersByGroup.extend(systemsBySeller[system])
-                    if set(sellersByGroup) == set(self.__Route):
-                        #TODO: At this point, check for repeats. If we have them, keep going smaller maybe
-                        self.Best_Sellers = systemGroup
-                        foundSellers = True
-                        break
-                if foundSellers:
-                    if i == 2:
-                        return self.__CalcFitness()
+            sellersUsed = []
+            sold = []
+            unsold = []
+            found = False
+            for i in range(routeLength*2):
+                currentSys = self.__Route[i%routeLength];
+                unsold.append(currentSys)
+                toRemove = []
+                for checkSys in unsold:
+                    #Means we can sell checkSys at currentSystem
+                    sellableSystems = systemsBySeller[currentSys]
+                    if systemsBySeller[currentSys].count(checkSys) != 0:
+                        toRemove.append(checkSys)
+                        sold.append(checkSys)
+                if toRemove.__len__() != 0:
+                    sellersUsed.append(currentSys)
+                    if self.Alt_Sellers == None:
+                        self.Alt_Sellers = defaultdict(list)
+                    currentList = self.Alt_Sellers[currentSys]
+                    self.Alt_Sellers[currentSys].extend(toRemove)
+                    #print("Selling at {0}: ".format(currentSys.System_Name))
+                for sys in toRemove:
+                    #print("\t{0}".format(sys.System_Name))
+                    unsold.remove(sys)
+                if set(sold) == set(self.__Route):
                     break
         else:
             #Just to reinforce that this is bad
@@ -281,9 +294,6 @@ class EDRareRoute(object):
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         return totalValue
-#------------------------------------------------------------------------------
-    def __DupeFinder(systemGroup, sellersBySystem : {}):
-        pass
 #------------------------------------------------------------------------------
     #Draws the route
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
@@ -382,7 +392,7 @@ class EDRareRoute(object):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
-        if self.Best_Sellers:
+        if self.Best_Sellers != None:
             sellersPerSystem = {}
             for system in self.__Route:
                 tempSellers = []
@@ -408,7 +418,25 @@ class EDRareRoute(object):
                         strList.append(" <{0}> ".format(seller.System_Name))
                     else:
                         strList.append(" {0} ".format(seller.System_Name))
-        
+        elif self.Alt_Sellers != None:
+            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.Fitness_Value))
+            for system in self.__Route:
+                if system in self.Alt_Sellers:
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
+                else:
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
+                if system.PermitReq:
+                    strList.append("**Permit**")
+                strList.append("\n")
+                count += 1
+            #TODO: Order these according to route order
+            for k,v in self.Alt_Sellers.items():
+                strList.append("\nAt <{0}> sell:\n\t".format(k.System_Name))
+                for seller in set(v):
+                    if seller in self.Alt_Sellers:
+                        strList.append(" <{0}> ".format(seller.System_Name))
+                    else:
+                        strList.append(" {0} ".format(seller.System_Name))
         else:
             strList.append("\n(Really bad)Route value:{0}\n".format(self.Fitness_Value))
             for system in self.__Route:
