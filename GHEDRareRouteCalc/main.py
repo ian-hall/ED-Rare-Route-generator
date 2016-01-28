@@ -87,7 +87,7 @@ def __RunGenetic(systems, routeLength: int, popSize: int, silent = False, stopSh
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
         print("Run: {0}".format(runNum))
-        routeTuple = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent)
+        routeTuple = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent,fitType)
         geneticEnd = time.time()
         if routeTuple:
             bestRoute = routeTuple[0]
@@ -208,13 +208,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 700
+    maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
-    popSize = 333
-    __RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=True,fitType=FitnessType.Alternative)
+    length = 10
+    popSize = 555
+    #__RunGenetic(systemsSubset,length,popSize,silent=False,stopShort=False,fitType=FitnessType.Default)
     #__RunBrute(bruteSystems,length)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Alternative)
+    PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
 
     #EDRareRoute(allSystems).DrawRoute()

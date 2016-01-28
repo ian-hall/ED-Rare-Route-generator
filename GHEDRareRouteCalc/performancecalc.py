@@ -9,7 +9,7 @@ class PerformanceCalc(object):
     def CheckPerformance(self,systemsList,fitType = FitnessType.Default):
         maxTests = 20
 
-        minPopSize = 200
+        minPopSize = 300
         maxPopSize = 400
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
@@ -56,7 +56,7 @@ class PerformanceCalc(object):
         ykLoopList.append(systemsDict['Quechua'])  
         print("\n\nYK Loop")
         print(EDRareRoute(ykLoopList,fitType))
-        EDRareRoute(ykLoopList).DrawRoute()
+        EDRareRoute(ykLoopList,fitType).DrawRoute()
 
         good4_1 = []
         good4_1.append(systemsDict['Fujin'])  
@@ -145,7 +145,7 @@ class PerformanceCalc(object):
         bad11_1.append(systemsDict['Altair'])
         print("\nPoor system distances, Bad system order")
         print(EDRareRoute(bad11_1,fitType))
-        EDRareRoute(bad11_1).DrawRoute()
+        EDRareRoute(bad11_1,fitType).DrawRoute()
 
         altTestRoute = []
         altTestRoute.append(systemsDict['Shinrarta Dezhra'])
@@ -217,7 +217,7 @@ class PerformanceCalc(object):
         altTestRoute.append(systemsDict["Baltah'Sine"])
         altTestRoute.append(systemsDict['CD-75 661'])	
         #print(EDRareRoute(altTestRoute,fitType))
-        #EDRareRoute(altTestRoute).DrawRoute()
+        #EDRareRoute(altTestRoute,fitType).DrawRoute()
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

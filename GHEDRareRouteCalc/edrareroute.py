@@ -186,9 +186,25 @@ class EDRareRoute(object):
     '''
     Alternative fitness value based on just accounting for all systems in a route without
     regard to system positions in the route
-    Expect this to be slow (About 5x slower than above)
+    Expect this to be slow once all checking is finished
     '''
     def __CalcFitnessAlt(self):
+        #TODO: Maybe step through the route in order, keep track of sold/unsold systems
+        #       At the end, sold systems should be set(route)
+        #       There is no reason to loop more than twice, if something hasnt sold by then it won't sell
+        #       Keep track of which system is sold where, below 4 can be sold at 2 and 6 but it is always sold at 6
+        #       So like, if route is [1,2,3,4,5,6,7] and say {2: 4,6; 3: 1,7; 4: 2,6; 6: 4,2; 7:3,5}
+        #       It would be: JUMP       SOLD            UNSOLD
+        #                    1                              1
+        #                    2                              1,2
+        #                    3          1                   2,3
+        #                    4          1,2                 3,4
+        #                    5          1,2                 3,4,5
+        #                    6          1,2,4               3,5,6
+        #                    7          1,2,4,3,5           6,7
+        #                    8          1,2,4,3,5           6,7,1
+        #                    9          1,2,4,3,5,6         7,1,2
+        #                   10          1,2,4,3,5,6,7,1     2,3  *DONE*
         routeLength = self.__Route.__len__()
         self.Total_Distance = 0
         distanceScale = 1
@@ -225,6 +241,7 @@ class EDRareRoute(object):
         #       Take into account repeats for sellers
         #           Eliminate systems where all sellers are accounted for in other systems... 
         #           Check forward down the list removing repeats
+        #           If we go through an i value without finding any that support all systems, break
         
         #Skip this part if we already know we can't sell all goods
         if sellersScale == 1:
@@ -242,11 +259,10 @@ class EDRareRoute(object):
                 if foundSellers:
                     if i == 2:
                         return self.__CalcFitness()
-                    else:
-                        break
+                    break
         else:
             #Just to reinforce that this is bad
-            sellerScale = sellersScale * .75
+            sellerScale = sellersScale * .5
 
         maxGoodDistance = routeLength * maxJumpDistance
         if routeLength < 6:
@@ -265,6 +281,9 @@ class EDRareRoute(object):
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         return totalValue
+#------------------------------------------------------------------------------
+    def __DupeFinder(systemGroup, sellersBySystem : {}):
+        pass
 #------------------------------------------------------------------------------
     #Draws the route
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
