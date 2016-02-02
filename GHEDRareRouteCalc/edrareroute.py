@@ -186,8 +186,8 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     '''
     Alternative fitness value based on just accounting for all systems in a route without
-    regard to system positions in the route
-    Expect this to be slow once all checking is finished
+    regard to system positions in the route. This system will not find "spread" routes.
+    Expect this to be slow once all checking is finished (maybe not?)
     Based on selling to the first system next on the route over the __Seller_Min distance
     '''
     def __CalcFitnessAlt(self):
@@ -207,25 +207,28 @@ class EDRareRoute(object):
         #                    8          1,2,4,3,5           6,7,1
         #                    9          1,2,4,3,5,6         7,1,2
         #                   10          1,2,4,3,5,6,7,1     2,3  *DONE*
+        #       Scale value based on max number of unsold, aim for 7 and lower
+        #           This makes sure we don't have too many goods being held, based off 10 per system
         routeLength = self.__Route.__len__()
         self.Total_Distance = 0
         distanceScale = 1
         sellersScale = 1
         baseValue = 6
-        maxJumpDistance = 120
+        maxJumpDistance = 155
         longestJump = -1
+        overMaxJump = False
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
             jumpDistance = currentSystem.System_Distances[nextSystem.Index]
             if jumpDistance > longestJump:
                 longestJump = jumpDistance
-            #Scale number instead of returning early
+            
             if jumpDistance > maxJumpDistance:
-                distanceScale = maxJumpDistance / jumpDistance
+                overMaxJump = True
             self.Total_Distance += jumpDistance
 
-        distanceMult = maxJumpDistance/longestJump
+        distanceScale = maxJumpDistance/longestJump
 
         systemsBySeller = {}
         for seller in self.__Route:
@@ -237,16 +240,11 @@ class EDRareRoute(object):
         for k,v in systemsBySeller.items():
             if v.__len__() == 0:
                 ableToSell -= 1
-        sellersScale = ableToSell/routeLength
-        
-        #TODO: Return default fit val when number of sellers is 2
-        #       Take into account repeats for sellers
-        #           Eliminate systems where all sellers are accounted for in other systems... 
-        #           Check forward down the list removing repeats
-        #           If we go through an i value without finding any that support all systems, break
+        sellersValue = ableToSell/routeLength * baseValue
         
         #Skip this part if we already know we can't sell all goods
-        if sellersScale == 1:
+        maxSellersWaiting = -1
+        if sellersValue >= baseValue:
             sellersUsed = []
             sold = []
             unsold = []
@@ -255,17 +253,21 @@ class EDRareRoute(object):
                 currentSys = self.__Route[i%routeLength];
                 unsold.append(currentSys)
                 toRemove = []
+                numUnsold = 0
                 for checkSys in unsold:
                     #Means we can sell checkSys at currentSystem
                     sellableSystems = systemsBySeller[currentSys]
                     if systemsBySeller[currentSys].count(checkSys) != 0:
                         toRemove.append(checkSys)
                         sold.append(checkSys)
+                    numUnsold += 1
+                if numUnsold > maxSellersWaiting:
+                    maxSellersWaiting = numUnsold
                 if toRemove.__len__() != 0:
                     sellersUsed.append(currentSys)
                     if self.Alt_Sellers == None:
                         self.Alt_Sellers = defaultdict(list)
-                    currentList = self.Alt_Sellers[currentSys]
+                    #currentList = self.Alt_Sellers[currentSys]
                     self.Alt_Sellers[currentSys].extend(toRemove)
                     #print("Selling at {0}: ".format(currentSys.System_Name))
                 for sys in toRemove:
@@ -275,8 +277,9 @@ class EDRareRoute(object):
                     break
         else:
             #Just to reinforce that this is bad
-            sellerScale = sellersScale * .5
+            sellersScale = sellersScale * .25
 
+        #print(maxSellersWaiting)
         maxGoodDistance = routeLength * maxJumpDistance
         if routeLength < 6:
             maxGoodDistance = maxGoodDistance * 1.2
@@ -290,8 +293,9 @@ class EDRareRoute(object):
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
-        totalValue = (baseValue + weightedCost + weightedDistance + weightedSupply) * sellersScale * distanceScale
-        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
+        #TODO: Try to get this to give values closer to the default fit value for the same systems
+        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellersScale
+        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2 or overMaxJump:
             totalValue = totalValue * 0.5
         return totalValue
 #------------------------------------------------------------------------------
@@ -392,6 +396,8 @@ class EDRareRoute(object):
         avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
+
+        #For printing default fitness values
         if self.Best_Sellers != None:
             sellersPerSystem = {}
             for system in self.__Route:
@@ -418,6 +424,8 @@ class EDRareRoute(object):
                         strList.append(" <{0}> ".format(seller.System_Name))
                     else:
                         strList.append(" {0} ".format(seller.System_Name))
+        
+        #For printing alt fitness values
         elif self.Alt_Sellers != None:
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.Fitness_Value))
             for system in self.__Route:
@@ -437,6 +445,8 @@ class EDRareRoute(object):
                         strList.append(" <{0}> ".format(seller.System_Name))
                     else:
                         strList.append(" {0} ".format(seller.System_Name))
+
+        #For just displaying the systems if they are not a good route
         else:
             strList.append("\n(Really bad)Route value:{0}\n".format(self.Fitness_Value))
             for system in self.__Route:

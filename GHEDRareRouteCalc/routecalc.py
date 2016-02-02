@@ -23,8 +23,8 @@ class RouteCalc(object):
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
-        if routeLength < 3 or routeLength > 20:
-            raise Exception("Routes need length between 3 and 14")
+        if routeLength < 3 or routeLength > 50:
+            raise Exception("Routes need length between 3 and XX")
         RouteCalc.__Fit_Type = fitType
 
         population = []
@@ -243,9 +243,8 @@ class RouteCalc(object):
         return tempRoute
 #------------------------------------------------------------------------------
     @classmethod
-    def Brute(self, validSystems: [], routeLength, fitType = FitnessType.Default):
+    def Brute(self, validSystems: [], routeLength):
         RouteCalc.__Valid_Systems = validSystems
-        RouteCalc.__Fit_Type = fitType
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return []
@@ -274,7 +273,7 @@ class RouteCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def BruteHelper(self,systemList):
-        newRoute = EDRareRoute(systemList,RouteCalc.__Fit_Type)
+        newRoute = EDRareRoute(systemList)
         if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
             return newRoute
         else:
