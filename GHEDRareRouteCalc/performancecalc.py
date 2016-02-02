@@ -7,7 +7,7 @@ class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def CheckPerformance(self,systemsList,fitType = FitnessType.Default):
-        maxTests = 20
+        maxTests = 10
 
         minPopSize = 300
         maxPopSize = 400
@@ -216,8 +216,8 @@ class PerformanceCalc(object):
         altTestRoute.append(systemsDict['HR 7221'])
         altTestRoute.append(systemsDict["Baltah'Sine"])
         altTestRoute.append(systemsDict['CD-75 661'])	
-        print(EDRareRoute(altTestRoute,fitType))
-        EDRareRoute(altTestRoute,fitType).DrawRoute()
+        #print(EDRareRoute(altTestRoute,fitType))
+        #EDRareRoute(altTestRoute,fitType).DrawRoute()
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

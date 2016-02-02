@@ -125,7 +125,6 @@ class RouteCalc(object):
                         while tempSystemList.count(tempSystem) != 0:
                             tempSystem = random.choice(RouteCalc.__Valid_Systems)
                         tempSystemList.append(tempSystem)
-                    #population.append(EDRareRoute(tempSystemList))
                     tempPop.append(tempSystemList)
                 for i in range(0,numReplace):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
@@ -135,18 +134,18 @@ class RouteCalc(object):
                     print("{0:>7}-> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
-            
-            tempPop = []
-            for i in range(0,currentPopulation.__len__()):
-                child = self.__Reproduce(currentPopulation,relativeFitnessVals)
-                if random.random() <= mutationChance:
-                    child = self.__Mutate(child)
-                nextPopulation.append(EDRareRoute(child,RouteCalc.__Fit_Type))
-                #tempPop.append(child)
 
-            #TODO: Find the slowness (probably just overhead from map)
-            #with Pool(RouteCalc.__Pool_Size) as p:
-            #    nextPopulation = p.map(self.RouteCreatorThread,tempPop)
+            #for i in range(0,currentPopulation.__len__()):
+            while nextPopulation.__len__() != currentPopulation.__len__():
+                children = self.__Reproduce(currentPopulation,relativeFitnessVals)
+                child1 = children[0]
+                child2 = children[1]
+                if random.random() <= mutationChance:
+                    child1 = self.__Mutate(child1)
+                    child2 = self.__Mutate(child2)
+                nextPopulation.append(EDRareRoute(child1,RouteCalc.__Fit_Type))
+                if nextPopulation.__len__() < currentPopulation.__len__():
+                    nextPopulation.append(EDRareRoute(child2,RouteCalc.__Fit_Type))
 
             currentPopulation = nextPopulation
 
@@ -182,7 +181,11 @@ class RouteCalc(object):
         parents = []
         while parents.__len__() != 2:
             value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
-            parents.append(population[bisect.bisect(selectionValues,value)])
+            parent = population[bisect.bisect(selectionValues,value)]
+            while parents.count(parent) != 0:
+                value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
+                parent = population[bisect.bisect(selectionValues,value)]
+            parents.append(parent)
         #Create the new child
         route1 = parents[0].GetRoute()
         route2 = parents[1].GetRoute()
@@ -190,30 +193,61 @@ class RouteCalc(object):
             raise Exception("Routes of uneven length")
         routeLength = route1.__len__()
         pivot = random.randrange(1,routeLength-1)
-        newRoute = []
+        child1 = []
+        child2 = []
 
-        if random.randrange(282)%2 == 0:
-            #Start with route1
-            for i in range(0,pivot):
-                newRoute.append(route1[i])
-            for i in range(pivot,pivot + routeLength):
-                toAdd = route2[i%routeLength]
-                if newRoute.count(toAdd) != 0:
-                    continue
-                if newRoute.__len__() != routeLength:
-                    newRoute.append(toAdd)
-        else:
-            #Start with route2
-            for i in range(0,pivot):
-                newRoute.append(route2[i])
-            for i in range(pivot, pivot + routeLength):
-                toAdd = route1[i%routeLength]
-                if newRoute.count(toAdd) != 0:
-                    continue
-                if newRoute.__len__() != routeLength:
-                    newRoute.append(toAdd)
+        #TODO: Maybe combine these loops since they have the same bounds
+        for i in range(0,pivot):
+            child1.append(route1[i])
+        i = pivot
+        while child1.__len__() != routeLength:
+            toAdd = route2[i%routeLength]
+            if child1.count(toAdd) != 0:
+                i += 1
+                continue
+            child1.append(toAdd)
+            i += 1
 
-        return newRoute
+        for i in range(0,pivot):
+            child2.append(route2[i])
+        i = pivot
+        while child2.__len__() != routeLength:
+            toAdd = route1[i%routeLength]
+            if child2.count(toAdd) != 0:
+                i += 1
+                continue
+            child2.append(toAdd)
+            i += 1
+
+        #if random.randrange(281)%2 == 0:
+            #Start with route1    
+        #i = pivot
+        #while child1.__len__() != routeLength and child2.__len__() != routeLength:
+        #    toAdd1 = route2[i%routeLength]
+        #    if child1.count(toAdd1) != 0:
+        #        pass
+        #    if child1.__len__() != routeLength:
+        #        child1.append(toAdd1)
+
+        #    toAdd2 = route1[i%routeLength]
+        #    if child2.count(toAdd2) != 0:
+        #        pass
+        #    if child2.__len__() != routeLength:
+        #        child2.append(toAdd2)
+            
+        #    i += 1
+        #else:
+        #    #Start with route2
+        #    for i in range(0,pivot):
+        #        child1.append(route2[i])
+        #    for i in range(pivot, pivot + routeLength):
+        #        toAdd = route1[i%routeLength]
+        #        if child1.count(toAdd) != 0:
+        #            continue
+        #        if child1.__len__() != routeLength:
+        #            child1.append(toAdd)
+
+        return (child1,child2)
 #------------------------------------------------------------------------------ 
     @classmethod
     def __Mutate(self,route: []):
