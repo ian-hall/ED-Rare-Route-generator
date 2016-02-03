@@ -180,10 +180,10 @@ if __name__ == '__main__':
 
     systemsDict = {}
     for system in allSystems:
-        systemsDict[system.System_Name] = system
         system.Location['x'] = coordLists['x'][system.Index]
         system.Location['y'] = coordLists['y'][system.Index]
         system.Location['z'] = coordLists['z'][system.Index]
+        systemsDict[system.System_Name] = system
 
     bruteSystems = []
     bruteSystems.append(systemsDict['Lave'])  
@@ -208,13 +208,13 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for size/station distance.
     '''
-    maxStationDistance = 700
+    maxStationDistance = 999999
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
     length = 8
     popSize = 300
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Default,silent=False,stopShort=True)
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Alternative,silent=False,stopShort=True)
     #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Default)
+    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
 
     #EDRareRoute(allSystems).DrawRoute()

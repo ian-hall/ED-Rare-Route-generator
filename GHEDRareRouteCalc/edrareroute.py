@@ -214,7 +214,7 @@ class EDRareRoute(object):
         distanceScale = 1
         sellersScale = 1
         baseValue = 6
-        maxJumpDistance = 155
+        maxJumpDistance = 150
         longestJump = -1
         overMaxJump = False
         for i in range(0,routeLength):
@@ -437,14 +437,24 @@ class EDRareRoute(object):
                     strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
+            
             #TODO: Order these according to route order
-            for k,v in self.Alt_Sellers.items():
-                strList.append("\nAt <{0}> sell:\n\t".format(k.System_Name))
-                for seller in set(v):
-                    if seller in self.Alt_Sellers:
-                        strList.append(" <{0}> ".format(seller.System_Name))
-                    else:
-                        strList.append(" {0} ".format(seller.System_Name))
+            for system in self.__Route:
+                if system in self.Alt_Sellers:
+                    strList.append("\nAt <{0}> sell:\n\t".format(system.System_Name))
+                    for seller in set(self.Alt_Sellers[system]):
+                        if seller in self.Alt_Sellers:
+                            strList.append(" <{0}> ".format(seller.System_Name))
+                        else:
+                            strList.append(" {0} ".format(seller.System_Name))
+
+            #for k,v in self.Alt_Sellers.items():
+            #    strList.append("\nAt <{0}> sell:\n\t".format(k.System_Name))
+            #    for seller in set(v):
+            #        if seller in self.Alt_Sellers:
+            #            strList.append(" <{0}> ".format(seller.System_Name))
+            #        else:
+            #            strList.append(" {0} ".format(seller.System_Name))
 
         #For just displaying the systems if they are not a good route
         else:

@@ -19,6 +19,7 @@ class RouteCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent, fitType = FitnessType.Default):
+        #TODO: Will not finish if popSize == validSystem.Len, related to mutate function
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
@@ -135,7 +136,6 @@ class RouteCalc(object):
 
             relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
 
-            #for i in range(0,currentPopulation.__len__()):
             while nextPopulation.__len__() != currentPopulation.__len__():
                 children = self.__Reproduce(currentPopulation,relativeFitnessVals)
                 child1 = children[0]
@@ -158,7 +158,6 @@ class RouteCalc(object):
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is
         X times the population size, set by __Selection_Mult
         '''
-        #percentages = []
         upperVal = population.__len__() * RouteCalc.__Selection_Mult
         total = sum([route.Fitness_Value for route in population])     
 
@@ -186,7 +185,8 @@ class RouteCalc(object):
                 value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
                 parent = population[bisect.bisect(selectionValues,value)]
             parents.append(parent)
-        #Create the new child
+        
+        #Create the new children
         route1 = parents[0].GetRoute()
         route2 = parents[1].GetRoute()
         if route1.__len__() != route2.__len__():
@@ -219,34 +219,6 @@ class RouteCalc(object):
             child2.append(toAdd)
             i += 1
 
-        #if random.randrange(281)%2 == 0:
-            #Start with route1    
-        #i = pivot
-        #while child1.__len__() != routeLength and child2.__len__() != routeLength:
-        #    toAdd1 = route2[i%routeLength]
-        #    if child1.count(toAdd1) != 0:
-        #        pass
-        #    if child1.__len__() != routeLength:
-        #        child1.append(toAdd1)
-
-        #    toAdd2 = route1[i%routeLength]
-        #    if child2.count(toAdd2) != 0:
-        #        pass
-        #    if child2.__len__() != routeLength:
-        #        child2.append(toAdd2)
-            
-        #    i += 1
-        #else:
-        #    #Start with route2
-        #    for i in range(0,pivot):
-        #        child1.append(route2[i])
-        #    for i in range(pivot, pivot + routeLength):
-        #        toAdd = route1[i%routeLength]
-        #        if child1.count(toAdd) != 0:
-        #            continue
-        #        if child1.__len__() != routeLength:
-        #            child1.append(toAdd)
-
         return (child1,child2)
 #------------------------------------------------------------------------------ 
     @classmethod
@@ -255,7 +227,7 @@ class RouteCalc(object):
         
         #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()
-        if mutateType < 0.2:
+        if mutateType < 0.2 or route.__len__() == RouteCalc.__Valid_Systems.__len__():
             #shuffle route
             random.shuffle(tempRoute)
         else:
