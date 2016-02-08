@@ -214,7 +214,7 @@ class EDRareRoute(object):
         distanceScale = 1
         sellersScale = 1
         baseValue = 6
-        maxJumpDistance = 150
+        maxJumpDistance = 135
         longestJump = -1
         overMaxJump = False
         for i in range(0,routeLength):
@@ -293,10 +293,11 @@ class EDRareRoute(object):
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
-        #TODO: Try to get this to give values closer to the default fit value for the same systems
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellersScale
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2 or overMaxJump:
             totalValue = totalValue * 0.5
+        if sellersValue < routeLength/2:
+            totalValue = totalValue * 0.25
         return totalValue
 #------------------------------------------------------------------------------
     #Draws the route
@@ -437,8 +438,7 @@ class EDRareRoute(object):
                     strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
-            
-            #TODO: Order these according to route order
+
             for system in self.__Route:
                 if system in self.Alt_Sellers:
                     strList.append("\nAt <{0}> sell:\n\t".format(system.System_Name))
@@ -447,14 +447,6 @@ class EDRareRoute(object):
                             strList.append(" <{0}> ".format(seller.System_Name))
                         else:
                             strList.append(" {0} ".format(seller.System_Name))
-
-            #for k,v in self.Alt_Sellers.items():
-            #    strList.append("\nAt <{0}> sell:\n\t".format(k.System_Name))
-            #    for seller in set(v):
-            #        if seller in self.Alt_Sellers:
-            #            strList.append(" <{0}> ".format(seller.System_Name))
-            #        else:
-            #            strList.append(" {0} ".format(seller.System_Name))
 
         #For just displaying the systems if they are not a good route
         else:

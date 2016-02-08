@@ -7,7 +7,7 @@ class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def CheckPerformance(self,systemsList,fitType = FitnessType.Default):
-        maxTests = 10
+        maxTests = 2
 
         minPopSize = 300
         maxPopSize = 400
@@ -15,10 +15,10 @@ class PerformanceCalc(object):
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
         minLength = 8
-        maxLength = 8
+        maxLength = 9
         lengths = range(minLength,maxLength+1,1)
 
-        
+        print("Fitness Type: {0}".format(fitType.name))
         for routeLength in lengths:
             for popSize in popSizes:
                 stats = PerformanceMetrics(routeLength,popSize)
@@ -44,7 +44,15 @@ class PerformanceCalc(object):
                 print(stats)
 #------------------------------------------------------------------------------
     @classmethod
-    def TestSystems(self,systemsDict,fitType = FitnessType.Default):
+    def TestSystems(self,systemsDict,fitType:FitnessType):
+        brokenRoute = []
+        brokenRoute.append(systemsDict['Diso'])  
+        brokenRoute.append(systemsDict['Orrere'])
+        brokenRoute.append(systemsDict['Uszaa'])
+        brokenRoute.append(systemsDict['Leesti'])
+        badRoute = EDRareRoute(brokenRoute,fitType)
+        print(badRoute)
+        
         ykLoopList = []
         ykLoopList.append(systemsDict['Coquim'])  
         ykLoopList.append(systemsDict['Altair'])   
@@ -218,6 +226,7 @@ class PerformanceCalc(object):
         altTestRoute.append(systemsDict['CD-75 661'])	
         #print(EDRareRoute(altTestRoute,fitType))
         #EDRareRoute(altTestRoute,fitType).DrawRoute()
+        
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
