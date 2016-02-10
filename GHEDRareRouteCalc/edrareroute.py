@@ -186,7 +186,7 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     '''
     Alternative fitness value based on just accounting for all systems in a route without
-    regard to system positions in the route. This system will not find "spread" routes.
+    regard to system positions in the route.
     Expect this to be slow once all checking is finished (maybe not?)
     Based on selling to the first system next on the route over the __Seller_Min distance
     '''
@@ -296,7 +296,7 @@ class EDRareRoute(object):
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellersScale
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2 or overMaxJump:
             totalValue = totalValue * 0.5
-        if sellersValue < routeLength/2:
+        if sellersValue < baseValue/2:
             totalValue = totalValue * 0.25
         return totalValue
 #------------------------------------------------------------------------------

@@ -45,6 +45,7 @@ class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def TestSystems(self,systemsDict,fitType:FitnessType):
+        
         brokenRoute = []
         brokenRoute.append(systemsDict['Diso'])  
         brokenRoute.append(systemsDict['Orrere'])
@@ -153,7 +154,7 @@ class PerformanceCalc(object):
         bad11_1.append(systemsDict['Altair'])
         print("\nPoor system distances, Bad system order")
         print(EDRareRoute(bad11_1,fitType))
-        EDRareRoute(bad11_1,fitType).DrawRoute()
+        EDRareRoute(bad11_1,fitType).DrawRoute()      
 
         altTestRoute = []
         altTestRoute.append(systemsDict['Shinrarta Dezhra'])
