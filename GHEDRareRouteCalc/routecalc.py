@@ -52,12 +52,8 @@ class RouteCalc(object):
     def __GeneticSolver(self,startingPopulation: [], silent):
         '''
         Actually does the solving. Goes through the population and, based on
-        how close to the goal they are, picks 2 parent states. These states
-        are then merged into a child that has a chance to be
-        mutated. Children are created until they have a number equal to 
-        the population. If a solution is found in these children, or if
-        this is the last generation, the best of the children is 
-        selected. 
+        how close to the goal they are, picks 2 parents to merge/shuffle/mutate
+        until a new population is ready.
         '''
         
         currentGeneration = 1
@@ -110,7 +106,6 @@ class RouteCalc(object):
             if currentGeneration - lastRouteFoundOn >= maxGensSinceLast:
                 break
 
-            #Should probably check to make sure this stops at 1 but I guess it doesnt really matter since random() always returns < 1
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration

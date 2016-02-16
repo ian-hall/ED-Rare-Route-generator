@@ -9,6 +9,8 @@ class RouteType(Enum):
     Other = 0
     Cluster = 1
     Spread = 2
+    Alt = 3
+    LongAlt = 4
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -82,13 +84,13 @@ class EDRareRoute(object):
 
             system1Index = self.__Route.index(system1)
             system2Index = self.__Route.index(system2)
-            systemDistance = abs(system1Index-system2Index)
+            systemJumpsApart = abs(system1Index-system2Index)
 
             if routeLength%2 == 0 :
-                if systemDistance != math.floor(routeLength/2):
+                if systemJumpsApart != math.floor(routeLength/2):
                     continue
             else:
-                if (systemDistance != math.floor(routeLength/2) and systemDistance != math.ceil(routeLength/2)):
+                if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
                     continue
 
             #TODO: Fix spacing
@@ -187,7 +189,6 @@ class EDRareRoute(object):
     '''
     Alternative fitness value based on just accounting for all systems in a route without
     regard to system positions in the route.
-    Expect this to be slow once all checking is finished (maybe not?)
     Based on selling to the first system next on the route over the __Seller_Min distance
     '''
     def __CalcFitnessAlt(self):
@@ -196,7 +197,7 @@ class EDRareRoute(object):
         #       There is no reason to loop more than twice, if something hasnt sold by then it won't sell
         #       Keep track of which system is sold where, below 4 can be sold at 2 and 6 but it is always sold at 6
         #       So like, if route is [1,2,3,4,5,6,7] and say {2: 4,6; 3: 1,7; 4: 2,6; 6: 4,2; 7:3,5}
-        #       It would be: JUMP       SOLD            UNSOLD
+        #       It would be: JUMP       SOLD                UNSOLD
         #                    1                              1
         #                    2                              1,2
         #                    3          1                   2,3
@@ -207,10 +208,9 @@ class EDRareRoute(object):
         #                    8          1,2,4,3,5           6,7,1
         #                    9          1,2,4,3,5,6         7,1,2
         #                   10          1,2,4,3,5,6,7,1     2,3  *DONE*
-        #       Scale value based on max number of unsold, aim for 7 and lower
-        #           This makes sure we don't have too many goods being held, based off 10 per system
         routeLength = self.__Route.__len__()
         self.Total_Distance = 0
+        self.Route_Type = RouteType.Alt
         distanceScale = 1
         sellersScale = 1
         baseValue = 6
@@ -226,6 +226,7 @@ class EDRareRoute(object):
             
             if jumpDistance > maxJumpDistance:
                 overMaxJump = True
+                self.Route_Type = RouteType.LongAlt
             self.Total_Distance += jumpDistance
 
         distanceScale = maxJumpDistance/longestJump
@@ -249,6 +250,7 @@ class EDRareRoute(object):
             sold = []
             unsold = []
             found = False
+            #Go through at most twice, since if a systems doesnt sell by then it won't sell
             for i in range(routeLength*2):
                 currentSys = self.__Route[i%routeLength];
                 unsold.append(currentSys)
@@ -267,11 +269,8 @@ class EDRareRoute(object):
                     sellersUsed.append(currentSys)
                     if self.Alt_Sellers == None:
                         self.Alt_Sellers = defaultdict(list)
-                    #currentList = self.Alt_Sellers[currentSys]
                     self.Alt_Sellers[currentSys].extend(toRemove)
-                    #print("Selling at {0}: ".format(currentSys.System_Name))
                 for sys in toRemove:
-                    #print("\t{0}".format(sys.System_Name))
                     unsold.remove(sys)
                 if set(sold) == set(self.__Route):
                     break
@@ -279,7 +278,6 @@ class EDRareRoute(object):
             #Just to reinforce that this is bad
             sellersScale = sellersScale * .25
 
-        #print(maxSellersWaiting)
         maxGoodDistance = routeLength * maxJumpDistance
         if routeLength < 6:
             maxGoodDistance = maxGoodDistance * 1.2
@@ -294,10 +292,16 @@ class EDRareRoute(object):
         weightedCost = math.log(avgCost,1000)
 
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellersScale
-        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2 or overMaxJump:
+        
+        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         if sellersValue < baseValue/2:
             totalValue = totalValue * 0.25
+        if overMaxJump:
+            totalValue = totalValue * 0.85
+        if maxSellersWaiting > 7:
+            totalValue = totalValue * 0.8
+        
         return totalValue
 #------------------------------------------------------------------------------
     #Draws the route

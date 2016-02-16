@@ -209,10 +209,10 @@ if __name__ == '__main__':
     TODO: Allow users to enter the values for length/station distance.
     '''
     maxStationDistance = 5000
-    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
+    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance]
     length = 8
-    popSize = 350
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Alternative,silent=False,stopShort=False)
+    popSize = 333
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Alternative,silent=False,stopShort=True)
     #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Alternative)
