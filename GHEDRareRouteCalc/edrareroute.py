@@ -297,9 +297,11 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.5
         if sellersValue < baseValue/2:
             totalValue = totalValue * 0.25
-        if overMaxJump:
+
+        #Only lower value for maxwaiting and maxjump on shorter routes
+        if overMaxJump and routeLength < 15:
             totalValue = totalValue * 0.85
-        if maxSellersWaiting > 7:
+        if maxSellersWaiting > 7 and routeLength < 15:
             totalValue = totalValue * 0.8
         
         return totalValue

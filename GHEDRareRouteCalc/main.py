@@ -100,19 +100,6 @@ def __RunGenetic(systems, routeLength: int, popSize: int, fitType: FitnessType, 
             print("Time: {0}s".format((geneticEnd-geneticStart)))
             bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
-def __RunBrute(systems, routeLength: int):
-    bruteStart = time.time()
-    routes = RouteCalc.Brute(systems,routeLength)
-    bruteEnd = time.time()
-    if routes.__len__() > 0:
-        for i in range(routes.__len__()):
-            print(routes[i])
-            if i == routes.__len__() - 1:
-                routes[i].DrawRoute()
-    else:
-        print("no routes =(")
-    print("Time: {0}s".format((bruteEnd-bruteStart)))
-#------------------------------------------------------------------------------
 def __TryFloat(val):
     try:
         float(val)
@@ -185,37 +172,36 @@ if __name__ == '__main__':
         system.Location['z'] = coordLists['z'][system.Index]
         systemsDict[system.System_Name] = system
 
-    bruteSystems = []
-    bruteSystems.append(systemsDict['Lave'])  
-    bruteSystems.append(systemsDict['Leesti'])
-    bruteSystems.append(systemsDict['Orrere'])  
-    bruteSystems.append(systemsDict['Uszaa'])  
-    bruteSystems.append(systemsDict['Diso'])
-    bruteSystems.append(systemsDict['Zeessze']) 
-    bruteSystems.append(systemsDict['39 Tauri'])   
-    bruteSystems.append(systemsDict['Fujin'])  
-    bruteSystems.append(systemsDict['George Pantazis'])  
-    bruteSystems.append(systemsDict['Momus Reach'])  
-    bruteSystems.append(systemsDict['Witchhaul']) 
-    bruteSystems.append(systemsDict['Altair'])     
-    bruteSystems.append(systemsDict['Tiolce'])  
-    bruteSystems.append(systemsDict['Coquim'])  
-    bruteSystems.append(systemsDict['Ethgreze'])  
-    bruteSystems.append(systemsDict['AZ Cancri'])  
-    bruteSystems.append(systemsDict['Utgaroar'])  
-    bruteSystems.append(systemsDict['Yaso Kondi']) 
-    bruteSystems.append(systemsDict['Quechua'])
+    commonSystems = []
+    commonSystems.append(systemsDict['Lave'])  
+    commonSystems.append(systemsDict['Leesti'])
+    commonSystems.append(systemsDict['Orrere'])  
+    commonSystems.append(systemsDict['Uszaa'])  
+    commonSystems.append(systemsDict['Diso'])
+    commonSystems.append(systemsDict['Zeessze']) 
+    commonSystems.append(systemsDict['39 Tauri'])   
+    commonSystems.append(systemsDict['Fujin'])  
+    commonSystems.append(systemsDict['George Pantazis'])  
+    commonSystems.append(systemsDict['Momus Reach'])  
+    commonSystems.append(systemsDict['Witchhaul']) 
+    commonSystems.append(systemsDict['Altair'])     
+    commonSystems.append(systemsDict['Tiolce'])  
+    commonSystems.append(systemsDict['Coquim'])  
+    commonSystems.append(systemsDict['Ethgreze'])  
+    commonSystems.append(systemsDict['AZ Cancri'])  
+    commonSystems.append(systemsDict['Utgaroar'])  
+    commonSystems.append(systemsDict['Yaso Kondi']) 
+    commonSystems.append(systemsDict['Quechua'])
     '''
     TODO: Allow users to enter the values for length/station distance.
     '''
-    maxStationDistance = 5000
-    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance]
-    length = 8
-    popSize = 333
+    maxStationDistance = 700
+    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
+    length = 18
+    popSize = 1333
     __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Alternative,silent=False,stopShort=True)
-    #__RunBrute(bruteSystems,length)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Alternative)
     #PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
 
-    #EDRareRoute(allSystems).DrawRoute()
+    EDRareRoute(systemsSubset).DrawRoute()

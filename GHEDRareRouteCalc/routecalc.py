@@ -3,9 +3,7 @@ from edrareroute import EDRareRoute, FitnessType
 import random
 import math
 import operator
-import itertools
 import bisect
-from multiprocessing import Pool
 
 class RouteCalc(object):
     '''
@@ -242,41 +240,4 @@ class RouteCalc(object):
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
-#------------------------------------------------------------------------------
-    @classmethod
-    def Brute(self, validSystems: [], routeLength):
-        RouteCalc.__Valid_Systems = validSystems
-        if RouteCalc.__Valid_Systems.__len__() < routeLength:
-            print("Not enough systems for a route...")
-            return []
-        
-        tempBrute = []
-        fullResults = []
-        num = 0
-        print("Starting brute force method...")
-        #Combinations instead of permutations because we are playing "fast" and loose here
-        for sysList in itertools.combinations(RouteCalc.__Valid_Systems,routeLength):
-            if tempBrute.__len__() < 10000000:
-                tempBrute.append(sysList)
-                num += 1
-            else:
-                print("Processing: {0}".format(num))
-                with Pool(RouteCalc.__Pool_Size) as p:
-                    results = p.map(RouteCalc.BruteHelper,tempBrute)
-                fullResults.extend([val for val in results if val])
-                tempBrute = [sysList]
-                num += 1
-        print("Processing: {0}".format(num))
-        with Pool(RouteCalc.__Pool_Size) as p:
-            results = p.map(RouteCalc.BruteHelper,tempBrute)
-        fullResults.extend([val for val in results if val])
-        return sorted(fullResults,key=operator.attrgetter('Fitness_Value'))
-#------------------------------------------------------------------------------
-    @classmethod
-    def BruteHelper(self,systemList):
-        newRoute = EDRareRoute(systemList)
-        if newRoute.Fitness_Value > RouteCalc.Route_Cutoff:
-            return newRoute
-        else:
-            return None
 #------------------------------------------------------------------------------
