@@ -249,7 +249,6 @@ class EDRareRoute(object):
             sellersUsed = []
             sold = []
             unsold = []
-            found = False
             #Go through at most twice, since if a systems doesnt sell by then it won't sell
             for i in range(routeLength*2):
                 currentSys = self.__Route[i%routeLength];
@@ -279,8 +278,8 @@ class EDRareRoute(object):
             sellersScale = sellersScale * .25
 
         maxGoodDistance = routeLength * maxJumpDistance
-        if routeLength < 6:
-            maxGoodDistance = maxGoodDistance * 1.2
+        #if routeLength < 6:
+        #    maxGoodDistance = maxGoodDistance * 1.2
         #Less total distance needs to give a higher value
         weightedDistance = (maxGoodDistance/self.Total_Distance) * 2
         

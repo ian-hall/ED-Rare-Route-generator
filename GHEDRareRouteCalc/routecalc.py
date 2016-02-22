@@ -68,6 +68,7 @@ class RouteCalc(object):
         #the value of the best route.
         mutationIncrease = 0.35
         timeBetweenIncrease = 400
+        cutoffAfterRouteFound = 100
         lastIncrease = currentGeneration
         numIncreases = 0
         maxIncreases = 2
@@ -96,8 +97,8 @@ class RouteCalc(object):
                     if not silent:
                         print("{0:>7}-> mutation chance: {1:.1f}%".format("",mutationChance*100))
 
-            #Exit if we are at least at the Route_Cutoff value and going to increase the mutation chance this gen
-            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= timeBetweenIncrease:
+            #Exit if we are at least at the Route_Cutoff value and its been X generations since last increase
+            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= cutoffAfterRouteFound:
                 break
             
             #Exit if it has been X generations since last found route
