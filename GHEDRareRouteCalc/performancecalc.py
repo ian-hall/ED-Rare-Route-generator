@@ -2,19 +2,20 @@
 from edrareroute import EDRareRoute, RouteType, FitnessType
 from routecalc import RouteCalc
 import time
+from collections import Counter
 
 class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
-    def CheckPerformance(self,systemsList,fitType = FitnessType.Default):
-        maxTests = 20
+    def CheckPerformance(cls,systemsList: [],fitType: FitnessType):
+        maxTests = 10
 
-        minPopSize = 250
-        maxPopSize = 400
+        minPopSize = 300
+        maxPopSize = 300
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 8
+        minLength = 6
         maxLength = 8
         lengths = range(minLength,maxLength+1,1)
 
@@ -44,7 +45,7 @@ class PerformanceCalc(object):
                 print(stats)
 #------------------------------------------------------------------------------
     @classmethod
-    def TestSystems(self,systemsDict,fitType:FitnessType):
+    def TestSystems(cls,systemsDict: {},fitType: FitnessType):
         
         brokenRoute = []
         brokenRoute.append(systemsDict['Diso'])  
@@ -233,7 +234,7 @@ class PerformanceCalc(object):
 #------------------------------------------------------------------------------
 class PerformanceMetrics(object):
 #------------------------------------------------------------------------------
-    def __init__(self,length,popSize):
+    def __init__(self,length: int,popSize: int):
         self.Route_Length = length
         self.Pop_Size = popSize
         self.Times = []
@@ -262,7 +263,7 @@ class PerformanceMetrics(object):
                 totalTimeUnsolved += self.Times[i]
                 totalGensUnsolved += self.Gens[i]
 
-        percentSolved = (numSolved/numEntries) * 100
+        #percentSolved = (numSolved/numEntries) * 100
         avgSolvedValue = sum(self.Values)/self.Values.__len__() if numSolved > 0 else 0
         avgTimeSolved = totalTimeSolved/numSolved if numSolved > 0 else 0
         avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
@@ -270,17 +271,21 @@ class PerformanceMetrics(object):
         avgGensUnsolved = totalGensUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0  
 
         strList.append("\nRoute Length {0}, Pop Size {1}".format(self.Route_Length,self.Pop_Size))
-        strList.append("\n\tSolved {0}%".format(percentSolved))
+        strList.append("\n\tSolved {0:.2%}".format((numSolved/numEntries)))
         if numSolved > 0:
-            strList.append("\n\tAvg solved value: {0}".format(avgSolvedValue))
-            strList.append("\n\tAvg time(solved): {0}".format(avgTimeSolved))
-            strList.append("\n\tAvg generations(solved): {0}".format(avgGensSolved))
+            strList.append("\n\tAvg route value: {0:.5f}".format(avgSolvedValue))
+            strList.append("\n\tAvg time(solved): {0:.5f}".format(avgTimeSolved))
+            strList.append("\n\tAvg generations(solved): {0:.2f}".format(avgGensSolved))
             strList.append("\n\tSolution Types:")
-            strList.append("\n\t\t{0}: {1}".format(RouteType.Other.name,self.Types.count(RouteType.Other)))
-            strList.append("\n\t\t{0}: {1}".format(RouteType.Spread.name,self.Types.count(RouteType.Spread)))
-            strList.append("\n\t\t{0}: {1}".format(RouteType.Cluster.name,self.Types.count(RouteType.Cluster)))
+            #TODO: Change this to only display those in the types list by using Counter or something
+            #strList.append("\n\t\t{0}: {1}".format(RouteType.Other.name,self.Types.count(RouteType.Other)))
+            #strList.append("\n\t\t{0}: {1}".format(RouteType.Spread.name,self.Types.count(RouteType.Spread)))
+            #strList.append("\n\t\t{0}: {1}".format(RouteType.Cluster.name,self.Types.count(RouteType.Cluster)))
+            typesCount = Counter(self.Types)
+            for type,count in typesCount.most_common():
+                strList.append("\n\t\t{0}: {1}".format(type.name,count))
         if numSolved != self.Solved.__len__():
-            strList.append("\n\tAvg time(fail): {0}".format(avgTimeUnsolved))
-            strList.append("\n\tAvg generations(fail): {0}".format(avgGensUnsolved))
+            strList.append("\n\tAvg time(fail): {0:.5f}".format(avgTimeUnsolved))
+            strList.append("\n\tAvg generations(fail): {0:.5f}".format(avgGensUnsolved))
 
         return ''.join(strList)

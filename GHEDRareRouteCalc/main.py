@@ -79,7 +79,7 @@ def __ValidateLine(currentLine, lineNum: int) -> EDSystem:
                     distToStation, stationName, systemName, index,
                     distToOthers, permit)
 #------------------------------------------------------------------------------
-def __RunGenetic(systems, routeLength: int, popSize: int, fitType: FitnessType, silent = False, stopShort = True):
+def __RunGenetic(systems, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
     maxRuns = 5
@@ -100,7 +100,7 @@ def __RunGenetic(systems, routeLength: int, popSize: int, fitType: FitnessType, 
             print("Time: {0}s".format((geneticEnd-geneticStart)))
             bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
-def __TryFloat(val):
+def __TryFloat(val: str):
     try:
         float(val)
         return True
@@ -197,11 +197,12 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
+    length = 17
     popSize = 333
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Alternative,silent=False,stopShort=True)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Default)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Alternative)
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Alternative)
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=False)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+    #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
-    #EDRareRoute(systemsSubset).DrawRoute()
+    #fullRoute = EDRareRoute(systemsSubset,FitnessType.FirstOver)
+    #fullRoute.DrawRoute()

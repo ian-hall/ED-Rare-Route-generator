@@ -16,28 +16,30 @@ class RouteType(Enum):
 #------------------------------------------------------------------------------
 @unique
 class FitnessType(Enum):
-    Default = 0
-    Alternative = 1
+    EvenSplit = 0
+    FirstOver = 1
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 class EDRareRoute(object):
 #------------------------------------------------------------------------------
-    def __init__(self,systemList: [], fType = FitnessType.Default):
+    def __init__(self,systemList: [], fType: FitnessType):
         self.__Route = systemList
         self.__Seller_Min = 160
         self.Total_Distance = 0
         self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
         self.Best_Sellers = None
         self.Alt_Sellers = None
-        self.Route_Type = RouteType.Other #Just default to 'other' as a catch all
-        self.Fitness_Type = fType #Probably can get rid of this once CalcFitAlt is done
-        self.Fitness_Value = self.__CalcFitness() if fType == FitnessType.Default else self.__CalcFitnessAlt()
+        self.Route_Type = RouteType.Other
+        self.Fitness_Value = self.__CalcFitness() if fType == FitnessType.EvenSplit else self.__CalcFitnessAlt()
 #------------------------------------------------------------------------------
     def GetRoute(self):
         return [val for val in self.__Route]       
 #------------------------------------------------------------------------------
     def __CalcFitness(self):
+        '''
+        Fitness value based on having a roughly even number of systems between sellers
+        '''
         #TODO: Maybe scale value based on longest distance to station
         #      Some routes come out "backwards", need to flag this 
         #      Set up some kind of flag on worst value from supply/distance/cost
@@ -186,12 +188,12 @@ class EDRareRoute(object):
 
         return totalValue
 #------------------------------------------------------------------------------
-    '''
-    Alternative fitness value based on just accounting for all systems in a route without
-    regard to system positions in the route.
-    Based on selling to the first system next on the route over the __Seller_Min distance
-    '''
     def __CalcFitnessAlt(self):
+        '''
+        Alternative fitness value based on just accounting for all systems in a route without
+        regard to system positions in the route.
+        Based on selling to the first system next on the route over the __Seller_Min distance
+        '''
         #TODO: Maybe step through the route in order, keep track of sold/unsold systems
         #       At the end, sold systems should be set(route)
         #       There is no reason to loop more than twice, if something hasnt sold by then it won't sell

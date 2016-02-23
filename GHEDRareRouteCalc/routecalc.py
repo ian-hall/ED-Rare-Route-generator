@@ -13,10 +13,10 @@ class RouteCalc(object):
     __Selection_Mult = .25
     __Pool_Size = 3
     __Valid_Systems = []
-    __Fit_Type = FitnessType.Default
+    __Fit_Type = FitnessType.EvenSplit
 #------------------------------------------------------------------------------
     @classmethod
-    def GeneticSolverStart(self,popSize, validSystems: [], routeLength, silent, fitType = FitnessType.Default):
+    def GeneticSolverStart(cls,popSize: int, validSystems: [], routeLength: int, silent: bool, fitType: FitnessType):
         #TODO: Will not finish if popSize == validSystem.Len, related to mutate function
         '''
         Creates the initial population for the genetic algorithm and starts it running.
@@ -44,10 +44,10 @@ class RouteCalc(object):
                 tempSystemList.append(tempSystem)
             population.append(EDRareRoute(tempSystemList,RouteCalc.__Fit_Type))
 
-        return self.__GeneticSolver(population,silent)
+        return cls.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
     @classmethod
-    def __GeneticSolver(self,startingPopulation: [], silent):
+    def __GeneticSolver(cls,startingPopulation: [], silent: bool):
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parents to merge/shuffle/mutate
@@ -128,15 +128,15 @@ class RouteCalc(object):
                 if not silent:
                     print("{0:>7}-> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
 
-            relativeFitnessVals = self.__CalculateRelativeFitness(currentPopulation)
+            relativeFitnessVals = cls.__CalculateRelativeFitness(currentPopulation)
 
             while nextPopulation.__len__() != currentPopulation.__len__():
-                children = self.__Reproduce(currentPopulation,relativeFitnessVals)
+                children = cls.__Reproduce(currentPopulation,relativeFitnessVals)
                 child1 = children[0]
                 child2 = children[1]
                 if random.random() <= mutationChance:
-                    child1 = self.__Mutate(child1)
-                    child2 = self.__Mutate(child2)
+                    child1 = cls.__Mutate(child1)
+                    child2 = cls.__Mutate(child2)
                 nextPopulation.append(EDRareRoute(child1,RouteCalc.__Fit_Type))
                 if nextPopulation.__len__() < currentPopulation.__len__():
                     nextPopulation.append(EDRareRoute(child2,RouteCalc.__Fit_Type))
@@ -146,7 +146,7 @@ class RouteCalc(object):
         return (bestRoute,currentGeneration)
 #------------------------------------------------------------------------------
     @classmethod
-    def __CalculateRelativeFitness(self, population: []):
+    def __CalculateRelativeFitness(cls, population: []):
         '''
         We rank each route relative to the others in the population.
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is
@@ -164,7 +164,7 @@ class RouteCalc(object):
         return selectionValues
 #------------------------------------------------------------------------------
     @classmethod
-    def __Reproduce(self, population: [], selectionValues: []): 
+    def __Reproduce(cls, population: [], selectionValues: []): 
         '''
         Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
@@ -216,7 +216,7 @@ class RouteCalc(object):
         return (child1,child2)
 #------------------------------------------------------------------------------ 
     @classmethod
-    def __Mutate(self,route: []):
+    def __Mutate(cls,route: []):
         tempRoute = [val for val in route]
         
         #Have a chance to either shuffle the route or introduce new systems in the route
