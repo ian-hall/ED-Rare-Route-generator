@@ -78,117 +78,91 @@ class EDRareRoute(object):
 
         pairValue = -999
         goodPair = 6
-        sellerScale = 1
-        
-        possibleSellers = []
-        systemsBySeller = defaultdict(list)
-        for seller in self.__Route:
-            for system in self.__Route:
-                if seller.System_Distances[system.Index] >= self.__Seller_Min:
-                    systemsBySeller[seller].append(system)
+
         for systemPair in itertools.combinations(self.__Route,2):
-            totalSystems = systemsBySeller[systemPair[0]].__len__() + systemsBySeller[systemPair[1]].__len__()
-            if totalSystems >= routeLength:
-                if possibleSellers.count(systemPair[0]) == 0:
-                    possibleSellers.append(systemPair[0])
-                if possibleSellers.count(systemPair[1]) == 0:
-                    possibleSellers.append(systemPair[1])
+            system1 = systemPair[0]
+            system2 = systemPair[1]
+            allSystemsSellable = [0 for i in range(routeLength)]
 
-        ableToSell = routeLength
-        for k,v in systemsBySeller.items():
-            if v.__len__() == 0:
-                ableToSell -= 1
-        sellersValue = ableToSell/routeLength * goodPair
+            system1Index = self.__Route.index(system1)
+            system2Index = self.__Route.index(system2)
+            systemJumpsApart = abs(system1Index-system2Index)
 
-        #We know we have at least all systems accounted for in sellers, but don't know if they are split even
-        if sellersValue >= goodPair:
-            for systemPair in itertools.combinations(possibleSellers,2):
-                system1 = systemPair[0]
-                system2 = systemPair[1]
-                allSystemsSellable = [0 for i in range(routeLength)]
-
-                system1Index = self.__Route.index(system1)
-                system2Index = self.__Route.index(system2)
-                systemJumpsApart = abs(system1Index-system2Index)
-
-                if routeLength%2 == 0 :
-                    if systemJumpsApart != math.floor(routeLength/2):
-                        continue
-                else:
-                    if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
-                        continue
-
-                #TODO: Fix spacing
-                #       Maybe change since now this is only grabbing pairs which can sell everything
-                system1Sellers = []
-                system1LastIndex = -999
-                system2Sellers = []
-                system2LastIndex = -999
-                for i in range(1,routeLength):
-                    system1IndexToCheck = (i + system1Index) % routeLength
-                    currentSystem = self.__Route[system1IndexToCheck]
-                    if system1.System_Distances[currentSystem.Index] >= self.__Seller_Min:
-                        if system1LastIndex > 0:
-                            if system1Sellers[-1]:
-                                system1Sellers.append(True)
-                                allSystemsSellable[system1IndexToCheck] = 1
-                            else:
-                                system1Sellers.append(False)
-                        else:
-                            system1LastIndex = system1IndexToCheck
-                            system1Sellers.append(True)
-                            allSystemsSellable[system1IndexToCheck] = 1
-                    else:
-                        system1Sellers.append(False)
-
-                    system2IndexToCheck = (i + system2Index) % routeLength
-                    currentSystem = self.__Route[system2IndexToCheck]
-                    if system2.System_Distances[currentSystem.Index] >= self.__Seller_Min:
-                        if system2LastIndex > 0:
-                            if system2Sellers[-1]:
-                                system2Sellers.append(True)
-                                allSystemsSellable[system2IndexToCheck] = 1
-                            else:
-                                system2Sellers.append(False)
-                        else:
-                            system2LastIndex = system2IndexToCheck
-                            system2Sellers.append(True)
-                            allSystemsSellable[system2IndexToCheck] = 1
-                    else:
-                        system2Sellers.append(False)
-            
-                num1 = 0
-                for val in system1Sellers:
-                    if val:
-                        num1 += 1
-                num2 = 0
-                for val in system2Sellers:
-                    if val:
-                        num2 += 1
-                     
-                if sum(allSystemsSellable) == 0:
+            if routeLength%2 == 0 :
+                if systemJumpsApart != math.floor(routeLength/2):
+                    continue
+            else:
+                if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
                     continue
 
-                if abs(num2-num1) <= 1:
-                    if (num2 + num1) == routeLength:
-                        if sum(allSystemsSellable) == routeLength:
-                            self.Split_Sellers = systemPair
-                            pairValue = goodPair
-                            break
+            #TODO: Fix spacing
+            system1Sellers = []
+            system1LastIndex = -999
+            system2Sellers = []
+            system2LastIndex = -999
+            for i in range(1,routeLength):
+                system1IndexToCheck = (i + system1Index) % routeLength
+                currentSystem = self.__Route[system1IndexToCheck]
+                if system1.System_Distances[currentSystem.Index] >= self.__Seller_Min:
+                    if system1LastIndex > 0:
+                        if system1Sellers[-1]:
+                            system1Sellers.append(True)
+                            allSystemsSellable[system1IndexToCheck] = 1
+                        else:
+                            system1Sellers.append(False)
                     else:
-                        if pairValue < sum(allSystemsSellable) / 5:
-                            pairValue = sum(allSystemsSellable) / 5
-                            self.Split_Sellers = systemPair
+                        system1LastIndex = system1IndexToCheck
+                        system1Sellers.append(True)
+                        allSystemsSellable[system1IndexToCheck] = 1
                 else:
-                    if pairValue < sum(allSystemsSellable)/ 15:
-                        pairValue = sum(allSystemsSellable) / 15
-                        self.Split_Sellers = systemPair
+                    system1Sellers.append(False)
 
+                system2IndexToCheck = (i + system2Index) % routeLength
+                currentSystem = self.__Route[system2IndexToCheck]
+                if system2.System_Distances[currentSystem.Index] >= self.__Seller_Min:
+                    if system2LastIndex > 0:
+                        if system2Sellers[-1]:
+                            system2Sellers.append(True)
+                            allSystemsSellable[system2IndexToCheck] = 1
+                        else:
+                            system2Sellers.append(False)
+                    else:
+                        system2LastIndex = system2IndexToCheck
+                        system2Sellers.append(True)
+                        allSystemsSellable[system2IndexToCheck] = 1
+                else:
+                    system2Sellers.append(False)
+            
+            num1 = 0
+            for val in system1Sellers:
+                if val:
+                    num1 += 1
+            num2 = 0
+            for val in system2Sellers:
+                if val:
+                    num2 += 1
+                     
+            if sum(allSystemsSellable) == 0:
+                continue
+
+            if abs(num2-num1) <= 1:
+                if (num2 + num1) == routeLength:
+                    if sum(allSystemsSellable) == routeLength:
+                        self.Split_Sellers = systemPair
+                        pairValue = goodPair
+                        break
+                else:
+                    if pairValue < sum(allSystemsSellable) / 5:
+                        pairValue = sum(allSystemsSellable) / 5
+                        self.Split_Sellers = systemPair
+            else:
+                if pairValue < sum(allSystemsSellable)/ 15:
+                    pairValue = sum(allSystemsSellable) / 15
+                    self.Split_Sellers = systemPair
             
         #If no combo of systems yields good seller spacing, or not all systems accounted for in the best pair(?), return here
         if self.Split_Sellers == None:
-            pairValue = sellersValue / 20
-            sellerScale = .01
+            return 0.01
         
         #Special case for shorter routes
         maxGoodDistance = routeLength * 100
@@ -204,9 +178,9 @@ class EDRareRoute(object):
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
-        sellersValue = sellersValue if sellersValue < pairValue else pairValue
 
-        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
+
+        totalValue = (((pairValue/goodPair) * pairValue) + weightedCost + weightedDistance + weightedSupply)
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         if longestJump > maxJumpRangeLY:
@@ -221,10 +195,6 @@ class EDRareRoute(object):
         Based on selling to the first system next on the route over the __Seller_Min distance
         Also a lot faster than the original __CalcFitness.
         '''
-        #TODO: Maybe step through the route in order, keep track of sold/unsold systems
-        #       At the end, sold systems should be set(route)
-        #       There is no reason to loop more than twice, if something hasnt sold by then it won't sell
-        #       Keep track of which system is sold where, below 4 can be sold at 2 and 6 but it is always sold at 6
         #       So like, if route is [1,2,3,4,5,6,7] and say {2: 4,6; 3: 1,7; 4: 2,6; 6: 4,2; 7:3,5}
         #       It would be: JUMP       SOLD                UNSOLD
         #                    1                              1
@@ -431,6 +401,7 @@ class EDRareRoute(object):
         count = 0
 
         #For printing split fitness values
+        #TODO: Flag systems that can be sold at either seller
         if self.Split_Sellers != None:
             sellersPerSystem = {}
             for system in self.__Route:
@@ -492,3 +463,159 @@ class EDRareRoute(object):
         strList.append("\nType: {0}".format(self.Route_Type.name))
 
         return ''.join(strList)
+#------------------------------------------------------------------------------
+def __BreakingFitnessAgain(self):
+        '''
+        Fitness value based on having a roughly even number of systems between sellers
+        '''
+        #TODO: Maybe scale value based on longest distance to station
+        #      Some routes come out "backwards", need to flag this 
+        #      Set up some kind of flag on worst value from supply/distance/cost
+        routeLength = self.__Route.__len__()
+        self.Total_Distance = 0     
+       
+        clusterShortLY = 50
+        clusterLongLY = 145
+        spreadMaxLY = 110
+        maxJumpRangeLY = 200
+        clusterShort = 0
+        clusterLong = 0
+        spreadJumps = 0
+        longestJump = -999
+
+        for i in range(0,routeLength):
+            currentSystem = self.__Route[i]
+            nextSystem = self.__Route[(i+1)%routeLength]
+            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            self.Total_Distance += jumpDistance
+            longestJump = jumpDistance if jumpDistance > longestJump else longestJump
+            if jumpDistance <= clusterShortLY:
+                clusterShort += 1
+            if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
+                clusterLong += 1 
+            if jumpDistance <= spreadMaxLY:
+                spreadJumps += 1 
+        
+        #Route has 2 groups of systems separated by a long jump
+        if clusterLong == 2 and (clusterLong + clusterShort) == routeLength:
+           self.Route_Type = RouteType.Cluster
+
+        #Route has fairly evenly spaced jumps
+        if spreadJumps == routeLength:
+            self.Route_Type = RouteType.Spread
+
+        pairValue = -999
+        goodPair = 6
+        sellerScale = 1
+        
+        possibleSellers = []
+        systemsBySeller = {}
+        for seller in self.__Route:
+            systemsBySeller[seller] = []
+            for system in self.__Route:
+                if seller.System_Distances[system.Index] >= self.__Seller_Min:
+                    systemsBySeller[seller].append(system)
+
+        for systemPair in itertools.combinations(self.__Route,2):
+            totalSystems = systemsBySeller[systemPair[0]].__len__() + systemsBySeller[systemPair[1]].__len__()
+            if totalSystems >= routeLength:
+                if possibleSellers.count(systemPair[0]) == 0:
+                    possibleSellers.append(systemPair[0])
+                if possibleSellers.count(systemPair[1]) == 0:
+                    possibleSellers.append(systemPair[1])
+
+        ableToSell = routeLength
+        for k,v in systemsBySeller.items():
+            if v.__len__() == 0:
+                ableToSell -= 1
+        sellersValue = ableToSell/routeLength * goodPair
+
+        #We know we have at least all systems accounted for in sellers, but don't know if they are split even
+        if possibleSellers.__len__() >= 2:
+            minOffset = 9999
+            pairAtMin = None
+            for systemPair in itertools.combinations(possibleSellers,2):
+                system1 = systemPair[0]
+                system2 = systemPair[1]
+                system1SellerIndices = sorted([self.__Route.index(system) for system in systemsBySeller[system1]])
+                system2SellerIndices = sorted([self.__Route.index(system) for system in systemsBySeller[system2]])
+                allindices = [val for val in system1SellerIndices if val not in system2SellerIndices]
+                allindices.extend([val for val in system2SellerIndices if val not in system1SellerIndices])
+                maxSellers = allindices.__len__()
+                allSystemsSellable = [0 for i in range(routeLength)]
+
+                system1Index = self.__Route.index(system1)
+                system2Index = self.__Route.index(system2)
+                systemJumpsApart = abs(system1Index-system2Index)
+                sellersOffset = routeLength - allindices.__len__()
+                if sellersOffset > 1:
+                    pairValue = allindices.__len__() / 10
+                    continue
+
+                if routeLength%2 == 0 :
+                    if systemJumpsApart != math.floor(routeLength/2):
+                        continue
+                    if system1SellerIndices.__len__() != system2SellerIndices.__len__():
+                        continue
+                else:
+                    if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
+                        continue
+                    if abs(system1SellerIndices.__len__() - system2SellerIndices.__len__()) > 1:
+                        continue
+
+                allSystemsInOrder = True
+                for i in range(system1SellerIndices.__len__()-1):
+                    currentIndex = system1SellerIndices[i]
+                    nextIndex = system1SellerIndices[i+1]
+
+                    if currentIndex + 1 != nextIndex and currentIndex + 1 + systemJumpsApart != nextIndex:
+                        allSystemsInOrder = False
+                        break
+                for i in range(system2SellerIndices.__len__()-1):
+                    currentIndex = system2SellerIndices[i]
+                    nextIndex = system2SellerIndices[i+1]
+
+                    if currentIndex + 1 != nextIndex and currentIndex + 1 + systemJumpsApart != nextIndex:
+                        allSystemsInOrder = False
+                        break
+
+                if not allSystemsInOrder:
+                    continue
+                else:
+                    systemsFromPair = [val for val in systemsBySeller[system1]]
+                    systemsFromPair.extend(systemsBySeller[system2])
+                    if set(systemsFromPair) == set(self.__Route):
+                        self.Split_Sellers = systemPair
+                        pairValue = goodPair
+                        break
+        else:
+            sellerScale = 0.25
+            
+        #If no combo of systems yields good seller spacing, or not all systems accounted for in the best pair(?), return here
+        if self.Split_Sellers == None:
+            pairValue = max(sellersValue/20,pairValue/20)
+            sellerScale = .01
+        
+        #Special case for shorter routes
+        maxGoodDistance = routeLength * 100
+        if routeLength < 6:
+            maxGoodDistance = maxGoodDistance * 1.2
+        #Less total distance needs to give a higher value
+        weightedDistance = (maxGoodDistance/self.Total_Distance) * 2
+        
+        minSupply = routeLength * 12
+        weightedSupply = math.log(self.Total_Supply,minSupply) * 2
+  
+        avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
+        #using log because these values can be very high
+        weightedCost = math.log(avgCost,1000)
+
+        sellersValue = min(sellersValue,pairValue)
+
+        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
+        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
+            totalValue = totalValue * 0.5
+        if longestJump > maxJumpRangeLY:
+            totalValue = totalValue * 0.7
+
+        return totalValue

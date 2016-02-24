@@ -47,12 +47,12 @@ class PerformanceCalc(object):
     @classmethod
     def TestSystems(cls,systemsDict: {},fitType: FitnessType):
         
-        brokenRoute = []
-        brokenRoute.append(systemsDict['Diso'])  
-        brokenRoute.append(systemsDict['Orrere'])
-        brokenRoute.append(systemsDict['Uszaa'])
-        brokenRoute.append(systemsDict['Leesti'])
-        badRoute = EDRareRoute(brokenRoute,fitType)
+        brokenRoute4 = []
+        brokenRoute4.append(systemsDict['Diso'])  
+        brokenRoute4.append(systemsDict['Orrere'])
+        brokenRoute4.append(systemsDict['Uszaa'])
+        brokenRoute4.append(systemsDict['Leesti'])
+        badRoute = EDRareRoute(brokenRoute4,fitType)
         print(badRoute)
         
         ykLoopList = []
@@ -67,46 +67,6 @@ class PerformanceCalc(object):
         print("\n\nYK Loop")
         print(EDRareRoute(ykLoopList,fitType))
         EDRareRoute(ykLoopList,fitType).DrawRoute()
-
-        good4_1 = []
-        good4_1.append(systemsDict['Fujin'])  
-        good4_1.append(systemsDict['39 Tauri'])   
-        good4_1.append(systemsDict['Diso'])  
-        good4_1.append(systemsDict['Leesti'])  
-        print(EDRareRoute(good4_1,fitType))
-       
-        good5_1 = []
-        good5_1.append(systemsDict['Irukama']) 
-        good5_1.append(systemsDict['Ngurii']) 
-        good5_1.append(systemsDict['Leesti']) 
-        good5_1.append(systemsDict['Aganippe'])  
-        good5_1.append(systemsDict['Altair'])  
-        print(EDRareRoute(good5_1,fitType))
-
-        good5_2 = []
-        good5_2.append(systemsDict['Leesti'])  
-        good5_2.append(systemsDict['Diso'])  
-        good5_2.append(systemsDict['Orrere'])  
-        good5_2.append(systemsDict['Utgaroar'])  
-        good5_2.append(systemsDict['Tanmark'])
-        print(EDRareRoute(good5_2,fitType))
-
-        good5_3 = []
-        good5_3.append(systemsDict['Tanmark'])  
-        good5_3.append(systemsDict['Orrere'])  
-        good5_3.append(systemsDict['Diso'])  
-        good5_3.append(systemsDict['Lave'])  
-        good5_3.append(systemsDict['Utgaroar'])  
-        print(EDRareRoute(good5_3,fitType))
-
-        good6_1 = []
-        good6_1.append(systemsDict['Orrere'])
-        good6_1.append(systemsDict['Tarach Tor'])  
-        good6_1.append(systemsDict['Tanmark'])  
-        good6_1.append(systemsDict['Utgaroar'])  
-        good6_1.append(systemsDict['Leesti'])  
-        good6_1.append(systemsDict['Lave'])  
-        print(EDRareRoute(good6_1,fitType)) 
          
         good8_1 = []
         good8_1.append(systemsDict['Hecate'])
@@ -154,6 +114,7 @@ class PerformanceCalc(object):
         bad11_1.append(systemsDict['Epsilon Indi'])
         bad11_1.append(systemsDict['Altair'])
         print("\nPoor system distances, Bad system order")
+        print("I dont even know if this route is bad or good anymore")
         print(EDRareRoute(bad11_1,fitType))
         EDRareRoute(bad11_1,fitType).DrawRoute()      
 
