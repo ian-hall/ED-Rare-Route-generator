@@ -226,8 +226,8 @@ class PerformanceCalc(object):
         altTestRoute.append(systemsDict['HR 7221'])
         altTestRoute.append(systemsDict["Baltah'Sine"])
         altTestRoute.append(systemsDict['CD-75 661'])	
-        print(EDRareRoute(altTestRoute,fitType))
-        EDRareRoute(altTestRoute,fitType).DrawRoute()
+        #print(EDRareRoute(altTestRoute,fitType))
+        #EDRareRoute(altTestRoute,fitType).DrawRoute()
         
 #------------------------------------------------------------------------------
 ###############################################################################
@@ -263,7 +263,6 @@ class PerformanceMetrics(object):
                 totalTimeUnsolved += self.Times[i]
                 totalGensUnsolved += self.Gens[i]
 
-        #percentSolved = (numSolved/numEntries) * 100
         avgSolvedValue = sum(self.Values)/self.Values.__len__() if numSolved > 0 else 0
         avgTimeSolved = totalTimeSolved/numSolved if numSolved > 0 else 0
         avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
@@ -277,10 +276,6 @@ class PerformanceMetrics(object):
             strList.append("\n\tAvg time(solved): {0:.5f}".format(avgTimeSolved))
             strList.append("\n\tAvg generations(solved): {0:.2f}".format(avgGensSolved))
             strList.append("\n\tSolution Types:")
-            #TODO: Change this to only display those in the types list by using Counter or something
-            #strList.append("\n\t\t{0}: {1}".format(RouteType.Other.name,self.Types.count(RouteType.Other)))
-            #strList.append("\n\t\t{0}: {1}".format(RouteType.Spread.name,self.Types.count(RouteType.Spread)))
-            #strList.append("\n\t\t{0}: {1}".format(RouteType.Cluster.name,self.Types.count(RouteType.Cluster)))
             typesCount = Counter(self.Types)
             for type,count in typesCount.most_common():
                 strList.append("\n\t\t{0}: {1}".format(type.name,count))

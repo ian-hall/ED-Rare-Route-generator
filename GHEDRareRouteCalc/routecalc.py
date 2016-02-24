@@ -17,11 +17,11 @@ class RouteCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def GeneticSolverStart(cls,popSize: int, validSystems: [], routeLength: int, silent: bool, fitType: FitnessType):
-        #TODO: Will not finish if popSize == validSystem.Len, related to mutate function
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
+        #TODO: Change this to allow certain lengths based on fitType
         if routeLength < 3 or routeLength > 50:
             raise Exception("Routes need length between 3 and XX")
         RouteCalc.__Fit_Type = fitType
