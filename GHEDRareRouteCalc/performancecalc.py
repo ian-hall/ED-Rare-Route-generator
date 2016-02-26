@@ -10,13 +10,13 @@ class PerformanceCalc(object):
     def CheckPerformance(cls,systemsList: [],fitType: FitnessType):
         maxTests = 10
 
-        minPopSize = 300
+        minPopSize = 150
         maxPopSize = 300
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 6
-        maxLength = 8
+        minLength = 9
+        maxLength = 9
         lengths = range(minLength,maxLength+1,1)
 
         print("Fitness Type: {0}".format(fitType.name))

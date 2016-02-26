@@ -27,9 +27,10 @@ class EDRareRoute(object):
         self.__Route = systemList
         self.__Seller_Min = 160
         self.Total_Distance = 0
-        self.Total_Supply = sum([val.Max_Supply for val in self.__Route])
+        self.Total_Supply = sum((val.Max_Supply for val in self.__Route))
         self.Split_Sellers = None
         self.Alt_Sellers = None
+        self.Max_Cargo = 0
         self.Route_Type = RouteType.Other
         self.Fitness_Value = self.__CalcFitness() if fType == FitnessType.EvenSplit else self.__CalcFitnessAlt()
 #------------------------------------------------------------------------------
@@ -242,11 +243,13 @@ class EDRareRoute(object):
         
         #Skip this part if we already know we can't sell all goods
         maxSellersWaiting = -1
+        maxCargo = 0
         if sellersValue >= baseValue:
             sellersUsed = []
             sold = []
             unsold = []
             #Go through at most twice, since if a systems doesnt sell by then it won't sell
+            #TODO: GO through the route in reverse at the same time
             for i in range(routeLength*2):
                 currentSys = self.__Route[i%routeLength];
                 unsold.append(currentSys)
@@ -262,6 +265,7 @@ class EDRareRoute(object):
                 if numUnsold > maxSellersWaiting:
                     maxSellersWaiting = numUnsold
                 if toRemove.__len__() != 0:
+                    maxCargo = max(maxCargo,sum((sys.Max_Supply for sys in unsold[:-1])))
                     sellersUsed.append(currentSys)
                     if self.Alt_Sellers == None:
                         self.Alt_Sellers = defaultdict(list)
@@ -293,13 +297,17 @@ class EDRareRoute(object):
 
         #Only lower value for maxwaiting and maxjump on shorter routes
         #TODO: Change this to not be so lax on larger routes, too common to have 10+ stations sell at one place
-        if overLongJump and routeLength < 15:
-            totalValue = totalValue * 0.8
-        if maxSellersWaiting > 7 and routeLength < 15:
+        #       Instead of checking for sellersWaiting, check for max cargo usage
+        if overLongJump and routeLength < 16:
             totalValue = totalValue * 0.8
         if longestJump > maxJumpDistance:
             totalValue = totalValue * 0.001
         
+        #TODO: scale this based off some set cargo amount
+        if maxCargo > 80:
+            totalValue = totalValue * 0.8
+        
+        self.Max_Cargo = maxCargo
         return totalValue
 #------------------------------------------------------------------------------
     #Draws the route
@@ -459,12 +467,13 @@ class EDRareRoute(object):
 
         strList.append("\nTotal distance: {0:.3f}ly".format(self.Total_Distance))
         strList.append("\nTotal goods: {0:.2f}".format(self.Total_Supply))
+        strList.append("\nCargo space req: {0}".format(self.Max_Cargo))
         strList.append("\nAvg cost: {0:.2f}".format(avgCost))
         strList.append("\nType: {0}".format(self.Route_Type.name))
 
         return ''.join(strList)
 #------------------------------------------------------------------------------
-def __BreakingFitnessAgain(self):
+    def __BreakingFitnessAgain(self):
         '''
         Fitness value based on having a roughly even number of systems between sellers
         '''
@@ -505,52 +514,42 @@ def __BreakingFitnessAgain(self):
             self.Route_Type = RouteType.Spread
 
         pairValue = -999
-        goodPair = 6
+        baseValue = 6
         sellerScale = 1
         
-        possibleSellers = []
         systemsBySeller = {}
         for seller in self.__Route:
             systemsBySeller[seller] = []
             for system in self.__Route:
                 if seller.System_Distances[system.Index] >= self.__Seller_Min:
                     systemsBySeller[seller].append(system)
+        ableToSell = routeLength
+        for k,v in systemsBySeller.items():
+            if v.__len__() == 0:
+                ableToSell -= 1
+        sellersValue = ableToSell/routeLength * baseValue
 
+        possibleSellers = []
         for systemPair in itertools.combinations(self.__Route,2):
-            totalSystems = systemsBySeller[systemPair[0]].__len__() + systemsBySeller[systemPair[1]].__len__()
-            if totalSystems >= routeLength:
+            totalSystems = [val for val in systemsBySeller[systemPair[0]]]
+            totalSystems.extend([val for val in systemsBySeller[systemPair[1]]])
+            if set(totalSystems) == set(self.__Route):
                 if possibleSellers.count(systemPair[0]) == 0:
                     possibleSellers.append(systemPair[0])
                 if possibleSellers.count(systemPair[1]) == 0:
                     possibleSellers.append(systemPair[1])
 
-        ableToSell = routeLength
-        for k,v in systemsBySeller.items():
-            if v.__len__() == 0:
-                ableToSell -= 1
-        sellersValue = ableToSell/routeLength * goodPair
-
         #We know we have at least all systems accounted for in sellers, but don't know if they are split even
         if possibleSellers.__len__() >= 2:
-            minOffset = 9999
-            pairAtMin = None
             for systemPair in itertools.combinations(possibleSellers,2):
                 system1 = systemPair[0]
                 system2 = systemPair[1]
                 system1SellerIndices = sorted([self.__Route.index(system) for system in systemsBySeller[system1]])
                 system2SellerIndices = sorted([self.__Route.index(system) for system in systemsBySeller[system2]])
-                allindices = [val for val in system1SellerIndices if val not in system2SellerIndices]
-                allindices.extend([val for val in system2SellerIndices if val not in system1SellerIndices])
-                maxSellers = allindices.__len__()
-                allSystemsSellable = [0 for i in range(routeLength)]
 
                 system1Index = self.__Route.index(system1)
                 system2Index = self.__Route.index(system2)
                 systemJumpsApart = abs(system1Index-system2Index)
-                sellersOffset = routeLength - allindices.__len__()
-                if sellersOffset > 1:
-                    pairValue = allindices.__len__() / 10
-                    continue
 
                 if routeLength%2 == 0 :
                     if systemJumpsApart != math.floor(routeLength/2):
@@ -586,7 +585,7 @@ def __BreakingFitnessAgain(self):
                     systemsFromPair.extend(systemsBySeller[system2])
                     if set(systemsFromPair) == set(self.__Route):
                         self.Split_Sellers = systemPair
-                        pairValue = goodPair
+                        pairValue = baseValue
                         break
         else:
             sellerScale = 0.25
