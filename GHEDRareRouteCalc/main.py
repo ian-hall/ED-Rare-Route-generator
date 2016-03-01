@@ -197,9 +197,9 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 17
+    length = 33
     popSize = 555
-    __RunGenetic(commonSystems,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
     #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)

@@ -21,10 +21,16 @@ class RouteCalc(object):
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
-        #TODO: Change this to allow certain lengths based on fitType
-        if routeLength < 3 or routeLength > 50:
-            raise Exception("Routes need length between 3 and XX")
+        #Really there is only a min length, upper end is limited to how long you wait until ragequitting
         RouteCalc.__Fit_Type = fitType
+        if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
+            if routeLength < 3 or routeLength > 15:
+                raise Exception("Split routes must have lengths [3-15]")
+        elif RouteCalc.__Fit_Type == FitnessType.FirstOver:
+            if routeLength < 6 or routeLength > 55:
+                raise Exception("Alternate type routes must have lengths [6-XX]")
+            
+
 
         population = []
         RouteCalc.__Valid_Systems = validSystems

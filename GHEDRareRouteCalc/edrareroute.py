@@ -32,6 +32,7 @@ class EDRareRoute(object):
         self.Alt_Sellers = None
         self.Max_Cargo = 0
         self.Route_Type = RouteType.Other
+        self.Longest_Jump = 0
         self.Fitness_Value = self.__CalcFitness() if fType == FitnessType.EvenSplit else self.__CalcFitnessAlt()
 #------------------------------------------------------------------------------
     def GetRoute(self):
@@ -68,7 +69,7 @@ class EDRareRoute(object):
                 clusterLong += 1 
             if jumpDistance <= spreadMaxLY:
                 spreadJumps += 1 
-        
+        self.Longest_Jump = longestJump
         #Route has 2 groups of systems separated by a long jump
         if clusterLong == 2 and (clusterLong + clusterShort) == routeLength:
            self.Route_Type = RouteType.Cluster
@@ -229,6 +230,7 @@ class EDRareRoute(object):
                 self.Route_Type = RouteType.LongAlt
             self.Total_Distance += jumpDistance
 
+        self.Longest_Jump = longestJump
         systemsBySeller = {}
         for seller in self.__Route:
             systemsBySeller[seller] = []
@@ -278,6 +280,7 @@ class EDRareRoute(object):
             #Scale overall value down
             sellersScale = 0.25
 
+        #TODO: Reintroduce some scale to allow for shorter routes
         maxGoodDistance = routeLength * longJumpDistance
         weightedDistance = (maxGoodDistance/self.Total_Distance) * 2
         
@@ -297,21 +300,21 @@ class EDRareRoute(object):
 
         #Only lower value for maxwaiting and maxjump on shorter routes
         #TODO: Change this to not be so lax on larger routes, too common to have 10+ stations sell at one place
-        #       Instead of checking for sellersWaiting, check for max cargo usage
         if overLongJump and routeLength < 16:
             totalValue = totalValue * 0.8
         if longestJump > maxJumpDistance:
-            totalValue = totalValue * 0.001
+            totalValue = totalValue * 0.45
         
-        #TODO: scale this based off some set cargo amount
+        #TODO: scale this based off some set cargo amount that increases for longer routes
         if maxCargo > 80:
-            totalValue = totalValue * 0.8
+            totalValue = totalValue * 1
         
         self.Max_Cargo = maxCargo
         return totalValue
 #------------------------------------------------------------------------------
     #Draws the route
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
+    #       Add a better way to represent large routes than first letter of system, too many duplicates
     def DrawRoute(self):
         maxCols = 53
         maxRows = 20
@@ -466,6 +469,7 @@ class EDRareRoute(object):
                strList.append('{0}\n'.format(system))
 
         strList.append("\nTotal distance: {0:.3f}ly".format(self.Total_Distance))
+        strList.append("\nLongest jump: {0:.3f}ly".format(self.Longest_Jump))
         strList.append("\nTotal goods: {0:.2f}".format(self.Total_Supply))
         strList.append("\nCargo space req: {0}".format(self.Max_Cargo))
         strList.append("\nAvg cost: {0:.2f}".format(avgCost))
