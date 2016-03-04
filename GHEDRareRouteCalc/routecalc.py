@@ -21,7 +21,7 @@ class RouteCalc(object):
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
-        #Really there is only a min length, upper end is limited to how long you wait until ragequitting
+        #TODO: Eventually add something here that calculates popSize based on route length
         RouteCalc.__Fit_Type = fitType
         if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
             if routeLength < 3 or routeLength > 15:
