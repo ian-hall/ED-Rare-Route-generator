@@ -62,9 +62,9 @@ class PerformanceCalc(object):
 5: Momus Reach (['Tartarus Point'])
 6: <Yaso Kondi (['Wheeler Market'])>
         '''
-        testingFarthest = EDRareRoute( [ systemsDict['Witchhaul'], systemsDict['George Pantazis'], systemsDict['Diso'], systemsDict['Utgaroar'], systemsDict['Momus Reach'],
-                                         systemsDict['Yaso Kondi'] ], fitType)
-        print(testingFarthest)
+        #testingFarthest = EDRareRoute( [ systemsDict['Witchhaul'], systemsDict['George Pantazis'], systemsDict['Diso'], systemsDict['Utgaroar'], systemsDict['Momus Reach'],
+        #                                 systemsDict['Yaso Kondi'] ], fitType)
+        #print(testingFarthest)
         
         ykLoopList = []
         ykLoopList.append(systemsDict['Coquim'])  
@@ -76,11 +76,11 @@ class PerformanceCalc(object):
         ykLoopList.append(systemsDict['Yaso Kondi']) 
         ykLoopList.append(systemsDict['Quechua'])  
         print("\n\nYK Loop")
-        ykLoop = EDRareRoute(ykLoopList,fitType)
-        print(ykLoop)
-        ykLoop.DrawRoute()
+        #ykLoop = EDRareRoute(ykLoopList,fitType)
+        #print(ykLoop)
+        #ykLoop.DrawRoute()
 
-        good5Route = EDRareRoute( [ systemsDict['Leesti'], systemsDict['Lave'], systemsDict['Diso'], systemsDict['39 Tauri'], systemsDict['Fujin'] ],fitType )
+        good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
         print(good5Route)
         good5Route.DrawRoute()
          
