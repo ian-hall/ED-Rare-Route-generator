@@ -76,9 +76,9 @@ class PerformanceCalc(object):
         ykLoopList.append(systemsDict['Yaso Kondi']) 
         ykLoopList.append(systemsDict['Quechua'])  
         print("\n\nYK Loop")
-        #ykLoop = EDRareRoute(ykLoopList,fitType)
-        #print(ykLoop)
-        #ykLoop.DrawRoute()
+        ykLoop = EDRareRoute(ykLoopList,fitType)
+        print(ykLoop)
+        ykLoop.DrawRoute()
 
         good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
         print(good5Route)
