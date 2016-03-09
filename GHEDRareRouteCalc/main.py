@@ -9,7 +9,7 @@ import re
 import time
 
 #------------------------------------------------------------------------------
-def __ValidateLine(currentLine, lineNum: int) -> EDSystem:
+def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
     '''
     0 - Max Cap
     1 - Supply Rate
@@ -79,7 +79,7 @@ def __ValidateLine(currentLine, lineNum: int) -> EDSystem:
                     distToStation, stationName, systemName, index,
                     distToOthers, permit)
 #------------------------------------------------------------------------------
-def __RunGenetic(systems, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
+def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
     maxRuns = 5
@@ -91,16 +91,16 @@ def __RunGenetic(systems, routeLength: int, popSize: int, fitType: FitnessType, 
         geneticEnd = time.time()
         if routeTuple:
             bestRoute = routeTuple[0]
-            if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff and stopShort:
+            if bestRoute.GetFitValue() >= RouteCalc.Route_Cutoff and stopShort:
                 exitTestLoop = True
-            if bestRoute.Fitness_Value < RouteCalc.Route_Cutoff:
-                print("No good route found".format(bestRoute.Fitness_Value))
+            if bestRoute.GetFitValue() < RouteCalc.Route_Cutoff:
+                print("No good route found".format(bestRoute.GetFitValue()))
             print(bestRoute)
             print("Generations: {0}".format(routeTuple[1]))
             print("Time: {0}s".format((geneticEnd-geneticStart)))
             bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
-def __TryFloat(val: str):
+def __TryFloat(val: str) -> bool:
     try:
         float(val)
         return True
@@ -197,12 +197,15 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
-    popSize = 300
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.Farthest,silent=False,stopShort=True)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Farthest)
+    length = 9
+    popSize = 222
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    
+    PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+    PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
+
+    #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
     #fullRoute = EDRareRoute(systemsSubset,FitnessType.FirstOver)
     #fullRoute.DrawRoute()

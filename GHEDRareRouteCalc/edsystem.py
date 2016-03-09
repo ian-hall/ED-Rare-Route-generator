@@ -4,8 +4,8 @@ class EDSystem( object ):
     '''
     TODO:  pretty printing so you don't see the braces around the lists
     '''
-    def __init__(self, supplyCap, avgSupply, itemCost, itemName, distToStation,
-                       stationName, systemName, stationIndex, distToOthers: [], permit: bool):
+    def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
+                       stationName: str, systemName: str, stationIndex: int, distToOthers: list, permit: bool):
         self.Max_Supply = supplyCap # Float
         self.Supply = [avgSupply] # Float
         self.Cost = [itemCost] # Int

@@ -7,35 +7,32 @@ from collections import Counter
 class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
-    def CheckPerformance(cls,systemsList: [],fitType: FitnessType):
-        maxTests = 2
+    def CheckPerformance(cls,systemsList: list,fitType: FitnessType):
+        maxTests = 20
 
-        minPopSize = 700
-        maxPopSize = 700
+        minPopSize = 300
+        maxPopSize = 350
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 32
-        maxLength = 35
+        minLength = 8
+        maxLength = 8
         lengths = range(minLength,maxLength+1,1)
 
         print("Fitness Type: {0}".format(fitType.name))
         for routeLength in lengths:
             for popSize in popSizes:
                 stats = PerformanceMetrics(routeLength,popSize)
-                #testNum = 0
                 for testNum in range(maxTests):
-                    #testNum += 1
-                    #print("Test: {0}".format(testNum))
                     solved = False
                     startTime = time.time()
                     routeTuple = RouteCalc.GeneticSolverStart(popSize,systemsList,routeLength, True,fitType)
                     endTime = time.time()
                     elapsed = endTime - startTime
                     bestRoute = routeTuple[0]
-                    if bestRoute.Fitness_Value >= RouteCalc.Route_Cutoff:
-                        stats.Types.append(routeTuple[0].Route_Type)
-                        stats.Values.append(routeTuple[0].Fitness_Value)
+                    if bestRoute.GetFitValue() >= RouteCalc.Route_Cutoff:
+                        stats.Types.append(routeTuple[0].GetRouteType())
+                        stats.Values.append(routeTuple[0].GetFitValue())
                         solved = True
 
                     stats.Times.append(elapsed)
@@ -45,7 +42,7 @@ class PerformanceCalc(object):
                 print(stats)
 #------------------------------------------------------------------------------
     @classmethod
-    def TestSystems(cls,systemsDict: {},fitType: FitnessType):
+    def TestSystems(cls,systemsDict: dict,fitType: FitnessType):
         
         #brokenRoute4 = []
         #brokenRoute4.append(systemsDict['Diso'])  
@@ -54,14 +51,7 @@ class PerformanceCalc(object):
         #brokenRoute4.append(systemsDict['Leesti'])
         #badRoute = EDRareRoute(brokenRoute4,fitType)
         #print(badRoute)
-        '''
-        1: Witchhaul (['Hornby Terminal'])
-2: George Pantazis (['Zamka Platform'])
-3: <Diso (['Shifnalport'])>
-4: Utgaroar (['Fort Klarix'])
-5: Momus Reach (['Tartarus Point'])
-6: <Yaso Kondi (['Wheeler Market'])>
-        '''
+
         #testingFarthest = EDRareRoute( [ systemsDict['Witchhaul'], systemsDict['George Pantazis'], systemsDict['Diso'], systemsDict['Utgaroar'], systemsDict['Momus Reach'],
         #                                 systemsDict['Yaso Kondi'] ], fitType)
         #print(testingFarthest)
@@ -135,77 +125,77 @@ class PerformanceCalc(object):
         #print(unknown11)
         #unknown11.DrawRoute()      
 
-        #altTestRoute = []
-        #altTestRoute.append(systemsDict['Shinrarta Dezhra'])
-        #altTestRoute.append(systemsDict['Leesti'])
-        #altTestRoute.append(systemsDict['Diso'])
-        #altTestRoute.append(systemsDict['Uszaa'])
-        #altTestRoute.append(systemsDict['Orrere'])
-        #altTestRoute.append(systemsDict['Lave'])
-        #altTestRoute.append(systemsDict['Zaonce'])
-        #altTestRoute.append(systemsDict['Sanuma'])
-        #altTestRoute.append(systemsDict['Toxandji'])
-        #altTestRoute.append(systemsDict['Any Na'])
-        #altTestRoute.append(systemsDict['Arouca'])
-        #altTestRoute.append(systemsDict['Deuringas'])
-        #altTestRoute.append(systemsDict['Neritus'])
-        #altTestRoute.append(systemsDict['AZ Cancri'])
-        #altTestRoute.append(systemsDict['Eranin'])
-        #altTestRoute.append(systemsDict['Ethgreze'])
-        #altTestRoute.append(systemsDict['Rusani'])
-        #altTestRoute.append(systemsDict['Damna'])
-        #altTestRoute.append(systemsDict['Volkhab'])
-        #altTestRoute.append(systemsDict['Alacarakmo'])
-        #altTestRoute.append(systemsDict['Rajukru'])
-        #altTestRoute.append(systemsDict['Kongga'])
-        #altTestRoute.append(systemsDict['Esuseku'])
-        #altTestRoute.append(systemsDict['Ochoeng'])
-        #altTestRoute.append(systemsDict['Karetii'])
-        #altTestRoute.append(systemsDict['Heike'])
-        #altTestRoute.append(systemsDict['Helvetitj'])
-        #altTestRoute.append(systemsDict['Eleu'])
-        #altTestRoute.append(systemsDict['Kinago'])
-        #altTestRoute.append(systemsDict['Vanayequi'])
-        #altTestRoute.append(systemsDict['Kamorin'])
-        #altTestRoute.append(systemsDict['Kachirigin'])
-        #altTestRoute.append(systemsDict['Nguna'])
-        #altTestRoute.append(systemsDict['HIP 10175'])
-        #altTestRoute.append(systemsDict['Momus Reach'])
-        ##altTestRoute.append(systemsDict['Wolf 1301'])
-        #altTestRoute.append(systemsDict['Witchhaul'])
-        #altTestRoute.append(systemsDict['Fujin'])
-        #altTestRoute.append(systemsDict['39 Tauri'])
-        #altTestRoute.append(systemsDict['Hecate'])
-        #altTestRoute.append(systemsDict['Bast'])
-        #altTestRoute.append(systemsDict['Zeessze'])
-        #altTestRoute.append(systemsDict['George Pantazis'])
-        #altTestRoute.append(systemsDict['Epsilon Indi'])
-        #altTestRoute.append(systemsDict['Altair'])
-        #altTestRoute.append(systemsDict['Xihe'])
-        #altTestRoute.append(systemsDict['Tiolce'])
-        #altTestRoute.append(systemsDict['Chi Eridani'])
-        #altTestRoute.append(systemsDict['Tanmark'])
-        #altTestRoute.append(systemsDict['Tarach Tor'])
-        #altTestRoute.append(systemsDict['Utgaroar'])
-        #altTestRoute.append(systemsDict['Quechua'])
-        #altTestRoute.append(systemsDict['Belalans'])
-        #altTestRoute.append(systemsDict['Aerial'])
-        #altTestRoute.append(systemsDict['Jaroua'])
-        #altTestRoute.append(systemsDict['Irukama'])
-        #altTestRoute.append(systemsDict['Karsuki Ti'])
-        #altTestRoute.append(systemsDict['Goman'])
-        #altTestRoute.append(systemsDict['Eshu'])
-        #altTestRoute.append(systemsDict['Rapa Bao'])
-        #altTestRoute.append(systemsDict['Wuthielo Ku'])
-        #altTestRoute.append(systemsDict['Kamitra'])
-        #altTestRoute.append(systemsDict['Delta Phoenicis'])
-        #altTestRoute.append(systemsDict['Coquim'])
-        #altTestRoute.append(systemsDict['Phiagre'])
-        #altTestRoute.append(systemsDict['HR 7221'])
-        #altTestRoute.append(systemsDict["Baltah'Sine"])
-        #altTestRoute.append(systemsDict['CD-75 661'])	
-        ##print(EDRareRoute(altTestRoute,fitType))
-        ##EDRareRoute(altTestRoute,fitType).DrawRoute()
+        altTestRoute = []
+        altTestRoute.append(systemsDict['Shinrarta Dezhra'])
+        altTestRoute.append(systemsDict['Leesti'])
+        altTestRoute.append(systemsDict['Diso'])
+        altTestRoute.append(systemsDict['Uszaa'])
+        altTestRoute.append(systemsDict['Orrere'])
+        altTestRoute.append(systemsDict['Lave'])
+        altTestRoute.append(systemsDict['Zaonce'])
+        altTestRoute.append(systemsDict['Sanuma'])
+        altTestRoute.append(systemsDict['Toxandji'])
+        altTestRoute.append(systemsDict['Any Na'])
+        altTestRoute.append(systemsDict['Arouca'])
+        altTestRoute.append(systemsDict['Deuringas'])
+        altTestRoute.append(systemsDict['Neritus'])
+        altTestRoute.append(systemsDict['AZ Cancri'])
+        altTestRoute.append(systemsDict['Eranin'])
+        altTestRoute.append(systemsDict['Ethgreze'])
+        altTestRoute.append(systemsDict['Rusani'])
+        altTestRoute.append(systemsDict['Damna'])
+        altTestRoute.append(systemsDict['Volkhab'])
+        altTestRoute.append(systemsDict['Alacarakmo'])
+        altTestRoute.append(systemsDict['Rajukru'])
+        altTestRoute.append(systemsDict['Kongga'])
+        altTestRoute.append(systemsDict['Esuseku'])
+        altTestRoute.append(systemsDict['Ochoeng'])
+        altTestRoute.append(systemsDict['Karetii'])
+        altTestRoute.append(systemsDict['Heike'])
+        altTestRoute.append(systemsDict['Helvetitj'])
+        altTestRoute.append(systemsDict['Eleu'])
+        altTestRoute.append(systemsDict['Kinago'])
+        altTestRoute.append(systemsDict['Vanayequi'])
+        altTestRoute.append(systemsDict['Kamorin'])
+        altTestRoute.append(systemsDict['Kachirigin'])
+        altTestRoute.append(systemsDict['Nguna'])
+        altTestRoute.append(systemsDict['HIP 10175'])
+        altTestRoute.append(systemsDict['Momus Reach'])
+        #altTestRoute.append(systemsDict['Wolf 1301'])
+        altTestRoute.append(systemsDict['Witchhaul'])
+        altTestRoute.append(systemsDict['Fujin'])
+        altTestRoute.append(systemsDict['39 Tauri'])
+        altTestRoute.append(systemsDict['Hecate'])
+        altTestRoute.append(systemsDict['Bast'])
+        altTestRoute.append(systemsDict['Zeessze'])
+        altTestRoute.append(systemsDict['George Pantazis'])
+        altTestRoute.append(systemsDict['Epsilon Indi'])
+        altTestRoute.append(systemsDict['Altair'])
+        altTestRoute.append(systemsDict['Xihe'])
+        altTestRoute.append(systemsDict['Tiolce'])
+        altTestRoute.append(systemsDict['Chi Eridani'])
+        altTestRoute.append(systemsDict['Tanmark'])
+        altTestRoute.append(systemsDict['Tarach Tor'])
+        altTestRoute.append(systemsDict['Utgaroar'])
+        altTestRoute.append(systemsDict['Quechua'])
+        altTestRoute.append(systemsDict['Belalans'])
+        altTestRoute.append(systemsDict['Aerial'])
+        altTestRoute.append(systemsDict['Jaroua'])
+        altTestRoute.append(systemsDict['Irukama'])
+        altTestRoute.append(systemsDict['Karsuki Ti'])
+        altTestRoute.append(systemsDict['Goman'])
+        altTestRoute.append(systemsDict['Eshu'])
+        altTestRoute.append(systemsDict['Rapa Bao'])
+        altTestRoute.append(systemsDict['Wuthielo Ku'])
+        altTestRoute.append(systemsDict['Kamitra'])
+        altTestRoute.append(systemsDict['Delta Phoenicis'])
+        altTestRoute.append(systemsDict['Coquim'])
+        altTestRoute.append(systemsDict['Phiagre'])
+        altTestRoute.append(systemsDict['HR 7221'])
+        altTestRoute.append(systemsDict["Baltah'Sine"])
+        altTestRoute.append(systemsDict['CD-75 661'])	
+        #print(EDRareRoute(altTestRoute,fitType))
+        #EDRareRoute(altTestRoute,fitType).DrawRoute()
         
 #------------------------------------------------------------------------------
 ###############################################################################
