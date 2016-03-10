@@ -10,9 +10,9 @@ class RouteType(Enum):
     Cluster = 1
     Spread = 2
     FirstOver = 3
-    LongFirstOver = 4
+    FirstOverLong = 4
     Farthest = 5
-    LongFarthest = 6
+    FarthestLong = 6
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class EDRareRoute(object):
         if fType == FitnessType.FirstOver:
             self.__Fitness_Value = self.__CalcFitnessAlt()
         elif fType == FitnessType.Farthest:
-            self.__Fitness_Value = self.__BreakingFitnessAgain()
+            self.__Fitness_Value = self.__CalcFitnessFarthest()
         else:
             self.__Fitness_Value = self.__CalcFitness()
 #------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ class EDRareRoute(object):
             
             if jumpDistance > longJumpDistance:
                 overLongJump = True
-                self.__Route_Type = RouteType.LongFirstOver
+                self.__Route_Type = RouteType.FirstOverLong
             self.__Total_Distance += jumpDistance
 
         self.__Longest_Jump = longestJump
@@ -507,7 +507,7 @@ class EDRareRoute(object):
 
         return ''.join(strList)
 #------------------------------------------------------------------------------
-    def __BreakingFitnessAgain(self):
+    def __CalcFitnessFarthest(self):
         '''
         Like alt fitness except farthest
         '''
@@ -528,7 +528,7 @@ class EDRareRoute(object):
             
             if jumpDistance > longJumpDistance:
                 overLongJump = True
-                self.__Route_Type = RouteType.LongFarthest
+                self.__Route_Type = RouteType.FarthestLong
             self.__Total_Distance += jumpDistance
 
         self.__Longest_Jump = longestJump
@@ -556,6 +556,11 @@ class EDRareRoute(object):
                 numUnsellable += 1
             else:
                 systemsBySeller[seller].extend([system])
+
+        sellersDifference = 999
+
+            
+        
         sellerScale = ((routeLength-numUnsellable)/routeLength)
         sellersValue = baseValue * sellerScale
         if sellersValue == 0:
@@ -586,6 +591,9 @@ class EDRareRoute(object):
                 if set(sold) == set(self.__Route):
                     break
             self.__Max_Cargo = maxCargo
+            mostSellers = max((systems.__len__() for sellers,systems in systemsBySeller.items()))
+            leastSellers = min((systems.__len__() for sellers,systems in systemsBySeller.items()))
+            sellersDifference = mostSellers - leastSellers
         else:
             sellersValue = sellersValue * 0.25
         
@@ -605,6 +613,12 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.5
         if sellersValue < baseValue/2:
             totalValue = totalValue * 0.25
+        
+        #TODO: Temp to try to get rid of high cargo values
+        if maxCargo > 80:
+            totalValue = totalValue * 0.5
+        if sellersDifference > 3:
+            totalValue = totalValue * 0.5
 
         if longestJump > maxJumpDistance:
             totalValue = totalValue * 0.45
