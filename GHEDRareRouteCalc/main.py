@@ -97,7 +97,7 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
                 print("No good route found".format(bestRoute.GetFitValue()))
             print(bestRoute)
             print("Generations: {0}".format(routeTuple[1]))
-            print("Time: {0}s".format((geneticEnd-geneticStart)))
+            print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
             bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
 def __TryFloat(val: str) -> bool:
@@ -195,18 +195,19 @@ if __name__ == '__main__':
     '''
     TODO: Allow users to enter the values for length/station distance.
     '''
-    maxStationDistance = 700
+    maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
+    length = 12
     popSize = 300
     
-    #__RunGenetic(commonSystems,length,popSize,fitType=FitnessType.Farthest,silent=False,stopShort=True)
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
-    PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
-    PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-    PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
 
     #PerformanceCalc.TestSystems(systemsDict,FitnessType.Farthest)
 
-    #fullRoute = EDRareRoute(systemsSubset,FitnessType.FirstOver)
+    #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+    #print(fullRoute)
     #fullRoute.DrawRoute()

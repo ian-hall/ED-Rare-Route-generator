@@ -11,7 +11,7 @@ class PerformanceCalc(object):
         maxTests = 20
 
         minPopSize = 300
-        maxPopSize = 350
+        maxPopSize = 300
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 

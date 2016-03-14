@@ -225,8 +225,10 @@ class EDRareRoute(object):
         Based on selling to the first system next on the route over the __Seller_Min distance
         Also a lot faster than the original __CalcFitness.
         '''
-        #TODO: Maybe force leesti/lave/diso/uszaa/orerrere to all be together in a route if more than 2 show up
-        #       and the route is long enough, probably do this in the main mutate method
+        #TODO:  Maybe force leesti/lave/diso/uszaa/orerrere to all be together in a route if more than 2 show up
+        #           and the route is long enough, probably do this in the main mutate method
+        #       Do something like sellersDifference from FitFarthest to nudge routes towards a max cargo value
+        #
         #       So like, if route is [1,2,3,4,5,6,7] and say {2: 4,6; 3: 1,7; 4: 2,6; 6: 4,2; 7:3,5}
         #       It would be: JUMP       SOLD                UNSOLD
         #                    1                              1
@@ -276,6 +278,7 @@ class EDRareRoute(object):
         #Skip this part if we already know we can't sell all goods
         #maxSellersWaiting = -1
         maxCargo = 0
+        sellersDifference = None
         if sellersValue >= baseValue:
             #sellersUsed = []
             sold = []
@@ -305,6 +308,9 @@ class EDRareRoute(object):
                 for sys in toRemove:
                     unsold.remove(sys)
                 if set(sold) == set(self.__Route):
+                    mostSellers = max((systems.__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    leastSellers = min((systems.__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    sellersDifference = mostSellers - leastSellers
                     break
         else:
             #Scale overall value down
@@ -336,7 +342,9 @@ class EDRareRoute(object):
         
         #TODO: scale this based off some set cargo amount that increases for longer routes
         if maxCargo > 80:
-            totalValue = totalValue * 1
+            totalValue = totalValue * (80/maxCargo)
+        if sellersDifference is not None:
+            totalValue = (totalValue * 0.5 ) if (sellersDifference > 2) else totalValue
         
         self.__Max_Cargo = maxCargo
         return totalValue
@@ -591,8 +599,8 @@ class EDRareRoute(object):
                 if set(sold) == set(self.__Route):
                     break
             self.__Max_Cargo = maxCargo
-            mostSellers = max((systems.__len__() for sellers,systems in systemsBySeller.items()))
-            leastSellers = min((systems.__len__() for sellers,systems in systemsBySeller.items()))
+            mostSellers = max((systems.__len__() for seller,systems in systemsBySeller.items() if systems.__len__() > 0))
+            leastSellers = min((systems.__len__() for seller,systems in systemsBySeller.items() if systems.__len__() > 0))
             sellersDifference = mostSellers - leastSellers
         else:
             sellersValue = sellersValue * 0.25
@@ -615,10 +623,10 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.25
         
         #TODO: Temp to try to get rid of high cargo values
+        if sellersDifference > 2:
+            totalValue = totalValue * .5
         if maxCargo > 80:
-            totalValue = totalValue * 0.5
-        if sellersDifference > 3:
-            totalValue = totalValue * 0.5
+            totalValue = totalValue * (80/maxCargo)
 
         if longestJump > maxJumpDistance:
             totalValue = totalValue * 0.45
