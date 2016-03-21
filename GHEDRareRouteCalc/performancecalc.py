@@ -68,8 +68,8 @@ class PerformanceCalc(object):
         print("\n\nYK Loop")
         ykLoop = EDRareRoute(ykLoopList,fitType)
         print(ykLoop)
-        ykLoop.DrawRoute()
         ykLoop.TestDrawing()
+        
 
         good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
         print(good5Route)

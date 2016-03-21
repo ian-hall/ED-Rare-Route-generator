@@ -636,16 +636,18 @@ class EDRareRoute(object):
 
         return ''.join(strList)
 #------------------------------------------------------------------------------
-    def TestDrawing(self):
+    def TestDrawing(self,showLines:bool):
         import tkinter
+
+        routeLength = self.__Route.__len__()
 
         cWidth = 900
         cHeight = 600
         ovalRad = 5
-        border = 40
+        border = 20
 
-        maxCols = cWidth - border
-        maxRows = cHeight - border
+        maxCols = cWidth - (2*border)
+        maxRows = cHeight - (2*border)
 
         xVals = [system.Location['x'] for system in self.__Route]
         yVals = [system.Location['y'] for system in self.__Route]
@@ -655,12 +657,12 @@ class EDRareRoute(object):
         yMin = min(yVals)
         zMin = min(zVals)
 
-        if xMin < 0:
-            xValsNew = [abs(xMin) + val for val in xVals]
+        if xMin < border:
+            xValsNew = [abs(xMin) + val + border for val in xVals]
         else:
             xValsNew = [val - xMin for val in xVals]
-        if yMin < 0:
-            yValsNew = [abs(yMin) + val for val in yVals]
+        if yMin < border:
+            yValsNew = [abs(yMin) + val + border for val in yVals]
         else:
             yValsNew = [val - yMin for val in yVals]
 
@@ -679,21 +681,22 @@ class EDRareRoute(object):
                     xValsNew[i] = maxCols
                 else:
                     xValsNew[i] = round((maxCols / xMax) * xValsNew[i])
-            #else:
-                #xValsNew[i] = border/2 + ovalRad
+            else:
+                xValsNew[i] = border
             if yValsNew[i] != 0:
                 if yValsNew[i] == yMax:
                     yValsNew[i] = maxRows
                 else:
                     yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
-            #else:
-                #yValsNew[i] = border/2 + ovalRad
+            else:
+                yValsNew[i] = border
             #points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
 
         xMax = max(xValsNew)
         yMax = max(yValsNew)
         #xValsNew = [xMax - val for val in xValsNew]
-        yValsNew = [yMax - val for val in yValsNew]
+        #flip yvals around and add border size to all
+        yValsNew = [(yMax - val) + border for val in yValsNew]
 
         for i in range(xValsNew.__len__()):
             points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
@@ -727,14 +730,28 @@ class EDRareRoute(object):
                         print("Unable to draw route")
                         return
 
+        zValsNew = [val + abs(zMin) for val in zVals]
+        zMax = max(zValsNew)
+        fillColors = ["#000000", "#543357", "#643D67", "#8F5894", "#C6A5C9"]
+        colorStep = zMax / (fillColors.__len__())
+
+        #for val in zValsNew:
+        #    print(int(val//colorStep))
 
         root = tkinter.Tk()
         canvas = tkinter.Canvas(root,width=cWidth,height=cHeight)
 
         for point in points:
-            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill="#000000")
+            colorIndex = int((point.Depth + abs(zMin))//colorStep)
+            if colorIndex >= fillColors.__len__():
+                colorIndex = fillColors.__len__() - 1;
+            fill = fillColors[colorIndex]
+            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill)
+
+        if showLines:
+            for i in range(points.__len__() + 1):
+                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row)
         canvas.pack(fill=tkinter.BOTH)
-        
         
         
         
