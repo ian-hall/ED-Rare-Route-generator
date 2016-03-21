@@ -308,9 +308,10 @@ class EDRareRoute(object):
                 for sys in toRemove:
                     unsold.remove(sys)
                 if set(sold) == set(self.__Route):
-                    mostSellers = max((systems.__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
-                    leastSellers = min((systems.__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
-                    sellersDifference = mostSellers - leastSellers
+                    #this is slowing stuff down a bit maybe
+                    #mostSellers = max((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    #leastSellers = min((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    #sellersDifference = mostSellers - leastSellers
                     break
         else:
             #Scale overall value down
@@ -319,7 +320,7 @@ class EDRareRoute(object):
         maxGoodDistance = routeLength * longJumpDistance
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
-        minSupply = routeLength * 12
+        minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
         avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
@@ -343,10 +344,130 @@ class EDRareRoute(object):
         #TODO: scale this based off some set cargo amount that increases for longer routes
         if maxCargo > 80:
             totalValue = totalValue * (80/maxCargo)
-        if sellersDifference is not None:
-            totalValue = (totalValue * 0.5 ) if (sellersDifference > 2) else totalValue
+        #TODO: Scale here, larger allowance for sellersDifference on longer routes.... maybe like ceil(len/5) or something  with a min of 1? 
+        #if sellersDifference is not None:
+        #    totalValue = (totalValue * 0.5 ) if (sellersDifference > 3) else totalValue
         
         self.__Max_Cargo = maxCargo
+        return totalValue
+#------------------------------------------------------------------------------
+    def __CalcFitnessFarthest(self):
+        '''
+        Like alt fitness except farthest
+        '''
+        #TODO:  Need to add a hard limit on number of sellers per station, cargo req are too close to max cargo, meaning like no ships can do these routes
+        #       Maybe back to evensplit style again, with roughly even number of systems to a seller but no seller limit
+        routeLength = self.__Route.__len__()
+        self.__Route_Type = RouteType.Farthest
+        longJumpDistance = 135
+        maxJumpDistance = 200
+        longestJump = -1
+        overLongJump = False
+        for i in range(0,routeLength):
+            currentSystem = self.__Route[i]
+            nextSystem = self.__Route[(i+1)%routeLength]
+            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            if jumpDistance > longestJump:
+                longestJump = jumpDistance
+            
+            if jumpDistance > longJumpDistance:
+                overLongJump = True
+                self.__Route_Type = RouteType.FarthestLong
+            self.__Total_Distance += jumpDistance
+
+        self.__Longest_Jump = longestJump
+
+        farthestSystems = {}
+        for seller in self.__Route:
+            farthestSystems[seller] = None
+            for system in self.__Route:
+                distToSystem = seller.System_Distances[system.Index]
+                if distToSystem > self.__Seller_Min:
+                    if farthestSystems[seller] is None:
+                        farthestSystems[seller] = system
+                    else:
+                        currentFarthest = seller.System_Distances[farthestSystems[seller].Index]
+                        if distToSystem > currentFarthest:
+                            farthestSystems[seller] = system
+
+        systemsBySeller = defaultdict(list)
+
+        baseValue = 6
+        fitnessScale = 1
+        numUnsellable = 0
+        for system,seller in farthestSystems.items():
+            if seller is None:
+                numUnsellable += 1
+            else:
+                systemsBySeller[seller].extend([system])
+
+        sellersDifference = 999
+
+            
+        
+        sellerScale = ((routeLength-numUnsellable)/routeLength)
+        sellersValue = baseValue * sellerScale
+        if sellersValue == 0:
+            return 0.01
+        maxCargo = 0
+        if sellerScale >= 1:
+            sold = []
+            unsold = []
+            for i in range(routeLength*2):
+                currentSys = self.__Route[i%routeLength];
+                unsold.append(currentSys)
+                toRemove = []
+                numUnsold = 0
+                for checkSys in unsold:
+                    #Means we can sell checkSys at currentSys
+                    sellableSystems = systemsBySeller[currentSys]
+                    if systemsBySeller[currentSys].count(checkSys) != 0:
+                        toRemove.append(checkSys)
+                        sold.append(checkSys)
+                    numUnsold += 1
+                if toRemove.__len__() != 0:
+                    maxCargo = max(maxCargo,sum((sys.Max_Supply for sys in unsold[:-1])))
+                    if self.__Sellers_Dict == None:
+                        self.__Sellers_Dict = defaultdict(list)
+                    self.__Sellers_Dict[currentSys].extend(toRemove)
+                for sys in toRemove:
+                    unsold.remove(sys)
+                if set(sold) == set(self.__Route):
+                    break
+            self.__Max_Cargo = maxCargo
+            mostSellers = max((systems.__len__() for seller,systems in systemsBySeller.items() if systems.__len__() > 0))
+            leastSellers = min((systems.__len__() for seller,systems in systemsBySeller.items() if systems.__len__() > 0))
+            sellersDifference = mostSellers - leastSellers
+        else:
+            sellersValue = sellersValue * 0.25
+        
+            
+        maxGoodDistance = routeLength * 100
+        weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
+        
+        minSupply = routeLength * 12
+        weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
+  
+        avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
+        weightedCost = math.log(avgCost,1000)
+
+        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
+        
+        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
+            totalValue = totalValue * 0.5
+        if sellersValue < baseValue/2:
+            totalValue = totalValue * 0.25
+        
+        #TODO: Temp to try to get rid of high cargo values
+        if sellersDifference > 1:
+            totalValue = totalValue * .5
+        if maxCargo > 80:
+            totalValue = totalValue * (80/maxCargo)
+
+        if longestJump > maxJumpDistance:
+            totalValue = totalValue * 0.45
+        
+        
         return totalValue
 #------------------------------------------------------------------------------
     #Draws the route
@@ -515,121 +636,19 @@ class EDRareRoute(object):
 
         return ''.join(strList)
 #------------------------------------------------------------------------------
-    def __CalcFitnessFarthest(self):
-        '''
-        Like alt fitness except farthest
-        '''
-        #TODO:  Need to add a hard limit on number of sellers per station, cargo req are too close to max cargo, meaning like no ships can do these routes
-        #       Maybe back to evensplit style again, with roughly even number of systems to a seller but no seller limit
-        routeLength = self.__Route.__len__()
-        self.__Route_Type = RouteType.Farthest
-        longJumpDistance = 135
-        maxJumpDistance = 200
-        longestJump = -1
-        overLongJump = False
-        for i in range(0,routeLength):
-            currentSystem = self.__Route[i]
-            nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
-            if jumpDistance > longestJump:
-                longestJump = jumpDistance
-            
-            if jumpDistance > longJumpDistance:
-                overLongJump = True
-                self.__Route_Type = RouteType.FarthestLong
-            self.__Total_Distance += jumpDistance
+    def TestDrawing(self):
+        import tkinter
 
-        self.__Longest_Jump = longestJump
+        cWidth = 300
+        cHeight = 300
+        ovalRad = 10
 
-        farthestSystems = {}
-        for seller in self.__Route:
-            farthestSystems[seller] = None
-            for system in self.__Route:
-                distToSystem = seller.System_Distances[system.Index]
-                if distToSystem > self.__Seller_Min:
-                    if farthestSystems[seller] is None:
-                        farthestSystems[seller] = system
-                    else:
-                        currentFarthest = seller.System_Distances[farthestSystems[seller].Index]
-                        if distToSystem > currentFarthest:
-                            farthestSystems[seller] = system
-
-        systemsBySeller = defaultdict(list)
-
-        baseValue = 6
-        fitnessScale = 1
-        numUnsellable = 0
-        for system,seller in farthestSystems.items():
-            if seller is None:
-                numUnsellable += 1
-            else:
-                systemsBySeller[seller].extend([system])
-
-        sellersDifference = 999
-
-            
-        
-        sellerScale = ((routeLength-numUnsellable)/routeLength)
-        sellersValue = baseValue * sellerScale
-        if sellersValue == 0:
-            return 0.01
-        maxCargo = 0
-        if sellerScale >= 1:
-            sold = []
-            unsold = []
-            for i in range(routeLength*2):
-                currentSys = self.__Route[i%routeLength];
-                unsold.append(currentSys)
-                toRemove = []
-                numUnsold = 0
-                for checkSys in unsold:
-                    #Means we can sell checkSys at currentSys
-                    sellableSystems = systemsBySeller[currentSys]
-                    if systemsBySeller[currentSys].count(checkSys) != 0:
-                        toRemove.append(checkSys)
-                        sold.append(checkSys)
-                    numUnsold += 1
-                if toRemove.__len__() != 0:
-                    maxCargo = max(maxCargo,sum((sys.Max_Supply for sys in unsold[:-1])))
-                    if self.__Sellers_Dict == None:
-                        self.__Sellers_Dict = defaultdict(list)
-                    self.__Sellers_Dict[currentSys].extend(toRemove)
-                for sys in toRemove:
-                    unsold.remove(sys)
-                if set(sold) == set(self.__Route):
-                    break
-            self.__Max_Cargo = maxCargo
-            mostSellers = max((systems.__len__() for seller,systems in systemsBySeller.items() if systems.__len__() > 0))
-            leastSellers = min((systems.__len__() for seller,systems in systemsBySeller.items() if systems.__len__() > 0))
-            sellersDifference = mostSellers - leastSellers
-        else:
-            sellersValue = sellersValue * 0.25
-        
-            
-        maxGoodDistance = routeLength * 100
-        weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
-        
-        minSupply = routeLength * 12
-        weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
-  
-        avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
-        weightedCost = math.log(avgCost,1000)
-
-        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
-        
-        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
-            totalValue = totalValue * 0.5
-        if sellersValue < baseValue/2:
-            totalValue = totalValue * 0.25
-        
-        #TODO: Temp to try to get rid of high cargo values
-        if sellersDifference > 2:
-            totalValue = totalValue * .5
-        if maxCargo > 80:
-            totalValue = totalValue * (80/maxCargo)
-
-        if longestJump > maxJumpDistance:
-            totalValue = totalValue * 0.45
+        root = tkinter.Tk()
+        canvas = tkinter.Canvas(root,width=cWidth,height=cHeight)
+        canvas.create_oval(cWidth/2 - ovalRad,cHeight/2 - ovalRad,cWidth/2 + ovalRad,cHeight/2 + ovalRad, fill="#000000")
+        canvas.pack(fill=tkinter.BOTH)
         
         
-        return totalValue
+        
+        
+        root.mainloop()

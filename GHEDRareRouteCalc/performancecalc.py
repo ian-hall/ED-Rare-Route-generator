@@ -193,9 +193,10 @@ class PerformanceCalc(object):
         altTestRoute.append(systemsDict['Phiagre'])
         altTestRoute.append(systemsDict['HR 7221'])
         altTestRoute.append(systemsDict["Baltah'Sine"])
-        altTestRoute.append(systemsDict['CD-75 661'])	
-        #print(EDRareRoute(altTestRoute,fitType))
-        #EDRareRoute(altTestRoute,fitType).DrawRoute()
+        altTestRoute.append(systemsDict['CD-75 661'])
+        #bigRoute = EDRareRoute(altTestRoute,fitType)	
+        #print(bigRoute)
+        #bigRoute.DrawRoute()
         
 #------------------------------------------------------------------------------
 ###############################################################################

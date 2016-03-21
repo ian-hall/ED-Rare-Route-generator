@@ -197,17 +197,18 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 12
+    length = 21
     popSize = 300
     
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    #__RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
 
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.Farthest)
+    #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
-    #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
-    #print(fullRoute)
-    #fullRoute.DrawRoute()
+    fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+    print(fullRoute)
+    fullRoute.DrawRoute()
+    fullRoute.TestDrawing()
