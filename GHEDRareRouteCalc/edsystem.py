@@ -53,9 +53,10 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
 class DisplayLocation(object):
 #------------------------------------------------------------------------------
-    def __init__(self, row, col, name = ""):
+    def __init__(self, row, col, depth = 0, name = ""):
         self.Row = row
         self.Col = col
+        self.Depth = depth
         self.System_Name = name
 #------------------------------------------------------------------------------
     def __eq__(self, other):

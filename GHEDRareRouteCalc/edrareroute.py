@@ -639,13 +639,100 @@ class EDRareRoute(object):
     def TestDrawing(self):
         import tkinter
 
-        cWidth = 300
-        cHeight = 300
-        ovalRad = 10
+        cWidth = 900
+        cHeight = 600
+        ovalRad = 5
+        border = 40
+
+        maxCols = cWidth - border
+        maxRows = cHeight - border
+
+        xVals = [system.Location['x'] for system in self.__Route]
+        yVals = [system.Location['y'] for system in self.__Route]
+        zVals = [system.Location['z'] for system in self.__Route]
+
+        xMin = min(xVals)
+        yMin = min(yVals)
+        zMin = min(zVals)
+
+        if xMin < 0:
+            xValsNew = [abs(xMin) + val for val in xVals]
+        else:
+            xValsNew = [val - xMin for val in xVals]
+        if yMin < 0:
+            yValsNew = [abs(yMin) + val for val in yVals]
+        else:
+            yValsNew = [val - yMin for val in yVals]
+
+        xMax = max(xValsNew)
+        yMax = max(yValsNew)
+        zMax = max(zVals)
+        points = []
+
+        if xMax == 0 or yMax == 0:
+            print("Unable to draw route")
+            return
+
+        for i in range(xValsNew.__len__()):
+            if xValsNew[i] != 0:
+                if xValsNew[i] == xMax:
+                    xValsNew[i] = maxCols
+                else:
+                    xValsNew[i] = round((maxCols / xMax) * xValsNew[i])
+            #else:
+                #xValsNew[i] = border/2 + ovalRad
+            if yValsNew[i] != 0:
+                if yValsNew[i] == yMax:
+                    yValsNew[i] = maxRows
+                else:
+                    yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
+            #else:
+                #yValsNew[i] = border/2 + ovalRad
+            #points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
+
+        xMax = max(xValsNew)
+        yMax = max(yValsNew)
+        #xValsNew = [xMax - val for val in xValsNew]
+        yValsNew = [yMax - val for val in yValsNew]
+
+        for i in range(xValsNew.__len__()):
+            points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
+
+
+        pointsCounter = Counter(points)
+        split = 10
+        loops = 0
+        while sum([v for k,v in pointsCounter.items() if v == 1]) != points.__len__():
+            for k,v in pointsCounter.items():
+                if v > 1:
+                    toChange = points.index(k)
+                    if loops%split == split-1:
+                        if points[toChange].Row + 1 < maxRows:
+                            points[toChange].Row += 1
+                        else:
+                            points[toChange].Row -= 1
+                    else:
+                        if points[toChange].Col + 1 < maxCols:
+                            points[toChange].Col += 1
+                        else:
+                            points[toChange].Col -= 1
+
+            loops += 1
+            pointsCounter = Counter(points)
+
+        for i in range(points.__len__()):
+            for j in range(points.__len__()):
+                if i != j:
+                    if points[i] == points[j]:
+                        print("Unable to draw route")
+                        return
+
 
         root = tkinter.Tk()
         canvas = tkinter.Canvas(root,width=cWidth,height=cHeight)
-        canvas.create_oval(cWidth/2 - ovalRad,cHeight/2 - ovalRad,cWidth/2 + ovalRad,cHeight/2 + ovalRad, fill="#000000")
+
+        for point in points:
+            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill="#000000")
         canvas.pack(fill=tkinter.BOTH)
         
         
