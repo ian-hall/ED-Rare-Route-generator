@@ -642,6 +642,7 @@ class EDRareRoute(object):
         '''
         Draws the route using tkinter
         '''
+        #TODO: Better way to display system names/info. Currently the arrows at the end of the lines "block" the mouse event to display the system info
         import tkinter
 
         routeLength = self.__Route.__len__()
@@ -744,20 +745,39 @@ class EDRareRoute(object):
         #    print(int(val//colorStep))
 
         root = tkinter.Tk()
-        canvas = tkinter.Canvas(root,width=cWidth,height=cHeight)
+        bgColor = "#666666"
+        systemLabel = tkinter.Label(root)
+        systemLabel.pack(fill=tkinter.BOTH)
+
+        #def enterPoint(event):
+        #    systemLabel.config(text="on a point")
+        def leavePoint(event):
+            systemLabel.config(text="")
+
+        #systemLabel.bind("<Enter>", enterPoint)
+        #systemLabel.bind("<Leave>", leavePoint)
+
+        canvas = tkinter.Canvas(root,width=cWidth,height=cHeight,bg=bgColor)
 
         for point in points:
             colorIndex = int((point.Depth + abs(zMin))//colorStep)
             if colorIndex >= fillColors.__len__():
                 colorIndex = fillColors.__len__() - 1;
             fill = fillColors[colorIndex]
-            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill)
+            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill, tags=point.System_Name)
+            canvas.tag_bind(point.System_Name,"<Enter>",lambda e, point=point: systemLabel.config(text=point.System_Name))
+            canvas.tag_bind(point.System_Name,"<Leave>",leavePoint)
+            #testLabel = tkinter.Label(root,height=0,width=2)
+            #testLabel.pack()
+            #testLabel.lower()
+            #testLabel.bind("<Enter>", lambda e, point=point: systemLabel.config(text=point.System_Name))
+            #testLabel.bind("<Leave>", leavePoint)
+            #testLabel.place(x=point.Col-ovalRad,y=point.Row+ovalRad)
 
         if showLines:
             for i in range(points.__len__() + 1):
-                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="last",arrowshape="14 16 7",width=2.0)
+                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="last",arrowshape="14 16 7",width=2.0)                       
         canvas.pack(fill=tkinter.BOTH)
-        
         
         root.wm_title("a route???")
         root.mainloop()

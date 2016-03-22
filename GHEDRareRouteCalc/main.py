@@ -203,7 +203,7 @@ if __name__ == '__main__':
     length = 16
     popSize = 333
     
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    #__RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
@@ -211,7 +211,7 @@ if __name__ == '__main__':
 
     #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
-    #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
-    #print(fullRoute)
-    #fullRoute.PrintRoute()
-    #fullRoute.DrawRoute(showLines=False)
+    fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+    print(fullRoute)
+    fullRoute.PrintRoute()
+    fullRoute.DrawRoute(showLines=True)
