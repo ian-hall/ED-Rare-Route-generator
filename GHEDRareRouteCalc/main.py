@@ -84,6 +84,7 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
     runNum = 0
     maxRuns = 5
     geneticStart = time.time()
+    bestRoute = None
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
         print("Run: {0}".format(runNum))
@@ -98,7 +99,9 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
             print(bestRoute)
             print("Generations: {0}".format(routeTuple[1]))
             print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
-            bestRoute.DrawRoute()
+            bestRoute.PrintRoute()
+    if bestRoute is not None:
+        bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
 def __TryFloat(val: str) -> bool:
     try:
@@ -197,10 +200,10 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 21
-    popSize = 300
+    length = 16
+    popSize = 333
     
-    #__RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
@@ -208,7 +211,7 @@ if __name__ == '__main__':
 
     #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
-    fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
-    print(fullRoute)
-    fullRoute.DrawRoute()
-    fullRoute.TestDrawing(showLines=False)
+    #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+    #print(fullRoute)
+    #fullRoute.PrintRoute()
+    #fullRoute.DrawRoute(showLines=False)

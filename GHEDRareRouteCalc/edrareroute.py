@@ -309,9 +309,9 @@ class EDRareRoute(object):
                     unsold.remove(sys)
                 if set(sold) == set(self.__Route):
                     #this is slowing stuff down a bit maybe
-                    #mostSellers = max((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
-                    #leastSellers = min((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
-                    #sellersDifference = mostSellers - leastSellers
+                    mostSellers = max((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    leastSellers = min((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    sellersDifference = mostSellers - leastSellers
                     break
         else:
             #Scale overall value down
@@ -342,11 +342,11 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.45
         
         #TODO: scale this based off some set cargo amount that increases for longer routes
-        if maxCargo > 80:
-            totalValue = totalValue * (80/maxCargo)
+        #if maxCargo > 80:
+        #    totalValue = totalValue * (80/maxCargo)
         #TODO: Scale here, larger allowance for sellersDifference on longer routes.... maybe like ceil(len/5) or something  with a min of 1? 
-        #if sellersDifference is not None:
-        #    totalValue = (totalValue * 0.5 ) if (sellersDifference > 3) else totalValue
+        if sellersDifference is not None:
+            totalValue = (totalValue * 0.5 ) if (sellersDifference > 3) else totalValue
         
         self.__Max_Cargo = maxCargo
         return totalValue
@@ -459,8 +459,8 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.25
         
         #TODO: Temp to try to get rid of high cargo values
-        if sellersDifference > 1:
-            totalValue = totalValue * .5
+        if sellersDifference > 2:
+            totalValue = totalValue * .85
         if maxCargo > 80:
             totalValue = totalValue * (80/maxCargo)
 
@@ -470,10 +470,12 @@ class EDRareRoute(object):
         
         return totalValue
 #------------------------------------------------------------------------------
-    #Draws the route
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
     #       Add a better way to represent large routes than first letter of system, too many duplicates
-    def DrawRoute(self):
+    def PrintRoute(self):
+        '''
+        prints the route with the power of the console
+        '''
         maxCols = 53
         maxRows = 20
 
@@ -636,14 +638,17 @@ class EDRareRoute(object):
 
         return ''.join(strList)
 #------------------------------------------------------------------------------
-    def TestDrawing(self,showLines:bool):
+    def DrawRoute(self,showLines=True):
+        '''
+        Draws the route using tkinter
+        '''
         import tkinter
 
         routeLength = self.__Route.__len__()
 
         cWidth = 900
         cHeight = 600
-        ovalRad = 5
+        ovalRad = 10
         border = 20
 
         maxCols = cWidth - (2*border)
@@ -730,9 +735,9 @@ class EDRareRoute(object):
                         print("Unable to draw route")
                         return
 
-        zValsNew = [val + abs(zMin) for val in zVals]
+        zValsNew = (val + abs(zMin) for val in zVals)
         zMax = max(zValsNew)
-        fillColors = ["#000000", "#543357", "#643D67", "#8F5894", "#C6A5C9"]
+        fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00","#00FF40"]
         colorStep = zMax / (fillColors.__len__())
 
         #for val in zValsNew:
@@ -750,9 +755,9 @@ class EDRareRoute(object):
 
         if showLines:
             for i in range(points.__len__() + 1):
-                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row)
+                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="last",arrowshape="14 16 7",width=2.0)
         canvas.pack(fill=tkinter.BOTH)
         
         
-        
+        root.wm_title("a route???")
         root.mainloop()

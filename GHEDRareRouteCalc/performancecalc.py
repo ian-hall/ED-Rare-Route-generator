@@ -8,7 +8,7 @@ class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
     def CheckPerformance(cls,systemsList: list,fitType: FitnessType):
-        maxTests = 20
+        maxTests = 10
 
         minPopSize = 300
         maxPopSize = 300
@@ -68,12 +68,13 @@ class PerformanceCalc(object):
         print("\n\nYK Loop")
         ykLoop = EDRareRoute(ykLoopList,fitType)
         print(ykLoop)
-        ykLoop.TestDrawing()
+        ykLoop.PrintRoute()
+        ykLoop.DrawRoute()
         
 
         good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
         print(good5Route)
-        good5Route.DrawRoute()
+        good5Route.PrintRoute()
          
         #good8_1 = []
         #good8_1.append(systemsDict['Hecate'])
@@ -124,7 +125,7 @@ class PerformanceCalc(object):
         #print("I dont even know if this route is bad or good anymore")
         #unknown11 = EDRareRoute(bad11_1,fitType)
         #print(unknown11)
-        #unknown11.DrawRoute()      
+        #unknown11.PrintRoute()      
 
         altTestRoute = []
         altTestRoute.append(systemsDict['Shinrarta Dezhra'])
@@ -197,6 +198,7 @@ class PerformanceCalc(object):
         altTestRoute.append(systemsDict['CD-75 661'])
         #bigRoute = EDRareRoute(altTestRoute,fitType)	
         #print(bigRoute)
+        #bigRoute.PrintRoute()
         #bigRoute.DrawRoute()
         
 #------------------------------------------------------------------------------
