@@ -642,7 +642,8 @@ class EDRareRoute(object):
         '''
         Draws the route using tkinter
         '''
-        #TODO: Better way to display system names/info. Currently the arrows at the end of the lines "block" the mouse event to display the system info
+        #TODO:  Better way to display system names/info. Some points aren't having the bind occur so ???
+        #       Seems like certain systems with actually I think its systems with a space in their name
         import tkinter
 
         routeLength = self.__Route.__len__()
@@ -738,6 +739,7 @@ class EDRareRoute(object):
 
         zValsNew = (val + abs(zMin) for val in zVals)
         zMax = max(zValsNew)
+        #Red -> low depth, Green -> high depth
         fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00","#00FF40"]
         colorStep = zMax / (fillColors.__len__())
 
@@ -749,34 +751,35 @@ class EDRareRoute(object):
         systemLabel = tkinter.Label(root)
         systemLabel.pack(fill=tkinter.BOTH)
 
-        #def enterPoint(event):
-        #    systemLabel.config(text="on a point")
-        def leavePoint(event):
+        def clearSystemLabel(event):
             systemLabel.config(text="")
 
-        #systemLabel.bind("<Enter>", enterPoint)
-        #systemLabel.bind("<Leave>", leavePoint)
 
         canvas = tkinter.Canvas(root,width=cWidth,height=cHeight,bg=bgColor)
 
         for point in points:
+            tag = "".join(point.System_Name.split())
             colorIndex = int((point.Depth + abs(zMin))//colorStep)
             if colorIndex >= fillColors.__len__():
                 colorIndex = fillColors.__len__() - 1;
             fill = fillColors[colorIndex]
-            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill, tags=point.System_Name)
-            canvas.tag_bind(point.System_Name,"<Enter>",lambda e, point=point: systemLabel.config(text=point.System_Name))
-            canvas.tag_bind(point.System_Name,"<Leave>",leavePoint)
-            #testLabel = tkinter.Label(root,height=0,width=2)
-            #testLabel.pack()
-            #testLabel.lower()
-            #testLabel.bind("<Enter>", lambda e, point=point: systemLabel.config(text=point.System_Name))
-            #testLabel.bind("<Leave>", leavePoint)
-            #testLabel.place(x=point.Col-ovalRad,y=point.Row+ovalRad)
+            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill, tags=tag)
+            canvas.tag_bind(tag,"<Motion>",lambda e, point=point: systemLabel.config(text=point.System_Name))
+            canvas.tag_bind(tag,"<Leave>",clearSystemLabel)
 
         if showLines:
             for i in range(points.__len__() + 1):
-                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="last",arrowshape="14 16 7",width=2.0)                       
+                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="none",arrowshape="14 16 7",width=0)  
+        def scaleCanv(event):
+            #thanks snackoverflow
+            if (event.delta > 0):
+                canvas.scale("all", event.x, event.y, 1.1, 1.1)
+            elif (event.delta < 0):
+                canvas.scale("all", event.x, event.y, 0.9, 0.9)
+            canvas.configure(scrollregion = canvas.bbox("all"))
+        canvas.bind("<MouseWheel>",lambda e: scaleCanv(e))    
+        canvas.bind("<Button-1>",lambda e: canvas.scan_mark(e.x,e.y))
+        canvas.bind("<B1-Motion>",lambda e: canvas.scan_dragto(e.x,e.y,gain=1)) 
         canvas.pack(fill=tkinter.BOTH)
         
         root.wm_title("a route???")

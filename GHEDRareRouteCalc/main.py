@@ -209,9 +209,9 @@ if __name__ == '__main__':
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
 
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
+    PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
     fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
     print(fullRoute)
     fullRoute.PrintRoute()
-    fullRoute.DrawRoute(showLines=True)
+    fullRoute.DrawRoute(showLines=False)
