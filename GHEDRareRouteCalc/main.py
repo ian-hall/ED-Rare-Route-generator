@@ -9,6 +9,7 @@ import re
 import time
 
 #------------------------------------------------------------------------------
+# TODO: When reading from google docs, system Baltah'Sine or whatever doesnt get parsed right
 def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
     '''
     0 - Max Cap
@@ -200,18 +201,18 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 16
-    popSize = 333
+    length = 25
+    popSize = 999
     
-    #__RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
 
-    PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
+    #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
-    fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
-    print(fullRoute)
-    fullRoute.PrintRoute()
-    fullRoute.DrawRoute(showLines=False)
+    #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+    #print(fullRoute)
+    #fullRoute.PrintRoute()
+    #fullRoute.DrawRoute(showLines=True)

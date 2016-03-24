@@ -201,7 +201,7 @@ class EDRareRoute(object):
         #Less total distance needs to give a higher value
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
-        minSupply = routeLength * 12
+        minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
         avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
@@ -230,17 +230,17 @@ class EDRareRoute(object):
         #       Do something like sellersDifference from FitFarthest to nudge routes towards a max cargo value
         #
         #       So like, if route is [1,2,3,4,5,6,7] and say {2: 4,6; 3: 1,7; 4: 2,6; 6: 4,2; 7:3,5}
-        #       It would be: JUMP       SOLD                UNSOLD
-        #                    1                              1
-        #                    2                              1,2
-        #                    3          1                   2,3
-        #                    4          1,2                 3,4
-        #                    5          1,2                 3,4,5
-        #                    6          1,2,4               3,5,6
-        #                    7          1,2,4,3,5           6,7
-        #                    8          1,2,4,3,5           6,7,1
-        #                    9          1,2,4,3,5,6         7,1,2
-        #                   10          1,2,4,3,5,6,7,1     2,3  *DONE*
+        #       It would be: JUMP   CURRENT    SOLD                UNSOLD
+        #                    1         1                            1
+        #                    2         2                            1,2
+        #                    3         3        1                   2,3
+        #                    4         4        1,2                 3,4
+        #                    5         5        1,2                 3,4,5
+        #                    6         6        1,2,4               3,5,6
+        #                    7         7        1,2,4,3,5           6,7
+        #                    8         1        1,2,4,3,5           6,7,1
+        #                    9         2        1,2,4,3,5,6         7,1,2
+        #                   10         3        1,2,4,3,5,6,7,1     2,3  *DONE*
         routeLength = self.__Route.__len__()
         self.__Total_Distance = 0
         self.__Route_Type = RouteType.FirstOver
@@ -279,6 +279,8 @@ class EDRareRoute(object):
         #maxSellersWaiting = -1
         maxCargo = 0
         sellersDifference = None
+        mostSellers = -1
+        leastSellers = routeLength
         if sellersValue >= baseValue:
             #sellersUsed = []
             sold = []
@@ -305,12 +307,16 @@ class EDRareRoute(object):
                     if self.__Sellers_Dict == None:
                         self.__Sellers_Dict = defaultdict(list)
                     self.__Sellers_Dict[currentSys].extend(toRemove)
+                numSold = 0
                 for sys in toRemove:
                     unsold.remove(sys)
+                    numSold = numSold + 1
+                mostSellers = max(mostSellers,numSold)
+                leastSellers = min(leastSellers,numSold)
                 if set(sold) == set(self.__Route):
                     #this is slowing stuff down a bit maybe
-                    mostSellers = max((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
-                    leastSellers = min((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    #mostSellers = max((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
+                    #leastSellers = min((set(systems).__len__() for seller,systems in self.__Sellers_Dict.items() if systems.__len__() > 0))
                     sellersDifference = mostSellers - leastSellers
                     break
         else:
@@ -346,7 +352,7 @@ class EDRareRoute(object):
         #    totalValue = totalValue * (80/maxCargo)
         #TODO: Scale here, larger allowance for sellersDifference on longer routes.... maybe like ceil(len/5) or something  with a min of 1? 
         if sellersDifference is not None:
-            totalValue = (totalValue * 0.5 ) if (sellersDifference > 3) else totalValue
+            totalValue = (totalValue * 0.5 ) if (sellersDifference > 4) else totalValue
         
         self.__Max_Cargo = maxCargo
         return totalValue
@@ -445,7 +451,7 @@ class EDRareRoute(object):
         maxGoodDistance = routeLength * 100
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
-        minSupply = routeLength * 12
+        minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
         avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
@@ -638,12 +644,13 @@ class EDRareRoute(object):
 
         return ''.join(strList)
 #------------------------------------------------------------------------------
-    def DrawRoute(self,showLines=True):
+    def DrawRoute(self,showLines:bool=True):
         '''
         Draws the route using tkinter
         '''
-        #TODO:  Better way to display system names/info. Some points aren't having the bind occur so ???
-        #       Seems like certain systems with actually I think its systems with a space in their name
+        #TODO:  Find why zoom jumps all over the place
+        #       Display more useful info on the systems
+        #           Like pos in route, item supply/cost, station name, station distance
         import tkinter
 
         routeLength = self.__Route.__len__()
@@ -712,6 +719,7 @@ class EDRareRoute(object):
         pointsCounter = Counter(points)
         split = 10
         loops = 0
+        #TODO: Maybe have this shuffle based on ovalRad so we dont have overlapping ovals
         while sum([v for k,v in pointsCounter.items() if v == 1]) != points.__len__():
             for k,v in pointsCounter.items():
                 if v > 1:
@@ -737,14 +745,14 @@ class EDRareRoute(object):
                         print("Unable to draw route")
                         return
 
-        zValsNew = (val + abs(zMin) for val in zVals)
+        zValsNew = [val + abs(zMin) for val in zVals]
         zMax = max(zValsNew)
         #Red -> low depth, Green -> high depth
-        fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00","#00FF40"]
-        colorStep = zMax / (fillColors.__len__())
+        fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00", "#00FF40"]
+        colorStep = (zMax / (fillColors.__len__())) + 0.1
 
         #for val in zValsNew:
-        #    print(int(val//colorStep))
+        #    print(val//colorStep)
 
         root = tkinter.Tk()
         bgColor = "#666666"
@@ -760,8 +768,8 @@ class EDRareRoute(object):
         for point in points:
             tag = "".join(point.System_Name.split())
             colorIndex = int((point.Depth + abs(zMin))//colorStep)
-            if colorIndex >= fillColors.__len__():
-                colorIndex = fillColors.__len__() - 1;
+            #if colorIndex >= fillColors.__len__():
+            #    colorIndex = fillColors.__len__() - 1;
             fill = fillColors[colorIndex]
             canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill, tags=tag)
             canvas.tag_bind(tag,"<Motion>",lambda e, point=point: systemLabel.config(text=point.System_Name))
@@ -769,13 +777,14 @@ class EDRareRoute(object):
 
         if showLines:
             for i in range(points.__len__() + 1):
-                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="none",arrowshape="14 16 7",width=0)  
+                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="last",arrowshape="10 20 10",width=2)  
         def scaleCanv(event):
             #thanks snackoverflow
+            #TODO: Make zoom zoom more better
             if (event.delta > 0):
-                canvas.scale("all", event.x, event.y, 1.1, 1.1)
+                canvas.scale("all", canvas.winfo_width()/2, canvas.winfo_height()/2, 1.1, 1.1)
             elif (event.delta < 0):
-                canvas.scale("all", event.x, event.y, 0.9, 0.9)
+                canvas.scale("all", canvas.winfo_width()/2, canvas.winfo_height()/2, 0.9, 0.9)
             canvas.configure(scrollregion = canvas.bbox("all"))
         canvas.bind("<MouseWheel>",lambda e: scaleCanv(e))    
         canvas.bind("<Button-1>",lambda e: canvas.scan_mark(e.x,e.y))
