@@ -180,67 +180,11 @@ def ReadSystems(file:str="") ->list:
 # Main starts here
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-    #cleanedCSV = []
-    #allSystems = []
-    #coordLists = {}
-    
-    #with open('RareGoods.csv') as csvFile:
-    #    reader = csv.reader(csvFile)
-    #    breakout = False
-    #    for line in reader:
-    #        for section in line:
-    #            if section == '':
-    #                breakout = True
-    #                continue
-    #            if section == 'x' or section == 'y' or section == 'z':
-    #                temp = [float(val) for val in line if __TryFloat(val)]
-    #                coordLists[section] = temp
-    #                breakout = True
-    #                break
-    #        if not breakout:
-    #            cleanedCSV.append(line)
-    #        breakout = False
-    #'''
-    #target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
-    #with request.urlopen(target_url) as csvFile:
-    #    fileToText = csvFile.read()
-    #    usableCSV = str(fileToText).split('\\n')
-    #    reader = csv.reader(usableCSV)
-    #    breakout = False
-    #    for line in reader:
-    #        for section in line:
-    #            if section == '':
-    #                breakout = True
-    #                continue
-    #            if section == 'x' or section == 'y' or section == 'z':
-    #                temp = [float(val) for val in line if __TryFloat(val)]
-    #                coordLists[section] = temp
-    #                breakout = True
-    #                break
-    #        if not breakout:
-    #            cleanedCSV.append(line)
-    #        breakout = False
-    #'''
-    #headers = cleanedCSV[0]
-    #for i in range(1,cleanedCSV.__len__()-1):
-    #    currentSystem = __ValidateLine(cleanedCSV[i],i)
-    #    '''
-    #    Putting all systems with multiple stations/rares/whatever into one EDSystem object
-    #    '''   
-    #    if allSystems.count(currentSystem) != 0:
-    #        for system in allSystems:
-    #            if system == currentSystem:
-    #                system.AddRares(currentSystem)
-    #    else:
-    #        allSystems.append(currentSystem)
     csvFile = "RareGoods.csv"
-    allSystems = ReadSystems();
+    allSystems = ReadSystems(csvFile);
 
     systemsDict = {}
     for system in allSystems:
-        #system.Location['x'] = coordLists['x'][system.Index]
-        #system.Location['y'] = coordLists['y'][system.Index]
-        #system.Location['z'] = coordLists['z'][system.Index]
         systemsDict[system.System_Name] = system
 
     commonSystems = []
@@ -268,8 +212,8 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 17
-    popSize = 555
+    length = 8
+    popSize = 200
     
     __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     

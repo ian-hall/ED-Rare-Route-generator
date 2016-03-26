@@ -39,16 +39,18 @@ class RouteCalc(object):
             print("Not enough systems for a route...")
             return
 
-        tempPopulation = []
-        for i in range(0,popSize):
-            tempSystemList = []
-            for j in range(0,routeLength):
-                tempSystem = random.choice(validSystems)                  
-                #Need to avoid duplicates
-                while tempSystemList.count(tempSystem) != 0:
-                    tempSystem = random.choice(validSystems)
-                tempSystemList.append(tempSystem)
-            population.append(EDRareRoute(tempSystemList,RouteCalc.__Fit_Type))
+        #for i in range(0,popSize):
+        #    tempSystemList = []
+        #    for j in range(0,routeLength):
+        #        tempSystem = random.choice(validSystems)                  
+        #        #Need to avoid duplicates
+        #        while tempSystemList.count(tempSystem) != 0:
+        #            tempSystem = random.choice(validSystems)
+        #        tempSystemList.append(tempSystem)
+        #    population.append(EDRareRoute(tempSystemList,RouteCalc.__Fit_Type))
+
+        for sysList in RouteCalc.GenerateSystemLists(popSize,routeLength,validSystems):
+            population.append(EDRareRoute(sysList,fitType))
 
         return cls.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
@@ -247,4 +249,40 @@ class RouteCalc(object):
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
+#------------------------------------------------------------------------------
+    @classmethod
+    def SetValidSystems(cls,systems: list):
+        cls.__Valid_Systems = systems
+#------------------------------------------------------------------------------
+    @classmethod
+    def WrapRelativeFitness(cls,population: list) -> list:
+        return cls.__CalculateRelativeFitness(population);
+#------------------------------------------------------------------------------
+    @classmethod
+    def WrapReproduce(cls,population: list, selectVals: list) -> tuple:
+        #selectVals = cls.__CalculateRelativeFitness(population)
+        return cls.__Reproduce(population,selectVals)
+#------------------------------------------------------------------------------
+    @classmethod
+    def WrapMutate(cls,route: list, validSystems: list) -> list:
+        return cls.__Mutate(route)
+#------------------------------------------------------------------------------
+    @classmethod
+    def GetSelectionMult(cls) -> float:
+        return cls.__Selection_Mult
+#------------------------------------------------------------------------------
+    @classmethod
+    def GenerateSystemLists(cls, numToCreate: int, routeLength: int, validSystems: list) -> list:
+        generatedLists = []
+        for i in range(numToCreate):
+            tempSystemList = []
+            for j in range(0,routeLength):
+                tempSystem = random.choice(validSystems)                  
+                #Need to avoid duplicates
+                while tempSystemList.count(tempSystem) != 0:
+                    tempSystem = random.choice(validSystems)
+                tempSystemList.append(tempSystem)
+            generatedLists.append(tempSystemList)
+        return generatedLists
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
