@@ -68,11 +68,9 @@ class EDRareRoute(object):
         '''
         Fitness value based on having a roughly even number of systems between sellers
         '''
-        #TODO:  Maybe scale value based on longest distance to station
-        #       Some routes come out "backwards", need to flag this 
-        #       Set up some kind of flag on worst value from supply/distance/cost
-        #       Add tracking for max cargo used
-        #       Try again without itertools combos maybe and instead do some stupid set thing that I think was slower so I changed it to this
+        #TODO:  Add tracking for max cargo used
+        #       Try again without itertools combos maybe and instead do only check values that are evenly spaced out like we want
+        #           Actually looks like I already do this because I continue if routes arent split???
         routeLength = self.__Route.__len__()
         self.__Total_Distance = 0     
        
@@ -228,6 +226,7 @@ class EDRareRoute(object):
         #TODO:  Maybe force leesti/lave/diso/uszaa/orerrere to all be together in a route if more than 2 show up
         #           and the route is long enough, probably do this in the main mutate method
         #       Do something like sellersDifference from FitFarthest to nudge routes towards a max cargo value
+        #       Add a check for the amount of jumps a system stay in before it is sold and scale if over some value
         #
         #       So like, if route is [1,2,3,4,5,6,7] and say {2: 4,6; 3: 1,7; 4: 2,6; 6: 4,2; 7:3,5}
         #       It would be: JUMP   CURRENT    SOLD                UNSOLD
