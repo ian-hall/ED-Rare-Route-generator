@@ -11,7 +11,6 @@ class RouteCalc(object):
     '''
     Route_Cutoff = 11.5
     __Selection_Mult = .25
-    __Pool_Size = 3
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
 #------------------------------------------------------------------------------
@@ -22,6 +21,7 @@ class RouteCalc(object):
         Population is a list of EDRareRoutes
         '''
         #TODO: Eventually add something here that calculates popSize based on route length
+        #       Add a min pop size of ... 3
         RouteCalc.__Fit_Type = fitType
         if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
             if routeLength < 3 or routeLength > 15:
@@ -29,6 +29,9 @@ class RouteCalc(object):
         else:
             if routeLength < 6 or routeLength > 55:
                 raise Exception("Alternate type routes must have lengths [6-XX]")
+
+        if popSize < 3:
+            raise Exception("Must have a population size of at least 3")
             
 
 
@@ -38,16 +41,6 @@ class RouteCalc(object):
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
             print("Not enough systems for a route...")
             return
-
-        #for i in range(0,popSize):
-        #    tempSystemList = []
-        #    for j in range(0,routeLength):
-        #        tempSystem = random.choice(validSystems)                  
-        #        #Need to avoid duplicates
-        #        while tempSystemList.count(tempSystem) != 0:
-        #            tempSystem = random.choice(validSystems)
-        #        tempSystemList.append(tempSystem)
-        #    population.append(EDRareRoute(tempSystemList,RouteCalc.__Fit_Type))
 
         for sysList in RouteCalc.GenerateSystemLists(popSize,routeLength,validSystems):
             population.append(EDRareRoute(sysList,fitType))
@@ -75,7 +68,7 @@ class RouteCalc(object):
         #Going to increase the mutation chance for every couple generations it goes without increasing
         #the value of the best route.
         mutationIncrease = 0.35
-        timeBetweenIncrease = 400
+        timeBetweenIncrease = 350
         cutoffAfterRouteFound = 100
         lastIncrease = currentGeneration
         numIncreases = 0
@@ -119,17 +112,8 @@ class RouteCalc(object):
                 currentPopulation = sorted(currentPopulation,key=operator.methodcaller('GetFitValue'))
                 #Replace a percentage of the routes with lowest values, maybe make this smart to not include adding systems already commonly in the top routes
                 numReplace = math.ceil(currentPopulation.__len__() * .75)
-                tempPop = []
-                for i in range(0,numReplace):
-                    tempSystemList = []
-                    for j in range(0,bestRoute.GetRoute().__len__()):
-                        tempSystem = random.choice(RouteCalc.__Valid_Systems)                   
-                        #Need to avoid duplicates
-                        while tempSystemList.count(tempSystem) != 0:
-                            tempSystem = random.choice(RouteCalc.__Valid_Systems)
-                        tempSystemList.append(tempSystem)
-                    tempPop.append(tempSystemList)
-                for i in range(0,numReplace):
+                tempPop = RouteCalc.GenerateSystemLists(numReplace,bestRoute.GetLength(),RouteCalc.__Valid_Systems)
+                for i in range(numReplace):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
 
 
@@ -264,7 +248,7 @@ class RouteCalc(object):
         return cls.__Reproduce(population,selectVals)
 #------------------------------------------------------------------------------
     @classmethod
-    def WrapMutate(cls,route: list, validSystems: list) -> list:
+    def WrapMutate(cls,route: list) -> list:
         return cls.__Mutate(route)
 #------------------------------------------------------------------------------
     @classmethod

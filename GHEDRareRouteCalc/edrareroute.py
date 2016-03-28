@@ -27,6 +27,8 @@ class FitnessType(Enum):
 class EDRareRoute(object):
 #------------------------------------------------------------------------------
     def __init__(self,systemList: list, fType: FitnessType):
+        if(systemList.__len__() < 3):
+            raise Exception("Routes must be 3 or more systems")
         self.__Route = systemList
         self.__Seller_Min = 160
         self.__Total_Distance = 0
@@ -59,6 +61,9 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     def GetTotalDistance(self) -> float:
         return self.__Total_Distance
+#------------------------------------------------------------------------------
+    def GetLength(self) -> int:
+        return self.__Route.__len__()
 #------------------------------------------------------------------------------
     def __key(self):
         return self.__Route
@@ -654,6 +659,7 @@ class EDRareRoute(object):
         #TODO:  Find why zoom jumps all over the place
         #       Display more useful info on the systems
         #           Like pos in route, item supply/cost, station name, station distance
+        #           maybe jump length on lines
         import tkinter
 
         routeLength = self.__Route.__len__()
