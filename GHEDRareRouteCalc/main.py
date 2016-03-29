@@ -207,14 +207,14 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Utgaroar'])  
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
+
     '''
     TODO: Allow users to enter the values for length/station distance.
     '''
-    maxStationDistance = 700
+    maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 12
+    length = 8
     popSize = 200
-    
     __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)

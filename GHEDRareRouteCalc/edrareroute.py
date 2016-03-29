@@ -657,16 +657,14 @@ class EDRareRoute(object):
         Draws the route using tkinter
         '''
         #TODO:  Find why zoom jumps all over the place
-        #       Display more useful info on the systems
-        #           Like pos in route, item supply/cost, station name, station distance
-        #           maybe jump length on lines
+        #       Too annoying to mouse over lines to get jump length, try something else maybe
         import tkinter
 
         routeLength = self.__Route.__len__()
 
         cWidth = 900
         cHeight = 600
-        ovalRad = 10
+        ovalRad = 12
         border = 20
 
         maxCols = cWidth - (2*border)
@@ -774,19 +772,30 @@ class EDRareRoute(object):
 
         canvas = tkinter.Canvas(root,width=cWidth,height=cHeight,bg=bgColor)
 
+        currSysInd = 0
         for point in points:
-            tag = "".join(point.System_Name.split())
+            currSys = self.__Route[currSysInd]
             colorIndex = int((point.Depth + abs(zMin))//colorStep)
-            #if colorIndex >= fillColors.__len__():
-            #    colorIndex = fillColors.__len__() - 1;
             fill = fillColors[colorIndex]
-            canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill, tags=tag)
-            canvas.tag_bind(tag,"<Motion>",lambda e, point=point: systemLabel.config(text=point.System_Name))
-            canvas.tag_bind(tag,"<Leave>",clearSystemLabel)
+            sysOval = canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill)
+            canvas.tag_bind(sysOval,"<Motion>",lambda e, currSys=currSys: systemLabel.config(text="{0}".format(currSys)))
+            canvas.tag_bind(sysOval,"<Leave>",clearSystemLabel)
+            currSysInd += 1
+
 
         if showLines:
             for i in range(points.__len__() + 1):
-                canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,arrow="last",arrowshape="10 20 10",width=2)  
+                currSys = self.__Route[i%routeLength]
+                nextSys = self.__Route[(i+1)%routeLength]
+                jumpDistance = currSys.System_Distances[nextSys.Index]
+                currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
+                                              points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
+                                              arrow="last",arrowshape="10 20 10",width=4)
+                canvas.tag_bind(currLine,"<Motion>", lambda e, i=i, jumpDist=jumpDistance: systemLabel.config(text="{0} -> {1}: {2:2F}".format(points[i%routeLength].System_Name,
+                                                                                                                     points[(i+1)%routeLength].System_Name,
+                                                                                                                     jumpDist)))
+                canvas.tag_bind(currLine,"<Leave>",clearSystemLabel)
+
         def scaleCanv(event):
             #thanks snackoverflow
             #TODO: Make zoom zoom more better
@@ -795,6 +804,7 @@ class EDRareRoute(object):
             elif (event.delta < 0):
                 canvas.scale("all", canvas.winfo_width()/2, canvas.winfo_height()/2, 0.9, 0.9)
             canvas.configure(scrollregion = canvas.bbox("all"))
+        
         canvas.bind("<MouseWheel>",lambda e: scaleCanv(e))    
         canvas.bind("<Button-1>",lambda e: canvas.scan_mark(e.x,e.y))
         canvas.bind("<B1-Motion>",lambda e: canvas.scan_dragto(e.x,e.y,gain=1)) 
