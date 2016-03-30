@@ -15,20 +15,24 @@ class RouteCalc(object):
     __Fit_Type = FitnessType.EvenSplit
 #------------------------------------------------------------------------------
     @classmethod
+    def GetSelectionMult(cls) -> float:
+        return cls.__Selection_Mult
+#------------------------------------------------------------------------------
+    @classmethod
     def GeneticSolverStart(cls,popSize: int, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
-        #TODO: Eventually add something here that calculates popSize based on route length
-        #       Add a min pop size of ... 3
+        #TODO:  Eventually add something here that calculates popSize based on route length
+        #       Flag tests so I dont accidently run this and cause everything to hang for several minutes
         RouteCalc.__Fit_Type = fitType
         if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
             if routeLength < 3 or routeLength > 15:
                 raise Exception("Split routes must have lengths [3-15]")
         else:
-            if routeLength < 6 or routeLength > 55:
-                raise Exception("Alternate type routes must have lengths [6-XX]")
+            if routeLength < 6 or routeLength > 35:
+                raise Exception("Alternate type routes must have lengths [6-35]")
 
         if popSize < 3:
             raise Exception("Must have a population size of at least 3")
@@ -39,8 +43,7 @@ class RouteCalc(object):
         RouteCalc.__Valid_Systems = validSystems
         
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
-            print("Not enough systems for a route...")
-            return
+            raise Exception("Not enough systems for a route...")
 
         for sysList in RouteCalc.GenerateSystemLists(popSize,routeLength,validSystems):
             population.append(EDRareRoute(sysList,fitType))
@@ -252,11 +255,10 @@ class RouteCalc(object):
         return cls.__Mutate(route)
 #------------------------------------------------------------------------------
     @classmethod
-    def GetSelectionMult(cls) -> float:
-        return cls.__Selection_Mult
-#------------------------------------------------------------------------------
-    @classmethod
     def GenerateSystemLists(cls, numToCreate: int, routeLength: int, validSystems: list) -> list:
+        if validSystems.__len__() < routeLength:
+            raise Exception("Not enough systems for a route")
+
         generatedLists = []
         for i in range(numToCreate):
             tempSystemList = []

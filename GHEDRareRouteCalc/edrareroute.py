@@ -2,6 +2,7 @@
 from collections import Counter, defaultdict
 import itertools
 import math
+import tkinter
 from enum import Enum,unique
 
 @unique
@@ -658,7 +659,7 @@ class EDRareRoute(object):
         '''
         #TODO:  Find why zoom jumps all over the place
         #       Too annoying to mouse over lines to get jump length, try something else maybe
-        import tkinter
+        #       Add color to seller locations on mouseover
 
         routeLength = self.__Route.__len__()
 
@@ -779,7 +780,7 @@ class EDRareRoute(object):
             fill = fillColors[colorIndex]
             sysOval = canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill)
             canvas.tag_bind(sysOval,"<Motion>",lambda e, currSys=currSys: systemLabel.config(text="{0}".format(currSys)))
-            canvas.tag_bind(sysOval,"<Leave>",clearSystemLabel)
+            #canvas.tag_bind(sysOval,"<Leave>",clearSystemLabel)
             currSysInd += 1
 
 
@@ -794,7 +795,7 @@ class EDRareRoute(object):
                 canvas.tag_bind(currLine,"<Motion>", lambda e, i=i, jumpDist=jumpDistance: systemLabel.config(text="{0} -> {1}: {2:2F}".format(points[i%routeLength].System_Name,
                                                                                                                      points[(i+1)%routeLength].System_Name,
                                                                                                                      jumpDist)))
-                canvas.tag_bind(currLine,"<Leave>",clearSystemLabel)
+                #canvas.tag_bind(currLine,"<Leave>",clearSystemLabel)
 
         def scaleCanv(event):
             #thanks snackoverflow
@@ -807,7 +808,8 @@ class EDRareRoute(object):
         
         canvas.bind("<MouseWheel>",lambda e: scaleCanv(e))    
         canvas.bind("<Button-1>",lambda e: canvas.scan_mark(e.x,e.y))
-        canvas.bind("<B1-Motion>",lambda e: canvas.scan_dragto(e.x,e.y,gain=1)) 
+        canvas.bind("<B1-Motion>",lambda e: canvas.scan_dragto(e.x,e.y,gain=1))
+        canvas.bind("<Button-3>",lambda e: clearSystemLabel(e)) 
         canvas.pack(fill=tkinter.BOTH)
         
         root.wm_title("a route???")

@@ -3,10 +3,10 @@ from edsystem import EDSystem, DisplayLocation
 from edrareroute import EDRareRoute, RouteType, FitnessType
 from routecalc import RouteCalc
 from performancecalc import PerformanceCalc
-from urllib import request
 import csv
 import re
 import time
+from urllib import request
 
 #------------------------------------------------------------------------------
 # TODO: When reading from google docs, system Baltah'Sine or whatever doesnt get parsed right
