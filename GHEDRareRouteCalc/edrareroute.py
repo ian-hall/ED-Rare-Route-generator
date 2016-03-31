@@ -67,7 +67,7 @@ class EDRareRoute(object):
         return self.__Route.__len__()
 #------------------------------------------------------------------------------
     def __key(self):
-        return self.__Route
+        return (self.__Route,self.__Fitness_Value)
 #------------------------------------------------------------------------------
     def __eq__(self,other):
         return self.__key() == other.__key()
@@ -581,78 +581,6 @@ class EDRareRoute(object):
             strList.append('\n')
         print(''.join(strList))
 #------------------------------------------------------------------------------
-    def __str__(self):
-        avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
-        strList = []
-        count = 0
-
-        #For printing split fitness values
-        #TODO:  Flag systems that can be sold at either seller
-        #       Add helper function to change sellers_list to sellers_dict so we can get rid of this
-        if self.__Sellers_List is not None:
-            sellersPerSystem = {}
-            for system in self.__Route:
-                tempSellers = []
-                for distToCheck in self.__Route:
-                    if system.System_Distances[distToCheck.Index] >= self.__Seller_Min:
-                        tempSellers.append(distToCheck)
-                sellersPerSystem[system] = tempSellers
-            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
-            for system in self.__Route:
-                if system in self.__Sellers_List:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
-                else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
-                if system.PermitReq:
-                    strList.append("**Permit**")
-                strList.append("\n")
-                count += 1
-            
-            for station in self.__Sellers_List:
-                strList.append("\nAt <{0}> sell:\n\t".format(station.System_Name))
-                for seller in sellersPerSystem[station]:
-                    if seller in self.__Sellers_List:
-                        strList.append(" <{0}> ".format(seller.System_Name))
-                    else:
-                        strList.append(" {0} ".format(seller.System_Name))
-        
-        #For printing alt fitness values
-        elif self.__Sellers_Dict is not None:
-            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
-            for system in self.__Route:
-                if system in self.__Sellers_Dict:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
-                else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
-                if system.PermitReq:
-                    strList.append("**Permit**")
-                strList.append("\n")
-                count += 1
-
-            for system in self.__Route:
-                if system in self.__Sellers_Dict:
-                    strList.append("\nAt <{0}> sell:\n\t".format(system.System_Name))
-                    for seller in set(self.__Sellers_Dict[system]):
-                        if seller in self.__Sellers_Dict:
-                            strList.append(" <{0}> ".format(seller.System_Name))
-                        else:
-                            strList.append(" {0} ".format(seller.System_Name))
-
-        #For just displaying the systems if they are not a good route
-        else:
-            strList.append("\n(Really bad)Route value:{0}\n".format(self.__Fitness_Value))
-            for system in self.__Route:
-               strList.append('{0}\n'.format(system))
-
-        strList.append("\nTotal distance: {0:.3f}ly".format(self.__Total_Distance))
-        strList.append("\nLongest jump: {0:.3f}ly".format(self.__Longest_Jump))
-        strList.append("\nTotal goods: {0:.2f}".format(self.__Total_Supply))
-        strList.append("\nCargo space req: {0}".format(self.__Max_Cargo))
-        strList.append("\nAvg cost: {0:.2f}".format(avgCost))
-        strList.append("\nType: {0}".format(self.__Route_Type.name))
-
-        return ''.join(strList)
-#------------------------------------------------------------------------------
     def DrawRoute(self,showLines:bool=True):
         '''
         Draws the route using tkinter
@@ -785,14 +713,14 @@ class EDRareRoute(object):
 
 
         if showLines:
-            for i in range(points.__len__() + 1):
+            for i in range(points.__len__()):
                 currSys = self.__Route[i%routeLength]
                 nextSys = self.__Route[(i+1)%routeLength]
                 jumpDistance = currSys.System_Distances[nextSys.Index]
                 currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
                                               points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
                                               arrow="last",arrowshape="10 20 10",width=4)
-                canvas.tag_bind(currLine,"<Motion>", lambda e, i=i, jumpDist=jumpDistance: systemLabel.config(text="{0} -> {1}: {2:2F}".format(points[i%routeLength].System_Name,
+                canvas.tag_bind(currLine,"<Motion>", lambda e, i=i, jumpDist=jumpDistance: systemLabel.config(text="{0} -> {1}: {2:.2F}ly".format(points[i%routeLength].System_Name,
                                                                                                                      points[(i+1)%routeLength].System_Name,
                                                                                                                      jumpDist)))
                 #canvas.tag_bind(currLine,"<Leave>",clearSystemLabel)
@@ -814,3 +742,78 @@ class EDRareRoute(object):
         
         root.wm_title("a route???")
         root.mainloop()
+#------------------------------------------------------------------------------
+    def __str__(self):
+        avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
+        strList = []
+        count = 0
+
+        #For printing split fitness values
+        #TODO:  Flag systems that can be sold at either seller
+        #       Add helper function to change sellers_list to sellers_dict so we can get rid of this
+        if self.__Sellers_List is not None:
+            sellersPerSystem = {}
+            for system in self.__Route:
+                tempSellers = []
+                for distToCheck in self.__Route:
+                    if system.System_Distances[distToCheck.Index] >= self.__Seller_Min:
+                        tempSellers.append(distToCheck)
+                sellersPerSystem[system] = tempSellers
+            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
+            for system in self.__Route:
+                if system in self.__Sellers_List:
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
+                else:
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
+                if system.PermitReq:
+                    strList.append("**Permit**")
+                strList.append("\n")
+                count += 1
+            
+            for station in self.__Sellers_List:
+                strList.append("\nAt <{0}> sell:\n\t".format(station.System_Name))
+                for seller in sellersPerSystem[station]:
+                    if seller in self.__Sellers_List:
+                        strList.append(" <{0}> ".format(seller.System_Name))
+                    else:
+                        strList.append(" {0} ".format(seller.System_Name))
+        
+        #For printing alt fitness values
+        elif self.__Sellers_Dict is not None:
+            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
+            for system in self.__Route:
+                if system in self.__Sellers_Dict:
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
+                else:
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
+                if system.PermitReq:
+                    strList.append("**Permit**")
+                strList.append("\n")
+                count += 1
+
+            for system in self.__Route:
+                if system in self.__Sellers_Dict:
+                    strList.append("\nAt <{0}> sell:\n\t".format(system.System_Name))
+                    for seller in set(self.__Sellers_Dict[system]):
+                        if seller in self.__Sellers_Dict:
+                            strList.append(" <{0}> ".format(seller.System_Name))
+                        else:
+                            strList.append(" {0} ".format(seller.System_Name))
+
+        #For just displaying the systems if they are not a good route
+        else:
+            strList.append("\n(Really bad)Route value:{0}\n".format(self.__Fitness_Value))
+            for system in self.__Route:
+               strList.append('{0}\n'.format(system))
+
+        strList.append("\nTotal distance: {0:.3f}ly".format(self.__Total_Distance))
+        strList.append("\nLongest jump: {0:.3f}ly".format(self.__Longest_Jump))
+        strList.append("\nTotal goods: {0:.2f}".format(self.__Total_Supply))
+        strList.append("\nCargo space req: {0}".format(self.__Max_Cargo))
+        strList.append("\nAvg cost: {0:.2f}".format(avgCost))
+        strList.append("\nType: {0}".format(self.__Route_Type.name))
+
+        return ''.join(strList)
+#------------------------------------------------------------------------------
+###############################################################################
+#------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 import main
+import routecalc
 from routecalc import RouteCalc
 from edsystem import EDSystem
 from edrareroute import EDRareRoute, FitnessType
@@ -19,7 +20,7 @@ class Test_RouteCalc(unittest.TestCase):
         self.Fit_Type = FitnessType.FirstOver
         
         RouteCalc.SetValidSystems(self.All_Systems)
-        self.Population = [EDRareRoute(systems,self.Fit_Type) for systems in RouteCalc.GenerateSystemLists(self.Pop_Size,self.Route_Length,self.All_Systems)]
+        self.Population = [EDRareRoute(systems,self.Fit_Type) for systems in routecalc.GenerateSystemLists(self.Pop_Size,self.Route_Length,self.All_Systems)]
 #------------------------------------------------------------------------------
     def test_Selection_Vals(self):
         '''
@@ -65,7 +66,7 @@ class Test_RouteCalc(unittest.TestCase):
         '''
         General test to make sure mutate will never return the same system list that we pass to it
         '''
-        systemLists = RouteCalc.GenerateSystemLists(self.Pop_Size,self.Route_Length,self.All_Systems)
+        systemLists = routecalc.GenerateSystemLists(self.Pop_Size,self.Route_Length,self.All_Systems)
         for systemList in systemLists:
             with self.subTest(systemList=systemList):
                 mutatedList = RouteCalc.WrapMutate(systemList)
@@ -77,7 +78,7 @@ class Test_RouteCalc(unittest.TestCase):
         '''
         tempValidSystems = self.All_Systems[:self.Route_Length]
         RouteCalc.SetValidSystems(tempValidSystems);
-        systemLists = RouteCalc.GenerateSystemLists(self.Pop_Size,self.Route_Length,tempValidSystems)
+        systemLists = routecalc.GenerateSystemLists(self.Pop_Size,self.Route_Length,tempValidSystems)
         for systemList in systemLists:
             with self.subTest(systemList=systemList):
                 mutatedList = RouteCalc.WrapMutate(systemList)
@@ -98,7 +99,7 @@ class Test_RouteCalc(unittest.TestCase):
             with self.subTest(popSize=popSize):
                 for routeLen in lenRange:
                     with self.subTest(routeLen=routeLen):
-                        systemLists = RouteCalc.GenerateSystemLists(popSize,routeLen,self.All_Systems)
+                        systemLists = routecalc.GenerateSystemLists(popSize,routeLen,self.All_Systems)
                         for systemList in systemLists:
                             for sys,count in Counter(systemList).most_common():
                                 self.assertEqual(count,1,"Multiple of a system found in route")
@@ -136,7 +137,18 @@ class Test_RouteCalc(unittest.TestCase):
                 with self.assertRaises(Exception):
                     RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.EvenSplit)
 
-        #
+        #FirstOver and Farthest should throw exception on routes under len 6 and over 35
+        for routeLen in range(6):
+            with self.subTest(routeLen=routeLen):
+                with self.assertRaises(Exception):
+                    RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.FirstOver)
+                    RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.Farthest)
+
+        for routeLen in range(36,39):
+            with self.subTest(routeLen=routeLen):
+                with self.assertRaises(Exception):
+                    RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.FirstOver)
+                    RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.Farthest)
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()

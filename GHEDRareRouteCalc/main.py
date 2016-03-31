@@ -213,8 +213,8 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 4500
     systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 8
-    popSize = 200
+    length = 15
+    popSize = 350
     __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
@@ -227,3 +227,4 @@ if __name__ == '__main__':
     #print(fullRoute)
     #fullRoute.PrintRoute()
     #fullRoute.DrawRoute(showLines=True)
+#------------------------------------------------------------------------------

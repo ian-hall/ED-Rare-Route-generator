@@ -33,12 +33,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="routecalc.py" />
-    <Compile Include="TestingRouteCalc.py">
+    <Compile Include="tests\test_edrareroute.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\test_routecalc.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="RareGoods.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="tests\" />
   </ItemGroup>
   <Import Condition="Exists($(PtvsTargetsFile))" Project="$(PtvsTargetsFile)" />
   <Import Condition="!Exists($(PtvsTargetsFile))" Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />

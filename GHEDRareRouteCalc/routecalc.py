@@ -4,7 +4,9 @@ import random
 import math
 import operator
 import bisect
-
+#------------------------------------------------------------------------------
+###############################################################################
+#------------------------------------------------------------------------------
 class RouteCalc(object):
     '''
     Class for calculating rare trade routes
@@ -45,7 +47,7 @@ class RouteCalc(object):
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
             raise Exception("Not enough systems for a route...")
 
-        for sysList in RouteCalc.GenerateSystemLists(popSize,routeLength,validSystems):
+        for sysList in GenerateSystemLists(popSize,routeLength,validSystems):
             population.append(EDRareRoute(sysList,fitType))
 
         return cls.__GeneticSolver(population,silent)
@@ -115,7 +117,7 @@ class RouteCalc(object):
                 currentPopulation = sorted(currentPopulation,key=operator.methodcaller('GetFitValue'))
                 #Replace a percentage of the routes with lowest values, maybe make this smart to not include adding systems already commonly in the top routes
                 numReplace = math.ceil(currentPopulation.__len__() * .75)
-                tempPop = RouteCalc.GenerateSystemLists(numReplace,bestRoute.GetLength(),RouteCalc.__Valid_Systems)
+                tempPop = GenerateSystemLists(numReplace,bestRoute.GetLength(),RouteCalc.__Valid_Systems)
                 for i in range(numReplace):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
 
@@ -254,21 +256,24 @@ class RouteCalc(object):
     def WrapMutate(cls,route: list) -> list:
         return cls.__Mutate(route)
 #------------------------------------------------------------------------------
-    @classmethod
-    def GenerateSystemLists(cls, numToCreate: int, routeLength: int, validSystems: list) -> list:
-        if validSystems.__len__() < routeLength:
-            raise Exception("Not enough systems for a route")
-
-        generatedLists = []
-        for i in range(numToCreate):
-            tempSystemList = []
-            for j in range(0,routeLength):
-                tempSystem = random.choice(validSystems)                  
-                #Need to avoid duplicates
-                while tempSystemList.count(tempSystem) != 0:
-                    tempSystem = random.choice(validSystems)
-                tempSystemList.append(tempSystem)
-            generatedLists.append(tempSystemList)
-        return generatedLists
+###############################################################################
 #------------------------------------------------------------------------------
+def GenerateSystemLists(numToCreate: int, routeLength: int, validSystems: list) -> list:
+    '''
+    Generates lists of length routeLength made up of the systems in the validSystems list
+    '''
+    if validSystems.__len__() < routeLength:
+        raise Exception("Not enough systems for a route")
+
+    generatedLists = []
+    for i in range(numToCreate):
+        tempSystemList = []
+        for j in range(0,routeLength):
+            tempSystem = random.choice(validSystems)                  
+            #Need to avoid duplicates
+            while tempSystemList.count(tempSystem) != 0:
+                tempSystem = random.choice(validSystems)
+            tempSystemList.append(tempSystem)
+        generatedLists.append(tempSystemList)
+    return generatedLists
 #------------------------------------------------------------------------------
