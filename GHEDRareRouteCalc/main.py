@@ -110,7 +110,6 @@ def __TryFloat(val: str) -> bool:
         return True
     except:
         return False
-
 #------------------------------------------------------------------------------
 def ReadSystems(file:str="") ->list:
     cleanedCSV = []
@@ -212,10 +211,10 @@ if __name__ == '__main__':
     TODO: Allow users to enter the values for length/station distance.
     '''
     maxStationDistance = 4500
-    systemsSubset = [system for system in allSystems if min(system.Station_Distance) <= maxStationDistance and not system.PermitReq]
-    length = 15
-    popSize = 350
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance]
+    length = 8
+    popSize = 222
+    __RunGenetic(commonSystems,length,popSize,fitType=FitnessType.EvenSplit,silent=False,stopShort=True)
     
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)

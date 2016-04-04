@@ -64,15 +64,7 @@ class EDRareRoute(object):
         return self.__Total_Distance
 #------------------------------------------------------------------------------
     def GetLength(self) -> int:
-        return self.__Route.__len__()
-#------------------------------------------------------------------------------
-    def __key(self):
-        return (self.__Route,self.__Fitness_Value)
-#------------------------------------------------------------------------------
-    def __eq__(self,other):
-        return self.__key() == other.__key()
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------  
+        return self.__Route.__len__() 
 #------------------------------------------------------------------------------
     def __CalcFitness(self):
         '''
@@ -212,7 +204,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
+        avgCost = sum([sum(val.Costs) for val in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -338,7 +330,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
+        avgCost = sum([sum(val.Costs) for val in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -372,6 +364,7 @@ class EDRareRoute(object):
         '''
         #TODO:  Need to add a hard limit on number of sellers per station, cargo req are too close to max cargo, meaning like no ships can do these routes
         #       Maybe back to evensplit style again, with roughly even number of systems to a seller but no seller limit
+        #       This doesnt actually find many routes of longer length, maybe set it to similar limits to EvenSplit
         routeLength = self.__Route.__len__()
         self.__Route_Type = RouteType.Farthest
         longJumpDistance = 135
@@ -463,7 +456,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([sum(val.Cost) for val in self.__Route])/routeLength
+        avgCost = sum([sum(val.Costs) for val in self.__Route])/routeLength
         weightedCost = math.log(avgCost,1000)
 
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
@@ -474,7 +467,7 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.25
         
         #TODO: Temp to try to get rid of high cargo values
-        if sellersDifference > 2:
+        if sellersDifference > 4:
             totalValue = totalValue * .85
         if maxCargo > 80:
             totalValue = totalValue * (80/maxCargo)
@@ -586,8 +579,8 @@ class EDRareRoute(object):
         Draws the route using tkinter
         '''
         #TODO:  Find why zoom jumps all over the place
-        #       Too annoying to mouse over lines to get jump length, try something else maybe
         #       Add color to seller locations on mouseover
+        #       Place arrows on lines in front of all sellers, or at least more than just at the starting point
 
         routeLength = self.__Route.__len__()
 
@@ -640,7 +633,6 @@ class EDRareRoute(object):
                     yValsNew[i] = round((maxRows / yMax) * yValsNew[i])
             else:
                 yValsNew[i] = border
-            #points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
 
         xMax = max(xValsNew)
         yMax = max(yValsNew)
@@ -701,28 +693,35 @@ class EDRareRoute(object):
 
         canvas = tkinter.Canvas(root,width=cWidth,height=cHeight,bg=bgColor)
 
+        if showLines:
+            for i in range(routeLength):
+                currSys = self.__Route[i%routeLength]
+                nextSys = self.__Route[(i+1)%routeLength]
+                jumpDistance = currSys.System_Distances[nextSys.Index]
+                if i == routeLength - 1:
+                    currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
+                                                  points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
+                                                  arrow="last",arrowshape=(20,30,20),width=4)
+                else:
+                    currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
+                                                  points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
+                                                  width=4)
+
+                canvas.tag_bind(currLine,"<Motion>", lambda e, i=i, jumpDist=jumpDistance: systemLabel.config(text="{0} -> {1}: {2:.2F}ly".format(points[i%routeLength].System_Name,
+                                                                                                                     points[(i+1)%routeLength].System_Name,
+                                                                                                                     jumpDist)))
+
         currSysInd = 0
         for point in points:
             currSys = self.__Route[currSysInd]
             colorIndex = int((point.Depth + abs(zMin))//colorStep)
             fill = fillColors[colorIndex]
             sysOval = canvas.create_oval(point.Col - ovalRad,point.Row - ovalRad,point.Col + ovalRad,point.Row + ovalRad, fill=fill)
-            canvas.tag_bind(sysOval,"<Motion>",lambda e, currSys=currSys: systemLabel.config(text="{0}".format(currSys)))
+            canvas.tag_bind(sysOval,"<Motion>",lambda e, currSys=currSys,sysInd=currSysInd: systemLabel.config(text="{0}: {1}".format(sysInd+1,currSys)))
             #canvas.tag_bind(sysOval,"<Leave>",clearSystemLabel)
             currSysInd += 1
 
 
-        if showLines:
-            for i in range(points.__len__()):
-                currSys = self.__Route[i%routeLength]
-                nextSys = self.__Route[(i+1)%routeLength]
-                jumpDistance = currSys.System_Distances[nextSys.Index]
-                currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
-                                              points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
-                                              arrow="last",arrowshape="10 20 10",width=4)
-                canvas.tag_bind(currLine,"<Motion>", lambda e, i=i, jumpDist=jumpDistance: systemLabel.config(text="{0} -> {1}: {2:.2F}ly".format(points[i%routeLength].System_Name,
-                                                                                                                     points[(i+1)%routeLength].System_Name,
-                                                                                                                     jumpDist)))
                 #canvas.tag_bind(currLine,"<Leave>",clearSystemLabel)
 
         def scaleCanv(event):
@@ -740,11 +739,11 @@ class EDRareRoute(object):
         canvas.bind("<Button-3>",lambda e: clearSystemLabel(e)) 
         canvas.pack(fill=tkinter.BOTH)
         
-        root.wm_title("a route???")
+        root.wm_title("a route")
         root.mainloop()
 #------------------------------------------------------------------------------
     def __str__(self):
-        avgCost = sum([sum(val.Cost) for val in self.__Route])/self.__Route.__len__()
+        avgCost = sum([sum(val.Costs) for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
 
@@ -762,9 +761,9 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_List:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
                 if system.PermitReq:
                     strList.append("**Permit**")
                 strList.append("\n")
@@ -783,9 +782,9 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_Dict:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Name))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Name))
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
                 if system.PermitReq:
                     strList.append("**Permit**")
                 strList.append("\n")
@@ -800,9 +799,9 @@ class EDRareRoute(object):
                         else:
                             strList.append(" {0} ".format(seller.System_Name))
 
-        #For just displaying the systems if they are not a good route
+        #For just displaying the systems if we dont have a sellers list/dict
         else:
-            strList.append("\n(Really bad)Route value:{0}\n".format(self.__Fitness_Value))
+            strList.append("\n(Probably bad)Route value:{0}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                strList.append('{0}\n'.format(system))
 
@@ -814,6 +813,12 @@ class EDRareRoute(object):
         strList.append("\nType: {0}".format(self.__Route_Type.name))
 
         return ''.join(strList)
+#------------------------------------------------------------------------------
+    def __key(self):
+        return (self.__Route,self.__Fitness_Value)
+#------------------------------------------------------------------------------
+    def __eq__(self,other):
+        return self.__key() == other.__key()
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

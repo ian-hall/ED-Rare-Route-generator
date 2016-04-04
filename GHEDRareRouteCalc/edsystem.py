@@ -5,27 +5,52 @@
 class EDSystem( object ):
 #------------------------------------------------------------------------------
     '''
-    TODO:  pretty printing so you don't see the braces around the lists
+    TODO:  Getters/Setters instead of public whatevers
     '''
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, stationIndex: int, distToOthers: list, permit: bool):
         self.Max_Supply = supplyCap # Float
-        self.Supply = [avgSupply] # Float
-        self.Cost = [itemCost] # Int
+        self.Supply_Numbers = [avgSupply] # Float
+        self.Costs = [itemCost] # Int
         self.Items = [itemName] # String
-        self.Station_Distance = [distToStation] # Float
-        self.Station_Name = [stationName] # String
+        self.Station_Distances = [distToStation] # Float
+        self.Station_Names = [stationName] # String
         self.System_Name = systemName # String
         self.Index = stationIndex # Int
         self.System_Distances = distToOthers # List of Floats
         self.Location = dict(x=0, y=0, z=0)
         self.PermitReq = permit
 #------------------------------------------------------------------------------
+    def AddRares(self, other):
+        self.Supply_Numbers.extend(other.Supply_Numbers)
+        self.Costs.extend(other.Costs)
+        self.Items.extend(other.Items)
+        self.Max_Supply += other.Max_Supply
+        if self.Station_Names != other.Station_Names:
+            self.Station_Names.extend(other.Station_Names)
+            self.Station_Distances.extend(other.Station_Distances)
+#------------------------------------------------------------------------------
     def __str__(self):
+        strBuilder = []
         if self.PermitReq:
-            return str.format("(P){0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Name),self.Items, self.Cost, self.Max_Supply)
-        else:
-            return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Name),self.Items, self.Cost, self.Max_Supply)
+            #return str.format("(P){0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
+            strBuilder.append("(P)")
+        
+        strBuilder.append("{0}(".format(self.System_Name))
+        for station in self.Station_Names:
+            strBuilder.append("{0}".format(station))
+            if station != self.Station_Names[-1]:
+                strBuilder.append(", ")
+        strBuilder.append("): {")
+        for i in range(self.Items.__len__()):
+            strBuilder.append("{0} - {1}cr".format(self.Items[i],self.Costs[i]))
+            if i != self.Items.__len__() - 1:
+                strBuilder.append(", ")
+        strBuilder.append("}} (~{0})".format(self.Max_Supply))
+            
+        #else:
+        #    return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
+        return ''.join(strBuilder)
         
 #------------------------------------------------------------------------------
     def __key(self):
@@ -43,15 +68,6 @@ class EDSystem( object ):
     def __eq__(self, other):
         return self.__key() == other.__key()
 #------------------------------------------------------------------------------    
-    def AddRares(self, newRares: 'EDSystem'):
-        self.Supply.extend(newRares.Supply)
-        self.Cost.extend(newRares.Cost)
-        self.Items.extend(newRares.Items)
-        self.Max_Supply += newRares.Max_Supply
-        if self.Station_Name != newRares.Station_Name:
-            self.Station_Name.extend(newRares.Station_Name)
-            self.Station_Distance.extend(newRares.Station_Distance)
-#------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 class DisplayLocation(object):
@@ -62,11 +78,11 @@ class DisplayLocation(object):
         self.Depth = depth
         self.System_Name = name
 #------------------------------------------------------------------------------
-    def __eq__(self, other):
-        return (self.Col == other.Col) and (self.Row == other.Row)
-#------------------------------------------------------------------------------
     def __str__(self):
         return "{0:>17}: ({1},{2})".format(self.System_Name,self.Col,self.Row)
+#------------------------------------------------------------------------------
+    def __eq__(self, other):
+        return (self.Col == other.Col) and (self.Row == other.Row)
 #------------------------------------------------------------------------------
     def __hash__(self):
         return hash((self.Col,self.Row))
