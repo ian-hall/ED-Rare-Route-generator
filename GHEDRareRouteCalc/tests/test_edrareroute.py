@@ -15,7 +15,7 @@ class Test_EDRareRoute(unittest.TestCase):
         self.System_Lists = routecalc.GenerateSystemLists(50,14,self.All_Systems)
 #------------------------------------------------------------------------------
     def test_A(self):
-        self.fail("Not implemented")
+        self.fail("should probably do this sometime")
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

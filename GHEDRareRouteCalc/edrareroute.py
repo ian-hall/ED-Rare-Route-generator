@@ -761,10 +761,10 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_List:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.GetStationNames()))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
-                if system.PermitReq:
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.GetStationNames()))
+                if system.NeedsPermit():
                     strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
@@ -782,10 +782,10 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_Dict:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.GetStationNames()))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
-                if system.PermitReq:
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.GetStationNames()))
+                if system.NeedsPermit():
                     strList.append("**Permit**")
                 strList.append("\n")
                 count += 1

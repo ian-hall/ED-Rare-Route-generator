@@ -36,6 +36,9 @@
     <Compile Include="tests\test_edrareroute.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="tests\test_edsystem.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests\test_routecalc.py">
       <SubType>Code</SubType>
     </Compile>

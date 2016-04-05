@@ -8,45 +8,61 @@ class EDSystem( object ):
     TODO:  Getters/Setters instead of public whatevers
     '''
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
-                       stationName: str, systemName: str, stationIndex: int, distToOthers: list, permit: bool):
+                       stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
+        self.__Supply_Numbers = [avgSupply] # Float
+        self.__Items = [itemName] # String
+        self.__Station_Names = [stationName] # String
+        self.__Permit_Req = permit
         self.Max_Supply = supplyCap # Float
-        self.Supply_Numbers = [avgSupply] # Float
-        self.Costs = [itemCost] # Int
-        self.Items = [itemName] # String
+        self.Costs = [itemCost] # Int 
         self.Station_Distances = [distToStation] # Float
-        self.Station_Names = [stationName] # String
         self.System_Name = systemName # String
-        self.Index = stationIndex # Int
+        self.Index = systemIndex # Int
         self.System_Distances = distToOthers # List of Floats
         self.Location = dict(x=0, y=0, z=0)
-        self.PermitReq = permit
+#------------------------------------------------------------------------------
+    def GetTotalCosts(self) -> int:
+        return sum(self.Costs)
+#------------------------------------------------------------------------------
+    def GetMaxSupply(self) -> float:
+        return self.Max_Supply
+#------------------------------------------------------------------------------
+    def GetDistanceTo(self, index:int) -> float:
+        return self.System_Distances[index]
+#------------------------------------------------------------------------------
+    def GetStationNames(self) -> list:
+        return self.__Station_Names
+#------------------------------------------------------------------------------
+    def NeedsPermit(self) -> bool:
+        return self.__Permit_Req
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def AddRares(self, other):
-        self.Supply_Numbers.extend(other.Supply_Numbers)
+        self.__Supply_Numbers.extend(other.__Supply_Numbers)
         self.Costs.extend(other.Costs)
-        self.Items.extend(other.Items)
+        self.__Items.extend(other.__Items)
         self.Max_Supply += other.Max_Supply
-        if self.Station_Names != other.Station_Names:
-            self.Station_Names.extend(other.Station_Names)
+        if self.__Station_Names != other.__Station_Names:
+            self.__Station_Names.extend(other.__Station_Names)
             self.Station_Distances.extend(other.Station_Distances)
 #------------------------------------------------------------------------------
     def __str__(self):
         strBuilder = []
-        if self.PermitReq:
+        if self.__Permit_Req:
             #return str.format("(P){0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
             strBuilder.append("(P)")
         
         strBuilder.append("{0}(".format(self.System_Name))
-        for station in self.Station_Names:
+        for station in self.__Station_Names:
             strBuilder.append("{0}".format(station))
-            if station != self.Station_Names[-1]:
+            if station != self.__Station_Names[-1]:
                 strBuilder.append(", ")
         strBuilder.append("): {")
-        for i in range(self.Items.__len__()):
-            strBuilder.append("{0} - {1}cr".format(self.Items[i],self.Costs[i]))
-            if i != self.Items.__len__() - 1:
+        for i in range(self.__Items.__len__()):
+            strBuilder.append("{0} - {1}cr".format(self.__Items[i],self.Costs[i]))
+            if i != self.__Items.__len__() - 1:
                 strBuilder.append(", ")
-        strBuilder.append("}} (~{0})".format(self.Max_Supply))
+        strBuilder.append("}} ({0}T)".format(self.Max_Supply))
             
         #else:
         #    return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
