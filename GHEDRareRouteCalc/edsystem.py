@@ -14,15 +14,15 @@ class EDSystem( object ):
         self.__Station_Names = [stationName] # String
         self.__Permit_Req = permit
         self.Max_Supply = supplyCap # Float
-        self.Costs = [itemCost] # Int 
+        self.__Costs = [itemCost] # Int 
         self.Station_Distances = [distToStation] # Float
         self.System_Name = systemName # String
         self.Index = systemIndex # Int
         self.System_Distances = distToOthers # List of Floats
         self.Location = dict(x=0, y=0, z=0)
 #------------------------------------------------------------------------------
-    def GetTotalCosts(self) -> int:
-        return sum(self.Costs)
+    def GetTotalCost(self) -> int:
+        return sum(self.__Costs)
 #------------------------------------------------------------------------------
     def GetMaxSupply(self) -> float:
         return self.Max_Supply
@@ -39,7 +39,7 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         self.__Supply_Numbers.extend(other.__Supply_Numbers)
-        self.Costs.extend(other.Costs)
+        self.__Costs.extend(other.__Costs)
         self.__Items.extend(other.__Items)
         self.Max_Supply += other.Max_Supply
         if self.__Station_Names != other.__Station_Names:
@@ -59,7 +59,7 @@ class EDSystem( object ):
                 strBuilder.append(", ")
         strBuilder.append("): {")
         for i in range(self.__Items.__len__()):
-            strBuilder.append("{0} - {1}cr".format(self.__Items[i],self.Costs[i]))
+            strBuilder.append("{0} - {1}cr".format(self.__Items[i],self.__Costs[i]))
             if i != self.__Items.__len__() - 1:
                 strBuilder.append(", ")
         strBuilder.append("}} ({0}T)".format(self.Max_Supply))

@@ -39,16 +39,14 @@ class RouteCalc(object):
         if popSize < 3:
             raise Exception("Must have a population size of at least 3")
             
-
-
-        population = []
         RouteCalc.__Valid_Systems = validSystems
         
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
             raise Exception("Not enough systems for a route...")
 
-        for sysList in GenerateSystemLists(popSize,routeLength,validSystems):
-            population.append(EDRareRoute(sysList,fitType))
+        population = [EDRareRoute(val, fitType) for val in GenerateSystemLists(popSize,routeLength,validSystems)]
+        #for sysList in GenerateSystemLists(popSize,routeLength,validSystems):
+        #    population.append(EDRareRoute(sysList,fitType))
 
         return cls.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
@@ -58,8 +56,7 @@ class RouteCalc(object):
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parents to merge/shuffle/mutate
         until a new population is ready.
-        '''
-        
+        '''       
         currentGeneration = 1
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
@@ -111,6 +108,7 @@ class RouteCalc(object):
             if currentGeneration - lastRouteFoundOn >= maxGensSinceLast:
                 break
 
+            #Increase mutation chance and replace the X lowest valued systems in the current population
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
@@ -120,7 +118,6 @@ class RouteCalc(object):
                 tempPop = GenerateSystemLists(numReplace,bestRoute.GetLength(),RouteCalc.__Valid_Systems)
                 for i in range(numReplace):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
-
 
                 if not silent:
                     print("{0:>7}-> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
@@ -267,13 +264,14 @@ def GenerateSystemLists(numToCreate: int, routeLength: int, validSystems: list) 
 
     generatedLists = []
     for i in range(numToCreate):
-        tempSystemList = []
-        for j in range(0,routeLength):
-            tempSystem = random.choice(validSystems)                  
-            #Need to avoid duplicates
-            while tempSystemList.count(tempSystem) != 0:
-                tempSystem = random.choice(validSystems)
-            tempSystemList.append(tempSystem)
+        #tempSystemList = []
+        #for j in range(0,routeLength):
+        #    tempSystem = random.choice(validSystems)                  
+        #    #Need to avoid duplicates
+        #    while tempSystemList.count(tempSystem) != 0:
+        #        tempSystem = random.choice(validSystems)
+        #    tempSystemList.append(tempSystem)
+        tempSystemList = random.sample(validSystems,routeLength)
         generatedLists.append(tempSystemList)
     return generatedLists
 #------------------------------------------------------------------------------

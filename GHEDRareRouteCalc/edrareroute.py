@@ -204,7 +204,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([sum(val.Costs) for val in self.__Route])/routeLength
+        avgCost = sum([val.GetTotalCost() for val in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -330,7 +330,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([sum(val.Costs) for val in self.__Route])/routeLength
+        avgCost = sum([val.GetTotalCost() for val in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -456,7 +456,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([sum(val.Costs) for val in self.__Route])/routeLength
+        avgCost = sum([val.GetTotalCost() for val in self.__Route])/routeLength
         weightedCost = math.log(avgCost,1000)
 
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
@@ -743,7 +743,7 @@ class EDRareRoute(object):
         root.mainloop()
 #------------------------------------------------------------------------------
     def __str__(self):
-        avgCost = sum([sum(val.Costs) for val in self.__Route])/self.__Route.__len__()
+        avgCost = sum([val.GetTotalCost() for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
 

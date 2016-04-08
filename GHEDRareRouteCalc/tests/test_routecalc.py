@@ -84,7 +84,7 @@ class Test_RouteCalc(unittest.TestCase):
                 mutatedList = RouteCalc.WrapMutate(systemList)
                 self.failIfEqual(systemList,mutatedList)
 #------------------------------------------------------------------------------
-    def test_Generate_Systems(self):
+    def test_Generate_System_Lists(self):
         '''
         Make sure RouteCalc.GenerateSystemLists generates lists of systems without duplicates
         '''
@@ -100,17 +100,18 @@ class Test_RouteCalc(unittest.TestCase):
                 for routeLen in lenRange:
                     with self.subTest(routeLen=routeLen):
                         systemLists = routecalc.GenerateSystemLists(popSize,routeLen,self.All_Systems)
-                        for systemList in systemLists:
-                            for sys,count in Counter(systemList).most_common():
+                        for currList in systemLists:
+                            for sys,count in Counter(currList).most_common():
                                 self.assertEqual(count,1,"Multiple of a system found in route")
+                        self.assertEqual(systemLists.__len__(),popSize,"Did not generate correct number of system lists")
+                        self.assertEqual(systemLists[0].__len__(),routeLen,"Did not generate lists of the correct length")
 #------------------------------------------------------------------------------
     @unittest.expectedFailure
     def test_Start_No_Args(self):
         RouteCalc.GeneticSolverStart()
 #------------------------------------------------------------------------------
     def test_Start_Bad_Args(self):
-        #Assert passing an empty list of valid systems raises exception
-        
+        #Assert empty system list raises exception
         with self.assertRaises(Exception):
             RouteCalc.GeneticSolverStart(500,[],20,True,self.Fit_Type)
 
@@ -125,7 +126,6 @@ class Test_RouteCalc(unittest.TestCase):
             RouteCalc.GeneticSolverStart(200,self.All_Systems[:self.Route_Length-1],self.Route_Length,True,self.Fit_Type)
 #------------------------------------------------------------------------------
     def test_Start_Bad_Routelength(self):
-        
         #Assert passing a route length 3 or over 15 raises exception for fittype.EvenSplit
         for routeLen in range(3):
             with self.subTest(routeLen=routeLen):
