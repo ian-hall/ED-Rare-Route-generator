@@ -54,21 +54,20 @@ class Test_EDRareRoute(unittest.TestCase):
                 testRoute1 = EDRareRoute(sysList,fType)
                 testRoute2 = EDRareRoute(sysListCopy,fType)
                 self.assertEqual(testRoute1,testRoute2)
-
-        #splitRoute1 = EDRareRoute(sysList,FitnessType.EvenSplit)
-        #splitRoute2 = EDRareRoute(sysListCopy,FitnessType.EvenSplit)
-        #farRoute1 = EDRareRoute(sysList,FitnessType.Farthest)
-        #farRoute2 = EDRareRoute(sysListCopy,FitnessType.Farthest)
-        #firstRoute1 = EDRareRoute(sysList,FitnessType.FirstOver)
-        #firstRoute2 = EDRareRoute(sysListCopy,FitnessType.FirstOver)
-
-        #self.assertEqual(splitRoute1,splitRoute2)
-        #self.assertEqual(farRoute1,farRoute2)
-        #self.assertEqual(firstRoute1,firstRoute2)
 #------------------------------------------------------------------------------
     def test_Route_Distance(self):
-        sysList = random.choice(self.System_Lists)   
-        self.fail("Not implemented")    
+        sysList = random.choice(self.System_Lists)
+        routeLen = sysList.__len__()   
+        expectedDistance = 0
+        for i in range(routeLen):
+            currSys = sysList[i%routeLen]
+            nextSys = sysList[(i+1)%routeLen]
+            expectedDistance += currSys.GetDistanceTo(nextSys)
+
+        for name,fType in FitnessType.__members__.items():
+            with self.subTest(fType=fType):
+                testRoute = EDRareRoute(sysList,fType)
+                self.assertAlmostEqual(expectedDistance,testRoute.GetTotalDistance())          
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

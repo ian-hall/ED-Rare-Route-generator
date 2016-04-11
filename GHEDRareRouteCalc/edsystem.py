@@ -5,46 +5,66 @@
 class EDSystem( object ):
 #------------------------------------------------------------------------------
     '''
-    TODO:  Getters/Setters instead of public whatevers
+    TODO:  Now with more @properties
     '''
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
+        
+        self.__Max_Supply = supplyCap # Float
         self.__Supply_Numbers = [avgSupply] # Float
+        self.__Costs = [itemCost] # Int
         self.__Items = [itemName] # String
+        self.__Station_Distances = [distToStation] # Float
         self.__Station_Names = [stationName] # String
-        self.__Permit_Req = permit
-        self.Max_Supply = supplyCap # Float
-        self.__Costs = [itemCost] # Int 
-        self.Station_Distances = [distToStation] # Float
-        self.System_Name = systemName # String
-        self.Index = systemIndex # Int
-        self.System_Distances = distToOthers # List of Floats
-        self.Location = dict(x=0, y=0, z=0)
+        self.__System_Name = systemName # String
+        self.__Index = systemIndex # Int
+        self.__System_Distances = distToOthers # List of Floats
+        self.__Permit_Req = permit 
+        self.__Location = dict(x=0, y=0, z=0)
 #------------------------------------------------------------------------------
-    def GetTotalCost(self) -> int:
+    @property
+    def Total_Cost(self) -> int:
         return sum(self.__Costs)
 #------------------------------------------------------------------------------
-    def GetMaxSupply(self) -> float:
-        return self.Max_Supply
+    @property
+    def Max_Supply(self) -> float:
+        return self.__Max_Supply
 #------------------------------------------------------------------------------
-    def GetDistanceTo(self, index:int) -> float:
-        return self.System_Distances[index]
-#------------------------------------------------------------------------------
-    def GetStationNames(self) -> list:
+    @property
+    def Station_Names(self) -> list:
         return self.__Station_Names
 #------------------------------------------------------------------------------
-    def NeedsPermit(self) -> bool:
+    @property
+    def Index(self) -> int:
+        return self.__Index
+#------------------------------------------------------------------------------
+    @property
+    def System_Name(self) -> str:
+        return self.__System_Name
+#------------------------------------------------------------------------------
+    @property
+    def Station_Distances(self) -> list:
+        return self.__Station_Distances
+#------------------------------------------------------------------------------
+    @property
+    def Location(self) -> dict:
+        return self.__Location
+#------------------------------------------------------------------------------
+    @property
+    def Needs_Permit(self) -> bool:
         return self.__Permit_Req
 #------------------------------------------------------------------------------
+    def GetDistanceTo(self, next) -> float:
+        return self.__System_Distances[next.__Index]
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         self.__Supply_Numbers.extend(other.__Supply_Numbers)
         self.__Costs.extend(other.__Costs)
         self.__Items.extend(other.__Items)
-        self.Max_Supply += other.Max_Supply
+        self.__Max_Supply += other.Max_Supply
         if self.__Station_Names != other.__Station_Names:
             self.__Station_Names.extend(other.__Station_Names)
-            self.Station_Distances.extend(other.Station_Distances)
+            self.__Station_Distances.extend(other.__Station_Distances)
 #------------------------------------------------------------------------------
     def __str__(self):
         strBuilder = []
@@ -52,7 +72,7 @@ class EDSystem( object ):
             #return str.format("(P){0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
             strBuilder.append("(P)")
         
-        strBuilder.append("{0}(".format(self.System_Name))
+        strBuilder.append("{0}(".format(self.__System_Name))
         for station in self.__Station_Names:
             strBuilder.append("{0}".format(station))
             if station != self.__Station_Names[-1]:
@@ -62,7 +82,7 @@ class EDSystem( object ):
             strBuilder.append("{0} - {1}cr".format(self.__Items[i],self.__Costs[i]))
             if i != self.__Items.__len__() - 1:
                 strBuilder.append(", ")
-        strBuilder.append("}} ({0}T)".format(self.Max_Supply))
+        strBuilder.append("}} ({0}T)".format(self.__Max_Supply))
             
         #else:
         #    return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
@@ -73,13 +93,13 @@ class EDSystem( object ):
         '''
         All stations/rares in a system will count as one EDSystems
         '''
-        return self.System_Name
+        return self.__System_Name
 #------------------------------------------------------------------------------  
     def __hash__(self):
         '''
         Use the index for hash since it is unique to each entry
         '''
-        return hash(self.Index)
+        return hash(self.__Index)
 #------------------------------------------------------------------------------
     def __eq__(self, other):
         return self.__key() == other.__key()

@@ -88,7 +88,7 @@ class EDRareRoute(object):
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
             self.__Total_Distance += jumpDistance
             longestJump = jumpDistance if jumpDistance > longestJump else longestJump
             if jumpDistance <= clusterShortLY:
@@ -133,7 +133,7 @@ class EDRareRoute(object):
             for i in range(1,routeLength):
                 system1IndexToCheck = (i + system1Index) % routeLength
                 currentSystem = self.__Route[system1IndexToCheck]
-                if system1.System_Distances[currentSystem.Index] >= self.__Seller_Min:
+                if system1.GetDistanceTo(currentSystem) >= self.__Seller_Min:
                     if system1LastIndex > 0:
                         if system1Sellers[-1]:
                             system1Sellers.append(True)
@@ -149,7 +149,7 @@ class EDRareRoute(object):
 
                 system2IndexToCheck = (i + system2Index) % routeLength
                 currentSystem = self.__Route[system2IndexToCheck]
-                if system2.System_Distances[currentSystem.Index] >= self.__Seller_Min:
+                if system2.GetDistanceTo(currentSystem) >= self.__Seller_Min:
                     if system2LastIndex > 0:
                         if system2Sellers[-1]:
                             system2Sellers.append(True)
@@ -204,7 +204,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([val.GetTotalCost() for val in self.__Route])/routeLength
+        avgCost = sum([val.Total_Cost for val in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -254,7 +254,7 @@ class EDRareRoute(object):
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
             if jumpDistance > longestJump:
                 longestJump = jumpDistance
             
@@ -268,7 +268,7 @@ class EDRareRoute(object):
         for seller in self.__Route:
             systemsBySeller[seller] = []
             for system in self.__Route:
-                if seller.System_Distances[system.Index] >= self.__Seller_Min:
+                if seller.GetDistanceTo(system) >= self.__Seller_Min:
                     systemsBySeller[seller].append(system)
         ableToSell = routeLength
         for k,v in systemsBySeller.items():
@@ -330,7 +330,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([val.GetTotalCost() for val in self.__Route])/routeLength
+        avgCost = sum([val.Total_Cost for val in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -374,7 +374,7 @@ class EDRareRoute(object):
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.System_Distances[nextSystem.Index]
+            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
             if jumpDistance > longestJump:
                 longestJump = jumpDistance
             
@@ -389,12 +389,12 @@ class EDRareRoute(object):
         for seller in self.__Route:
             farthestSystems[seller] = None
             for system in self.__Route:
-                distToSystem = seller.System_Distances[system.Index]
+                distToSystem = seller.GetDistanceTo(system)
                 if distToSystem > self.__Seller_Min:
                     if farthestSystems[seller] is None:
                         farthestSystems[seller] = system
                     else:
-                        currentFarthest = seller.System_Distances[farthestSystems[seller].Index]
+                        currentFarthest = seller.GetDistanceTo(farthestSystems[seller])
                         if distToSystem > currentFarthest:
                             farthestSystems[seller] = system
 
@@ -456,7 +456,7 @@ class EDRareRoute(object):
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
   
-        avgCost = sum([val.GetTotalCost() for val in self.__Route])/routeLength
+        avgCost = sum([val.Total_Cost for val in self.__Route])/routeLength
         weightedCost = math.log(avgCost,1000)
 
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
@@ -697,7 +697,7 @@ class EDRareRoute(object):
             for i in range(routeLength):
                 currSys = self.__Route[i%routeLength]
                 nextSys = self.__Route[(i+1)%routeLength]
-                jumpDistance = currSys.System_Distances[nextSys.Index]
+                jumpDistance = currSys.GetDistanceTo(nextSys)
                 if i == routeLength - 1:
                     currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
                                                   points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
@@ -743,7 +743,7 @@ class EDRareRoute(object):
         root.mainloop()
 #------------------------------------------------------------------------------
     def __str__(self):
-        avgCost = sum([val.GetTotalCost() for val in self.__Route])/self.__Route.__len__()
+        avgCost = sum([val.Total_Cost for val in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
 
@@ -755,16 +755,16 @@ class EDRareRoute(object):
             for system in self.__Route:
                 tempSellers = []
                 for distToCheck in self.__Route:
-                    if system.System_Distances[distToCheck.Index] >= self.__Seller_Min:
+                    if system.GetDistanceTo(distToCheck) >= self.__Seller_Min:
                         tempSellers.append(distToCheck)
                 sellersPerSystem[system] = tempSellers
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_List:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.GetStationNames()))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.GetStationNames()))
-                if system.NeedsPermit():
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
+                if system.Needs_Permit:
                     strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
@@ -782,10 +782,10 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_Dict:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.GetStationNames()))
+                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.GetStationNames()))
-                if system.NeedsPermit():
+                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
+                if system.Needs_Permit:
                     strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
