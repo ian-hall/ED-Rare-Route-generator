@@ -44,7 +44,7 @@ class RouteCalc(object):
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
             raise Exception("Not enough systems for a route...")
 
-        population = [EDRareRoute(val, fitType) for val in GenerateSystemLists(popSize,routeLength,validSystems)]
+        population = [EDRareRoute(sysList, fitType) for sysList in GenerateSystemLists(popSize,routeLength,validSystems)]
         #for sysList in GenerateSystemLists(popSize,routeLength,validSystems):
         #    population.append(EDRareRoute(sysList,fitType))
 
@@ -64,7 +64,7 @@ class RouteCalc(object):
         mutationChance = baseMutation
         
         #Just keep track of the single best route
-        bestRoute = max(currentPopulation,key=operator.methodcaller('GetFitValue'))
+        bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness'))
 
         #Want the program to keep running until it finds something, which it will eventually (maybe).
         #Going to increase the mutation chance for every couple generations it goes without increasing
@@ -80,18 +80,18 @@ class RouteCalc(object):
         maxGensSinceLast = (maxIncreases+1)*timeBetweenIncrease
 
         while True:    
-            possibleRoute = max(currentPopulation,key=operator.methodcaller('GetFitValue'))
+            possibleRoute = max(currentPopulation,key=operator.attrgetter('Fitness'))
 
             if not silent:
                 if currentGeneration == 1:
-                    print("Starting value: {0:.5f}".format(possibleRoute.GetFitValue()))
+                    print("Starting value: {0:.5f}".format(possibleRoute.Fitness))
 
             currentGeneration += 1
             nextPopulation = []
 
-            if possibleRoute.GetFitValue() > bestRoute.GetFitValue():
+            if possibleRoute.Fitness > bestRoute.Fitness:
                 if not silent:
-                    print("{0:>7}-> {1:.5f}".format(currentGeneration,possibleRoute.GetFitValue()))
+                    print("{0:>7}-> {1:.5f}".format(currentGeneration,possibleRoute.Fitness))
                 bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
                 #Reset mutation chance when finding a new best route
@@ -101,7 +101,7 @@ class RouteCalc(object):
                         print("{0:>7}-> mutation chance: {1:.1f}%".format("",mutationChance*100))
 
             #Exit if we are at least at the Route_Cutoff value and its been X generations since last increase
-            if bestRoute.GetFitValue() >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= cutoffAfterRouteFound:
+            if bestRoute.Fitness >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= cutoffAfterRouteFound:
                 break
             
             #Exit if it has been X generations since last found route
@@ -112,10 +112,10 @@ class RouteCalc(object):
             if currentGeneration - lastRouteFoundOn >= timeBetweenIncrease and (currentGeneration - lastIncrease) >= timeBetweenIncrease:
                 mutationChance += mutationIncrease
                 lastIncrease = currentGeneration
-                currentPopulation = sorted(currentPopulation,key=operator.methodcaller('GetFitValue'))
+                currentPopulation = sorted(currentPopulation,key=operator.attrgetter('Fitness'))
                 #Replace a percentage of the routes with lowest values, maybe make this smart to not include adding systems already commonly in the top routes
                 numReplace = math.ceil(currentPopulation.__len__() * .75)
-                tempPop = GenerateSystemLists(numReplace,bestRoute.GetLength(),RouteCalc.__Valid_Systems)
+                tempPop = GenerateSystemLists(numReplace,bestRoute.Length,RouteCalc.__Valid_Systems)
                 for i in range(numReplace):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
 
@@ -147,11 +147,11 @@ class RouteCalc(object):
         X times the population size, set by __Selection_Mult
         '''
         upperVal = population.__len__() * RouteCalc.__Selection_Mult
-        total = sum([route.GetFitValue() for route in population])     
+        total = sum([route.Fitness for route in population])     
 
-        selectionValues = [population[0].GetFitValue()/total * upperVal]
+        selectionValues = [population[0].Fitness/total * upperVal]
         for i in range(1,population.__len__()):
-            percentTotal = population[i].GetFitValue()/total * upperVal
+            percentTotal = population[i].Fitness/total * upperVal
             selectionValues.append(percentTotal + selectionValues[i-1])
 
         
@@ -175,8 +175,8 @@ class RouteCalc(object):
             parents.append(parent)
         
         #Create the new children
-        route1 = parents[0].GetRoute()
-        route2 = parents[1].GetRoute()
+        route1 = parents[0].Systems
+        route2 = parents[1].Systems
         if route1.__len__() != route2.__len__():
             raise Exception("Routes of uneven length")
         routeLength = route1.__len__()
@@ -211,7 +211,7 @@ class RouteCalc(object):
 #------------------------------------------------------------------------------ 
     @classmethod
     def __Mutate(cls,route: list) -> list:
-        tempRoute = [val for val in route]
+        tempRoute = [system for system in route]
         
         #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()

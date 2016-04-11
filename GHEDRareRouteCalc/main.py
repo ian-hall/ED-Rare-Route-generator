@@ -93,10 +93,10 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
         geneticEnd = time.time()
         if routeTuple:
             bestRoute = routeTuple[0]
-            if bestRoute.GetFitValue() >= RouteCalc.Route_Cutoff and stopShort:
+            if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
                 exitTestLoop = True
-            if bestRoute.GetFitValue() < RouteCalc.Route_Cutoff:
-                print("No good route found".format(bestRoute.GetFitValue()))
+            if bestRoute.Fitness < RouteCalc.Route_Cutoff:
+                print("No good route found".format(bestRoute.Fitness))
             print(bestRoute)
             print("Generations: {0}".format(routeTuple[1]))
             print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
@@ -212,8 +212,8 @@ if __name__ == '__main__':
     '''
     maxStationDistance = 10000
     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-    length = 6
-    popSize = 150
+    length = 13
+    popSize = 333
     __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
 
     

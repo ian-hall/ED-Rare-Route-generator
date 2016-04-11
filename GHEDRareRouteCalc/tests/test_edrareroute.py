@@ -19,7 +19,7 @@ class Test_EDRareRoute(unittest.TestCase):
                                   same systems, different order, same fitness types are not equal
         '''
         sysList1 = random.choice(self.System_Lists)
-        sysList2 = [val for val in sysList1]
+        sysList2 = [system for system in sysList1]
         random.shuffle(sysList2)
 
         #Make sure these aren't equal, but I think shuffle will never return the same list??
@@ -47,7 +47,7 @@ class Test_EDRareRoute(unittest.TestCase):
         Test that routes with the same systems and fit type are equal
         '''
         sysList = random.choice(self.System_Lists)
-        sysListCopy = [val for val in sysList]
+        sysListCopy = [system for system in sysList]
         
         for name,fType in FitnessType.__members__.items():
             with self.subTest(fType=fType):
@@ -56,6 +56,9 @@ class Test_EDRareRoute(unittest.TestCase):
                 self.assertEqual(testRoute1,testRoute2)
 #------------------------------------------------------------------------------
     def test_Route_Distance(self):
+        '''
+        Make sure all fitvals are calculating the expected total distance of a route
+        '''
         sysList = random.choice(self.System_Lists)
         routeLen = sysList.__len__()   
         expectedDistance = 0
@@ -67,7 +70,7 @@ class Test_EDRareRoute(unittest.TestCase):
         for name,fType in FitnessType.__members__.items():
             with self.subTest(fType=fType):
                 testRoute = EDRareRoute(sysList,fType)
-                self.assertAlmostEqual(expectedDistance,testRoute.GetTotalDistance())          
+                self.assertAlmostEqual(expectedDistance,testRoute.Total_Distance)          
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

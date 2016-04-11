@@ -33,7 +33,7 @@ class EDRareRoute(object):
         self.__Route = systemList
         self.__Seller_Min = 160
         self.__Total_Distance = 0
-        self.__Total_Supply = sum((val.Max_Supply for val in self.__Route))
+        self.__Total_Cargo = sum((system.Max_Supply for system in self.__Route))
         self.__Sellers_List = None
         self.__Sellers_Dict = None
         self.__Max_Cargo = 0
@@ -48,22 +48,28 @@ class EDRareRoute(object):
         else:
             self.__Fitness_Value = self.__CalcFitness()
 #------------------------------------------------------------------------------
-    def GetRoute(self) -> list:
-        return [val for val in self.__Route]     
-#------------------------------------------------------------------------------
-    def GetRouteType(self) -> RouteType:
-        return self.__Route_Type
-#------------------------------------------------------------------------------
-    def GetFitValue(self) -> float:
+    @property
+    def Fitness(self) -> float:
         return self.__Fitness_Value
 #------------------------------------------------------------------------------
-    def GetTotalSupply(self) -> float:
-        return self.__Total_Supply
+    @property
+    def Systems(self) -> list:
+        return [system for system in self.__Route]     
 #------------------------------------------------------------------------------
-    def GetTotalDistance(self) -> float:
+    @property
+    def Route_Type(self) -> RouteType:
+        return self.__Route_Type
+#------------------------------------------------------------------------------
+    @property
+    def Total_Cargo(self) -> float:
+        return self.__Total_Cargo
+#------------------------------------------------------------------------------
+    @property
+    def Total_Distance(self) -> float:
         return self.__Total_Distance
 #------------------------------------------------------------------------------
-    def GetLength(self) -> int:
+    @property
+    def Length(self) -> int:
         return self.__Route.__len__() 
 #------------------------------------------------------------------------------
     def __CalcFitness(self):
@@ -202,9 +208,9 @@ class EDRareRoute(object):
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
         minSupply = routeLength * 10
-        weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
+        weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
   
-        avgCost = sum([val.Total_Cost for val in self.__Route])/routeLength
+        avgCost = sum([system.Total_Cost for system in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -328,9 +334,9 @@ class EDRareRoute(object):
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
         minSupply = routeLength * 10
-        weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
+        weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
   
-        avgCost = sum([val.Total_Cost for val in self.__Route])/routeLength
+        avgCost = sum([system.Total_Cost for system in self.__Route])/routeLength
         #using log because these values can be very high
         weightedCost = math.log(avgCost,1000)
 
@@ -454,9 +460,9 @@ class EDRareRoute(object):
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
         minSupply = routeLength * 10
-        weightedSupply = math.log(self.__Total_Supply,minSupply) * 2
+        weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
   
-        avgCost = sum([val.Total_Cost for val in self.__Route])/routeLength
+        avgCost = sum([system.Total_Cost for system in self.__Route])/routeLength
         weightedCost = math.log(avgCost,1000)
 
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
@@ -494,13 +500,13 @@ class EDRareRoute(object):
         yMin = min(yVals)
 
         if xMin < 0:
-            xValsNew = [abs(xMin) + val for val in xVals]
+            xValsNew = [abs(xMin) + x for x in xVals]
         else:
-            xValsNew = [val - xMin for val in xVals]
+            xValsNew = [x - xMin for x in xVals]
         if yMin < 0:
-            yValsNew = [abs(yMin) + val for val in yVals]
+            yValsNew = [abs(yMin) + y for y in yVals]
         else:
-            yValsNew = [val - yMin for val in yVals]
+            yValsNew = [y - yMin for y in yVals]
 
         xMax = max(xValsNew)
         yMax = max(yValsNew)
@@ -601,13 +607,13 @@ class EDRareRoute(object):
         zMin = min(zVals)
 
         if xMin < border:
-            xValsNew = [abs(xMin) + val + border for val in xVals]
+            xValsNew = [abs(xMin) + x + border for x in xVals]
         else:
-            xValsNew = [val - xMin for val in xVals]
+            xValsNew = [x - xMin for x in xVals]
         if yMin < border:
-            yValsNew = [abs(yMin) + val + border for val in yVals]
+            yValsNew = [abs(yMin) + y + border for y in yVals]
         else:
-            yValsNew = [val - yMin for val in yVals]
+            yValsNew = [y - yMin for y in yVals]
 
         xMax = max(xValsNew)
         yMax = max(yValsNew)
@@ -638,7 +644,7 @@ class EDRareRoute(object):
         yMax = max(yValsNew)
         #xValsNew = [xMax - val for val in xValsNew]
         #flip yvals around and add border size to all
-        yValsNew = [(yMax - val) + border for val in yValsNew]
+        yValsNew = [(yMax - y) + border for y in yValsNew]
 
         for i in range(xValsNew.__len__()):
             points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
@@ -673,7 +679,7 @@ class EDRareRoute(object):
                         print("Unable to draw route")
                         return
 
-        zValsNew = [val + abs(zMin) for val in zVals]
+        zValsNew = [z + abs(zMin) for z in zVals]
         zMax = max(zValsNew)
         #Red -> low depth, Green -> high depth
         fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00", "#00FF40"]
@@ -743,7 +749,7 @@ class EDRareRoute(object):
         root.mainloop()
 #------------------------------------------------------------------------------
     def __str__(self):
-        avgCost = sum([val.Total_Cost for val in self.__Route])/self.__Route.__len__()
+        avgCost = sum([system.Total_Cost for system in self.__Route])/self.__Route.__len__()
         strList = []
         count = 0
 
@@ -807,7 +813,7 @@ class EDRareRoute(object):
 
         strList.append("\nTotal distance: {0:.3f}ly".format(self.__Total_Distance))
         strList.append("\nLongest jump: {0:.3f}ly".format(self.__Longest_Jump))
-        strList.append("\nTotal goods: {0:.2f}".format(self.__Total_Supply))
+        strList.append("\nTotal goods: {0:.2f}".format(self.__Total_Cargo))
         strList.append("\nCargo space req: {0}".format(self.__Max_Cargo))
         strList.append("\nAvg cost: {0:.2f}".format(avgCost))
         strList.append("\nType: {0}".format(self.__Route_Type.name))

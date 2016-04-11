@@ -33,8 +33,8 @@ class Test_RouteCalc(unittest.TestCase):
         lastVal = selectMult * self.Pop_Size
         self.assertAlmostEqual(lastVal,selectVals[-1])
 
-        popSum = sum([val.GetFitValue() for val in self.Population])
-        firstVal = self.Population[0].GetFitValue()/popSum * lastVal
+        popSum = sum([route.Fitness for route in self.Population])
+        firstVal = self.Population[0].Fitness/popSum * lastVal
         self.assertEqual(firstVal,selectVals[0])
         
         for i in range(500):
@@ -42,7 +42,7 @@ class Test_RouteCalc(unittest.TestCase):
                 index = random.randrange(1,self.Pop_Size-1)
                 randSelectVal = selectVals[index]
                 randRoute = self.Population[index]
-                sumToIndex = sum([val.GetFitValue() for val in self.Population[:index+1]])
+                sumToIndex = sum([route.Fitness for route in self.Population[:index+1]])
                 calcVal = (sumToIndex/popSum) * lastVal
                 self.assertAlmostEqual(calcVal,randSelectVal)
 

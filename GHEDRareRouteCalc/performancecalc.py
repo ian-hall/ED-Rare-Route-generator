@@ -12,8 +12,8 @@ class PerformanceCalc(object):
     def CheckPerformance(cls,systemsList: list,fitType: FitnessType):
         maxTests = 10
 
-        minPopSize = 300
-        maxPopSize = 300
+        minPopSize = 250
+        maxPopSize = 250
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
@@ -32,9 +32,9 @@ class PerformanceCalc(object):
                     endTime = time.time()
                     elapsed = endTime - startTime
                     bestRoute = routeTuple[0]
-                    if bestRoute.GetFitValue() >= RouteCalc.Route_Cutoff:
-                        stats.Types.append(routeTuple[0].GetRouteType())
-                        stats.Values.append(routeTuple[0].GetFitValue())
+                    if bestRoute.Fitness >= RouteCalc.Route_Cutoff:
+                        stats.Types.append(routeTuple[0].Route_Type)
+                        stats.Values.append(routeTuple[0].Fitness)
                         solved = True
 
                     stats.Times.append(elapsed)
