@@ -4,9 +4,6 @@
 #------------------------------------------------------------------------------
 class EDSystem( object ):
 #------------------------------------------------------------------------------
-    '''
-    TODO:  Now with more @properties
-    '''
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
         
@@ -32,7 +29,7 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     @property
     def Station_Names(self) -> list:
-        return self.__Station_Names
+        return [name for name in self.__Station_Names]
 #------------------------------------------------------------------------------
     @property
     def Index(self) -> int:
@@ -44,8 +41,9 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     @property
     def Station_Distances(self) -> list:
-        return self.__Station_Distances
+        return [dist for dist in self.__Station_Distances]
 #------------------------------------------------------------------------------
+    #TODO: Maybe a better way to get location so it can't be set
     @property
     def Location(self) -> dict:
         return self.__Location
@@ -53,6 +51,19 @@ class EDSystem( object ):
     @property
     def Needs_Permit(self) -> bool:
         return self.__Permit_Req
+#------------------------------------------------------------------------------
+    @property
+    def Short_Str(self) -> str:
+        strBuilder = []
+        if self.__Permit_Req:
+            strBuilder.append("(P) ")
+        strBuilder.append("{0} (".format(self.__System_Name))
+        for station in self.__Station_Names:
+            strBuilder.append("{0}".format(station))
+            if station != self.__Station_Names[-1]:
+                strBuilder.append(", ")
+        strBuilder.append(")")
+        return "".join(strBuilder)
 #------------------------------------------------------------------------------
     def GetDistanceTo(self, next) -> float:
         return self.__System_Distances[next.__Index]
@@ -69,7 +80,6 @@ class EDSystem( object ):
     def __str__(self):
         strBuilder = []
         if self.__Permit_Req:
-            #return str.format("(P){0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
             strBuilder.append("(P)")
         
         strBuilder.append("{0}(".format(self.__System_Name))
@@ -83,9 +93,7 @@ class EDSystem( object ):
             if i != self.__Items.__len__() - 1:
                 strBuilder.append(", ")
         strBuilder.append("}} ({0}T)".format(self.__Max_Supply))
-            
-        #else:
-        #    return str.format("{0}({1}): {2} @ {3}cr (~{4})", self.System_Name,''.join(self.Station_Names),self.Items, self.Costs, self.Max_Supply)
+
         return ''.join(strBuilder)
         
 #------------------------------------------------------------------------------

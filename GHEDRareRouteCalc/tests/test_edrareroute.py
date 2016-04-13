@@ -72,7 +72,34 @@ class Test_EDRareRoute(unittest.TestCase):
                 testRoute = EDRareRoute(sysList,fType)
                 self.assertAlmostEqual(expectedDistance,testRoute.Total_Distance)          
 #------------------------------------------------------------------------------
+    def test_Route_Cargo_Totals(self):
+        '''
+        Test that the correct total cargo is being calculated
+        '''
+        sysList = random.choice(self.System_Lists)
+        routeLen = sysList.__len__()
+        expectedCargo = 0
+        for i in range(routeLen):
+            currSys = sysList[i]
+            expectedCargo += currSys.Max_Supply
+
+        for name,fType in FitnessType.__members__.items():
+            with self.subTest(fType=fType):
+                testRoute = EDRareRoute(sysList,fType)
+                self.assertAlmostEqual(expectedCargo,testRoute.Total_Cargo)    
 #------------------------------------------------------------------------------
+    def test_Route_Bad_Constructor(self):
+        '''
+        Make sure we are unable to create routes under length 3
+        '''
+        for i in range(3):
+            sysList = random.choice(self.System_Lists)
+            shortList = sysList[:i]
+            with self.subTest(i=i):
+                for name,fType in FitnessType.__members__.items():
+                    with self.subTest(fType=fType):
+                        with self.assertRaises(Exception):
+                            testRoute = EDRareRoute(shortList,fType)   
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

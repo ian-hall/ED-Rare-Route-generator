@@ -79,7 +79,7 @@ class EDRareRoute(object):
         #TODO:  Add tracking for max cargo used
         #       Try again without itertools combos maybe and instead do only check values that are evenly spaced out like we want
         #           Actually looks like I already do this because I continue if routes arent split???
-        routeLength = self.__Route.__len__()
+        routeLength = self.Length
         self.__Total_Distance = 0     
        
         clusterShortLY = 50
@@ -767,11 +767,13 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_List:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
+                    #strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
+                    strList.append("{0}: <{1}>".format(count+1,system.Short_Str))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
-                if system.Needs_Permit:
-                    strList.append("**Permit**")
+                    #strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
+                    strList.append("{0}: {1}".format(count+1,system.Short_Str))
+                #if system.Needs_Permit:
+                #    strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
             
@@ -788,11 +790,13 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_Dict:
-                    strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
+                    #strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
+                    strList.append("{0}: <{1}>".format(count+1,system.Short_Str))
                 else:
-                    strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
-                if system.Needs_Permit:
-                    strList.append("**Permit**")
+                    #strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
+                    strList.append("{0}: {1}".format(count+1,system.Short_Str))
+                #if system.Needs_Permit:
+                #    strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
 
@@ -807,7 +811,7 @@ class EDRareRoute(object):
 
         #For just displaying the systems if we dont have a sellers list/dict
         else:
-            strList.append("\n(Probably bad)Route value:{0}\n".format(self.__Fitness_Value))
+            strList.append("\nRoute value:{0}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                strList.append('{0}\n'.format(system))
 
