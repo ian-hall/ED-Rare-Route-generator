@@ -101,6 +101,59 @@ class Test_EDRareRoute(unittest.TestCase):
                         with self.assertRaises(Exception):
                             testRoute = EDRareRoute(shortList,fType)   
 #------------------------------------------------------------------------------
+    def test_Route_RouteType_Split(self):
+        '''
+        Test that we are getting only the expected RouteTypes back from certain FitnessTypes
+        '''
+        fType = FitnessType.EvenSplit
+        expectedRouteTypes = [RouteType.Cluster, RouteType.Spread, RouteType.Other]
+        for sysList in self.System_Lists:
+            currRoute = EDRareRoute(sysList,fType)
+            self.assertIn(currRoute.Route_Type,expectedRouteTypes)
+#------------------------------------------------------------------------------
+    def test_Route_RouteType_First(self):
+        '''
+        Test that we are getting only the expected RouteTypes back from certain FitnessTypes
+        '''
+        fType = FitnessType.FirstOver
+        expectedRouteTypes = [RouteType.FirstOver, RouteType.FirstOverLong]
+        for sysList in self.System_Lists:
+            currRoute = EDRareRoute(sysList,fType)
+            self.assertIn(currRoute.Route_Type,expectedRouteTypes)
+#------------------------------------------------------------------------------
+    def test_Route_RouteType_Farthest(self):
+        '''
+        Test that we are getting only the expected RouteTypes back from certain FitnessTypes
+        '''
+        fType = FitnessType.Farthest
+        expectedRouteTypes = [RouteType.Farthest, RouteType.FarthestLong]
+        for sysList in self.System_Lists:
+            currRoute = EDRareRoute(sysList,fType)
+            self.assertIn(currRoute.Route_Type,expectedRouteTypes)
+#------------------------------------------------------------------------------
+    def test_Route_Systems(self):
+        '''
+        Test that we get back the same systems from a route that we put in
+        '''
+        for systemList in self.System_Lists:
+            for name,fType in FitnessType.__members__.items():
+                with self.subTest(fType=fType):
+                    testRoute = EDRareRoute(systemList,fType)
+                    self.assertListEqual(testRoute.Systems,systemList)   
+#------------------------------------------------------------------------------
+    def test_Route_Length(self):
+        '''
+        Test that we get the expected length back from a route
+        '''
+        for systemList in self.System_Lists:
+            expectedLength = random.randint(3,15)
+            tempList = systemList[:expectedLength]
+            with self.subTest(expectedLength=expectedLength):
+                for name,fType in FitnessType.__members__.items():
+                    with self.subTest(fType=fType):
+                        testRoute = EDRareRoute(tempList,fType)
+                        self.assertEqual(testRoute.Length,expectedLength)
+#------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 if __name__ == '__main__':

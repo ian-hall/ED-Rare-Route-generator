@@ -4,7 +4,9 @@ import itertools
 import math
 import tkinter
 from enum import Enum,unique
-
+#------------------------------------------------------------------------------
+###############################################################################
+#------------------------------------------------------------------------------
 @unique
 class RouteType(Enum):
     Other = 0
@@ -767,13 +769,9 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_List:
-                    #strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
                     strList.append("{0}: <{1}>".format(count+1,system.Short_Str))
                 else:
-                    #strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
                     strList.append("{0}: {1}".format(count+1,system.Short_Str))
-                #if system.Needs_Permit:
-                #    strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
             
@@ -790,13 +788,9 @@ class EDRareRoute(object):
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_Dict:
-                    #strList.append("{0}: <{1} ({2})>".format(count+1,system.System_Name, system.Station_Names))
                     strList.append("{0}: <{1}>".format(count+1,system.Short_Str))
                 else:
-                    #strList.append("{0}: {1} ({2})".format(count+1,system.System_Name, system.Station_Names))
                     strList.append("{0}: {1}".format(count+1,system.Short_Str))
-                #if system.Needs_Permit:
-                #    strList.append("**Permit**")
                 strList.append("\n")
                 count += 1
 

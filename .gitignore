@@ -187,3 +187,7 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+/GHEDRareRouteCalc/tests/__pycache__
+/GHEDRareRouteCalc/__pycache__
+*.pyperf
+*.playlist
