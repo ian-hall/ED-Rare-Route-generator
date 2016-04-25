@@ -216,7 +216,9 @@ if __name__ == '__main__':
     length = 8
     popSize = 333
     #__RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
-    edsystem.CreateEDSystems(100)
+    
+    for system in edsystem.CreateEDSystems(100):
+        print(system,"\n")
 
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
