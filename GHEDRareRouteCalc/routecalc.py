@@ -264,13 +264,6 @@ def GenerateSystemLists(numToCreate: int, routeLength: int, validSystems: list) 
 
     generatedLists = []
     for i in range(numToCreate):
-        #tempSystemList = []
-        #for j in range(0,routeLength):
-        #    tempSystem = random.choice(validSystems)                  
-        #    #Need to avoid duplicates
-        #    while tempSystemList.count(tempSystem) != 0:
-        #        tempSystem = random.choice(validSystems)
-        #    tempSystemList.append(tempSystem)
         tempSystemList = random.sample(validSystems,routeLength)
         generatedLists.append(tempSystemList)
     return generatedLists

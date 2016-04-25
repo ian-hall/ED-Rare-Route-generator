@@ -133,3 +133,16 @@ class DisplayLocation(object):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
+def CreateEDSystems(numToCreate: int) -> list:
+    '''
+    "Factory" whatever for making EDSystems to use in testing
+    '''
+    #TODO:  Create a set list of systemNames to chose from so we can support multiple stations per systems
+    #       Also want to support multiple rares per station per system
+    import random
+    import string
+    for i in range(numToCreate):
+        systemName = ''.join(random.choice(string.ascii_lowercase + "'- ") for _ in range(10))
+        stationName = ''.join(random.choice(string.ascii_lowercase + "'- ") for _ in range(14))
+        index = i
+        print(systemName,stationName, i)

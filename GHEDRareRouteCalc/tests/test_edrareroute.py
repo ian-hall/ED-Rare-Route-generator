@@ -154,6 +154,43 @@ class Test_EDRareRoute(unittest.TestCase):
                         testRoute = EDRareRoute(tempList,fType)
                         self.assertEqual(testRoute.Length,expectedLength)
 #------------------------------------------------------------------------------
+    def test_Route_Properties(self):
+        '''
+        Test that properties cannot be set
+        '''
+        testRoute = EDRareRoute(self.System_Lists[0],FitnessType.FirstOver)
+        
+        with self.assertRaises(AttributeError):
+            testRoute.Fitness = 99
+        
+        with self.assertRaises(AttributeError):
+            testRoute.Length = 13
+        
+        with self.assertRaises(AttributeError):
+            testRoute.Route_Type = RouteType.Cluster
+        
+        with self.assertRaises(AttributeError):
+            testRoute.Systems = []
+        
+        with self.assertRaises(AttributeError):
+            testRoute.Total_Cargo = -1
+        
+        with self.assertRaises(AttributeError):
+            testRoute.Total_Distance = -1
+#------------------------------------------------------------------------------
+    def test_Route_Systems_Unchanged(self):
+        '''
+        Test that getting the systems of a route and modifying the list does
+        not change the systems of the route indirectly
+        '''
+        for systemList in self.System_Lists:
+            for name,fType in FitnessType.__members__.items():
+                with self.subTest(fType=fType):
+                    testRoute = EDRareRoute(systemList,fType)
+                    changedSystems = testRoute.Systems
+                    random.shuffle(changedSystems)
+                    self.assertNotEqual(testRoute.Systems,changedSystems,msg="EDRareRoute systems indirectly changed")
+#------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
