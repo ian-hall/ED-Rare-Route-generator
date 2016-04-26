@@ -10,7 +10,6 @@ import time
 from urllib import request
 
 #------------------------------------------------------------------------------
-# TODO: When reading from google docs, system Baltah'Sine or whatever doesnt get parsed right
 def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
     '''
     0 - Max Cap
@@ -30,10 +29,10 @@ def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
     supplyCap       = currentLine[0]
     avgSupply       = currentLine[1]
     itemCost        = currentLine[2]
-    itemName        = currentLine[3].strip()
+    itemName        = currentLine[3].strip().replace("\\'","\'")
     distToStation   = currentLine[4]
-    stationName     = currentLine[5].strip()
-    systemName      = currentLine[6].strip()
+    stationName     = currentLine[5].strip().replace("\\'","\'")
+    systemName      = currentLine[6].strip().replace("\\'","\'")
     index           = lineNum-1
     distToOthers    = []
     for j in range(7,currentLine.__len__()-3):
@@ -216,9 +215,6 @@ if __name__ == '__main__':
     length = 8
     popSize = 333
     #__RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
-    
-    for system in edsystem.CreateEDSystems(100):
-        print(system,"\n")
 
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
     #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)

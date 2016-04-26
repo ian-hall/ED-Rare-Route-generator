@@ -78,6 +78,7 @@ class EDSystem( object ):
             self.__Station_Distances.extend(other.__Station_Distances)
 #------------------------------------------------------------------------------
     def __str__(self):
+        #TODO: Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
         strBuilder = []
         if self.__Permit_Req:
             strBuilder.append("(P)")
@@ -133,33 +134,3 @@ class DisplayLocation(object):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
-def CreateEDSystems(numToCreate: int) -> list:
-    '''
-    "Factory" whatever for making EDSystems to use in testing
-    '''
-    #TODO: Some kind of dictionary for chosing station/systems/item names so I dont just have random ugly garbage names
-    import random
-    import string
-    validSystemNames = [''.join(random.choice("ABCDEFGHabcdefgh' ") for _ in range(7)) for _ in range(numToCreate)]
-    validStationNames = [''.join(random.choice("IJKLMNOijklmno ") for _ in range(11)) for _ in range(numToCreate)]
-    generatedSystems = []
-    for i in range(numToCreate):
-        systemName = random.choice(validSystemNames)
-        stationName = random.choice(validStationNames)
-        index = i
-        supplyCap = random.randint(1,15)
-        avgSupply = supplyCap
-        itemCost = random.randrange(7000)
-        itemName = ''.join(random.choice(string.ascii_lowercase + "' ") for _ in range(10))
-        distToStation = random.randrange(10000)
-        permitReq = (random.randrange(100)%10 == 0)
-        distToOthers = [0 for _ in range(numToCreate)]
-
-        currentSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
-        if generatedSystems.count(currentSystem) != 0:
-            for system in generatedSystems:
-                if system == currentSystem:
-                    system.AddRares(currentSystem)
-        else:
-            generatedSystems.append(currentSystem)
-    return generatedSystems

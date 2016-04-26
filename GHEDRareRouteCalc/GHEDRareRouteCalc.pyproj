@@ -44,7 +44,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="items.txt" />
     <Content Include="RareGoods.csv" />
+    <Content Include="stations.txt" />
+    <Content Include="systems.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="tests\" />

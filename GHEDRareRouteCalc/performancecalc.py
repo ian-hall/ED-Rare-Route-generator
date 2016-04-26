@@ -78,16 +78,16 @@ class PerformanceCalc(object):
         print(good5Route)
         good5Route.PrintRoute()
          
-        #good8_1 = []
-        #good8_1.append(systemsDict['Hecate'])
-        #good8_1.append(systemsDict['Aganippe']) 
-        #good8_1.append(systemsDict['Leesti'])
-        #good8_1.append(systemsDict['Any Na'])
-        #good8_1.append(systemsDict['Ngurii'])
-        #good8_1.append(systemsDict["Baltah'Sine"])
-        #good8_1.append(systemsDict['Chi Eridani'])
-        #good8_1.append(systemsDict['Altair']) 
-        #print(EDRareRoute(good8_1,fitType))
+        good8_1 = []
+        good8_1.append(systemsDict['Hecate'])
+        good8_1.append(systemsDict['Aganippe']) 
+        good8_1.append(systemsDict['Leesti'])
+        good8_1.append(systemsDict['Any Na'])
+        good8_1.append(systemsDict['Ngurii'])
+        good8_1.append(systemsDict["Baltah'Sine"])
+        good8_1.append(systemsDict['Chi Eridani'])
+        good8_1.append(systemsDict['Altair']) 
+        print(EDRareRoute(good8_1,fitType))
         
         #bad6_1 = []
         #bad6_1.append(systemsDict['Karetii'])
