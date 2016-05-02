@@ -27,6 +27,7 @@ class FitnessType(Enum):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
+#TODO: Add tracking for max_cargo to all fitness calculations
 class EDRareRoute(object):
 #------------------------------------------------------------------------------
     def __init__(self,systemList: list, fType: FitnessType):
@@ -588,7 +589,6 @@ class EDRareRoute(object):
         '''
         #TODO:  Find why zoom jumps all over the place
         #       Add color to seller locations on mouseover
-        #       Place arrows on lines in front of all sellers, or at least more than just at the starting point
 
         routeLength = self.__Route.__len__()
 
@@ -652,10 +652,10 @@ class EDRareRoute(object):
             points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
 
 
+        #TODO: Maybe have this shuffle based on ovalRad so we dont have overlapping ovals
         pointsCounter = Counter(points)
         split = 10
         loops = 0
-        #TODO: Maybe have this shuffle based on ovalRad so we dont have overlapping ovals
         while sum([v for k,v in pointsCounter.items() if v == 1]) != points.__len__():
             for k,v in pointsCounter.items():
                 if v > 1:
@@ -670,7 +670,6 @@ class EDRareRoute(object):
                             points[toChange].Col += 1
                         else:
                             points[toChange].Col -= 1
-
             loops += 1
             pointsCounter = Counter(points)
 
@@ -683,7 +682,7 @@ class EDRareRoute(object):
 
         zValsNew = [z + abs(zMin) for z in zVals]
         zMax = max(zValsNew)
-        #Red -> low depth, Green -> high depth
+        #Red -> low, Green -> high
         fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00", "#00FF40"]
         colorStep = (zMax / (fillColors.__len__())) + 0.1
 
@@ -706,7 +705,10 @@ class EDRareRoute(object):
                 currSys = self.__Route[i%routeLength]
                 nextSys = self.__Route[(i+1)%routeLength]
                 jumpDistance = currSys.GetDistanceTo(nextSys)
-                if i == routeLength - 1:
+                #gross
+                #also doesnt look as good as I thought
+                if( (self.__Sellers_Dict is not None and nextSys in self.__Sellers_Dict) or 
+                    (self.__Sellers_List is not None and nextSys in self.__Sellers_List) ):#i == routeLength - 1:
                     currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
                                                   points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
                                                   arrow="last",arrowshape=(20,30,20),width=4)
@@ -728,9 +730,6 @@ class EDRareRoute(object):
             canvas.tag_bind(sysOval,"<Motion>",lambda e, currSys=currSys,sysInd=currSysInd: systemLabel.config(text="{0}: {1}".format(sysInd+1,currSys)))
             #canvas.tag_bind(sysOval,"<Leave>",clearSystemLabel)
             currSysInd += 1
-
-
-                #canvas.tag_bind(currLine,"<Leave>",clearSystemLabel)
 
         def scaleCanv(event):
             #thanks snackoverflow

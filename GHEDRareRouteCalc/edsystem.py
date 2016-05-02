@@ -3,10 +3,16 @@
 ###############################################################################
 #------------------------------------------------------------------------------
 class EDSystem( object ):
+    #TODO: Maybe a better way to do this?
+    #      Also constructor args types don't seem to actually do any type checking, thanks python
 #------------------------------------------------------------------------------
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
-        
+
+        if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
+            (stationName is None) or (systemName is None) or (systemIndex is None) or (distToOthers is None) or (permit is None) ):
+            raise Exception("Values cannot be None")        
+
         self.__Max_Supply = supplyCap # Float
         self.__Supply_Numbers = [avgSupply] # Float
         self.__Costs = [itemCost] # Int
@@ -52,6 +58,7 @@ class EDSystem( object ):
     def Needs_Permit(self) -> bool:
         return self.__Permit_Req
 #------------------------------------------------------------------------------
+    #Maybe not the best use of a property
     @property
     def Short_Str(self) -> str:
         strBuilder = []
@@ -65,10 +72,20 @@ class EDSystem( object ):
         strBuilder.append(")")
         return "".join(strBuilder)
 #------------------------------------------------------------------------------
-    def GetDistanceTo(self, next) -> float:
-        return self.__System_Distances[next.__Index]
+    def GetDistanceTo(self, other) -> float:
+        '''
+        Get the distance from self to the other system. If the other system's index
+        is not in the system distances list return -1
+        '''
+        if other.__Index < self.__System_Distances.__len__():
+            return self.__System_Distances[other.__Index]
+        else:
+            return -1.0
 #------------------------------------------------------------------------------
     def AddRares(self, other):
+        if self.__System_Name != other.__System_Name:
+            return
+
         self.__Supply_Numbers.extend(other.__Supply_Numbers)
         self.__Costs.extend(other.__Costs)
         self.__Items.extend(other.__Items)
@@ -78,7 +95,8 @@ class EDSystem( object ):
             self.__Station_Distances.extend(other.__Station_Distances)
 #------------------------------------------------------------------------------
     def __str__(self):
-        #TODO: Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
+        #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
+        #           In game this doesn't matter much because rares are flagged in each station but for this it might be good
         strBuilder = []
         if self.__Permit_Req:
             strBuilder.append("(P)")

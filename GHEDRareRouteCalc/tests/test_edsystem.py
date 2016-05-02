@@ -13,15 +13,36 @@ class Test_EDSystem(unittest.TestCase):
     def test_System(self):
         self.fail("Not implemented")
 #------------------------------------------------------------------------------
+    def test_System_Contructor(self):
+        
+        systemName = "test system"
+        stationName = "test station"
+        index = 0
+        supplyCap = 12
+        avgSupply = 10
+        itemCost = 400
+        itemName = "test item"
+        distToStation = 219
+        permitReq = False
+        distToOthers = [0]
+
+        with self.assertRaises(Exception,msg="no empty constructor"):
+            testSystem = EDSystem()
+        with self.assertRaises(Exception,msg="missing systemName"):
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,index,distToOthers,permitReq)
+        
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 def CreateEDSystems(numToCreate: int) -> list:
     '''
     "Factory" whatever for making EDSystems to use in testing
     '''
-    #TODO: Some kind of dictionary for chosing station/systems/item names so I dont just have random ugly garbage names
-    #validSystemNames = [''.join(random.choice("ABCDEFGHabcdefgh' ") for _ in range(7)) for _ in range(numToCreate)]
-    #validStationNames = [''.join(random.choice("IJKLMNOijklmno ") for _ in range(11)) for _ in range(numToCreate)]
+    validSystemNames,validStationNames,validItemNames = [],[],[]
 
     with open("systems.txt") as systemNames:
         validSystemNames = systemNames.read().split()
