@@ -5,13 +5,17 @@
 class EDSystem( object ):
     #TODO: Maybe a better way to do this?
     #      Also constructor args types don't seem to actually do any type checking, thanks python
+    #      Also i never realized how bad this was with so many values being passed, but i just read from csv so ???
 #------------------------------------------------------------------------------
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
 
         if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
             (stationName is None) or (systemName is None) or (systemIndex is None) or (distToOthers is None) or (permit is None) ):
-            raise Exception("Values cannot be None")        
+            raise Exception("Values cannot be None") 
+        
+        if not isinstance(distToOthers,list):
+            raise TypeError       
 
         self.__Max_Supply = supplyCap # Float
         self.__Supply_Numbers = [avgSupply] # Float
@@ -23,7 +27,7 @@ class EDSystem( object ):
         self.__Index = systemIndex # Int
         self.__System_Distances = distToOthers # List of Floats
         self.__Permit_Req = permit 
-        self.__Location = dict(x=0, y=0, z=0)
+        self.__Location = dict(x=0, y=0, z=0)    
 #------------------------------------------------------------------------------
     @property
     def Total_Cost(self) -> int:
@@ -32,6 +36,18 @@ class EDSystem( object ):
     @property
     def Max_Supply(self) -> float:
         return self.__Max_Supply
+#------------------------------------------------------------------------------
+    @property
+    def Items_And_Costs(self) -> list:
+        return list(zip(self.__Items,self.__Costs))
+#------------------------------------------------------------------------------
+    @property
+    def Item_Names(self) -> list:
+        return [name for name in self.__Items]
+#------------------------------------------------------------------------------
+    @property
+    def Item_Costs(self) -> list:
+        return [cost for cost in self.__Costs]
 #------------------------------------------------------------------------------
     @property
     def Station_Names(self) -> list:
@@ -83,8 +99,13 @@ class EDSystem( object ):
             return -1.0
 #------------------------------------------------------------------------------
     def AddRares(self, other):
+        '''
+        Add rare goods to a system. This will add duplicates if the same good is in self and other.
+        '''
+        #TODO:  Change this to address the duplicates thing by looping through costs/supply/items and adding those not already in
+        #           This assumes those all have the same length, which they should.
         if self.__System_Name != other.__System_Name:
-            return
+            raise Exception("Can only add rares to the same system")
 
         self.__Supply_Numbers.extend(other.__Supply_Numbers)
         self.__Costs.extend(other.__Costs)
