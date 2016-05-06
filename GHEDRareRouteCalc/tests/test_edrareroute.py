@@ -8,6 +8,8 @@ import random
 ###############################################################################
 #------------------------------------------------------------------------------
 class Test_EDRareRoute(unittest.TestCase):
+    #TODO: one assert per test
+#------------------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
         cls.All_Systems = main.ReadSystems("RareGoods.csv")

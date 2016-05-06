@@ -107,13 +107,25 @@ class EDSystem( object ):
         if self.__System_Name != other.__System_Name:
             raise Exception("Can only add rares to the same system")
 
-        self.__Supply_Numbers.extend(other.__Supply_Numbers)
-        self.__Costs.extend(other.__Costs)
-        self.__Items.extend(other.__Items)
-        self.__Max_Supply += other.Max_Supply
-        if self.__Station_Names != other.__Station_Names:
-            self.__Station_Names.extend(other.__Station_Names)
-            self.__Station_Distances.extend(other.__Station_Distances)
+        for i in range(other.__Items.__len__()):
+            if other.__Items[i] not in self.__Items:
+                self.__Items.append(other.__Items[i])
+                self.__Costs.append(other.__Costs[i])
+                self.__Supply_Numbers.append(other.__Supply_Numbers[i])
+                self.__Max_Supply += other.__Supply_Numbers[i]
+        
+        for i in range(other.__Station_Names.__len__()):
+            if other.__Station_Names[i] not in self.__Station_Names:
+                self.__Station_Names.append(other.__Station_Names[i])
+                self.__Station_Distances.append(other.__Station_Distances[i])
+
+        #self.__Supply_Numbers.extend(other.__Supply_Numbers)
+        #self.__Costs.extend(other.__Costs)
+        #self.__Items.extend(other.__Items)
+        #self.__Max_Supply += other.Max_Supply
+        #if self.__Station_Names != other.__Station_Names:
+        #    self.__Station_Names.extend(other.__Station_Names)
+        #    self.__Station_Distances.extend(other.__Station_Distances)
 #------------------------------------------------------------------------------
     def __str__(self):
         #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
@@ -145,7 +157,7 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------  
     def __hash__(self):
         '''
-        Use the index for hash since it is unique to each entry
+        Since Index refers to a system's index in the System_Distances list, this should be unique
         '''
         return hash(self.__Index)
 #------------------------------------------------------------------------------
