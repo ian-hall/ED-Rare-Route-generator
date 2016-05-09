@@ -7,14 +7,18 @@ import itertools
 ###############################################################################
 #------------------------------------------------------------------------------
 class Test_EDSystem(unittest.TestCase):
-    #TODO: one assert per test
+    #TODO: one assert per test(maybe)
 #------------------------------------------------------------------------------
-    @classmethod
-    def setUpClass(cls):
-        cls.Test_Systems = CreateEDSystems(500)
+    #@classmethod
+    ##This is causing a lot of slowdown on these tests but it should only run once?
+    ##Just slamming this down into setUp
+    #def setUpClass(cls):
+    #    cls.Test_Params = CreateEDSystemParamList(1000)
+    #    cls.Test_Systems = CreateSystemsFromParams(cls.Test_Params)
 #------------------------------------------------------------------------------
     def setUp(self):
-        self.Test_Params = CreateEDSystemParamList(100)
+        self.Test_Params = CreateEDSystemParamList(500)
+        self.Test_Systems = CreateSystemsFromParams(self.Test_Params)
 #------------------------------------------------------------------------------
     def test_System_Contructor(self):        
         systemName = "test system"
@@ -58,49 +62,7 @@ class Test_EDSystem(unittest.TestCase):
         with self.assertRaises(Exception,msg="no Nones allowed"):
             testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,None)
 #------------------------------------------------------------------------------
-    def test_System_AddRares(self):
-        systemName1 = "test system 1"
-        stationName1 = "test station 1"
-        index1 = 0
-        supplyCap1 = 12
-        avgSupply1 = 10
-        itemCost1 = 400
-        itemName1 = "test item 1"
-        distToStation1 = 219
-
-        systemName2 = "test system 2"
-        stationName2 = "test station 2"
-        index2 = 1
-        supplyCap2 = 7
-        avgSupply2 = 4
-        itemCost2 = 1400
-        itemName2 = "test item 2"
-        distToStation2 = 420
-
-        distToOthers = [0]
-        permitReq = False
-
-        origSystem = EDSystem(supplyCap1,avgSupply1,itemCost1,itemName1,distToStation1,stationName1,systemName1,index1,distToOthers,permitReq)
-        testSys_Same_SysName = EDSystem(supplyCap2,avgSupply2,itemCost2,itemName2,distToStation2,stationName2,systemName1,index2,distToOthers,permitReq)
-        origSystem.AddRares(testSys_Same_SysName)
-        testSys_Same_SysName.AddRares(origSystem)
-
-        expectedTotalCost = itemCost1 + itemCost2
-        self.assertIn(itemName2,origSystem.Item_Names)
-        self.assertIn(itemCost2,origSystem.Item_Costs)
-        self.assertAlmostEqual(origSystem.Total_Cost,expectedTotalCost)
-        self.assertIn(stationName2,origSystem.Station_Names)
-        self.assertIn(distToStation2,origSystem.Station_Distances)
-
-        origSystem = EDSystem(supplyCap1,avgSupply1,itemCost1,itemName1,distToStation1,stationName1,systemName1,index1,distToOthers,permitReq)
-        testSys_Diff_SysName = EDSystem(supplyCap2,avgSupply2,itemCost2,itemName2,distToStation2,stationName2,systemName2,index2,distToOthers,permitReq)
-        with self.assertRaises(Exception):
-            origSystem.AddRares(testSys_Diff_SysName)
-#------------------------------------------------------------------------------
     def test_System_AddRares_Item_Names(self):
-        '''
-        Test that AddRares is actually... adding rares to a system
-        '''
         squishedSystems = []
         for args in self.Test_Params:
             newSystem = EDSystem(**args)
@@ -116,9 +78,6 @@ class Test_EDSystem(unittest.TestCase):
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
     def test_System_AddRares_Item_Costs(self):
-        '''
-        Test that AddRares is actually... adding rares to a system
-        '''
         squishedSystems = []
         for args in self.Test_Params:
             newSystem = EDSystem(**args)
@@ -134,9 +93,6 @@ class Test_EDSystem(unittest.TestCase):
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
     def test_System_AddRares_Station_Names(self):
-        '''
-        Test that AddRares is actually... adding rares to a system
-        '''
         squishedSystems = []
         for args in self.Test_Params:
             newSystem = EDSystem(**args)
@@ -145,6 +101,9 @@ class Test_EDSystem(unittest.TestCase):
                     with self.subTest(currSystem=currentSystem):
                         if currentSystem == newSystem:
                             expected_Station_Names = currentSystem.Station_Names
+                            #Checking for duplicates because ingame a system cannot have multiple stations with the same name (i think)
+                            #This arises from not doing a check on previously generated systems when creating the paramater lists
+                            #expected_Station_Names.extend([station for station in newSystem.Station_Names if station not in expected_Station_Names])
                             expected_Station_Names.extend(newSystem.Station_Names)
                             currentSystem.AddRares(newSystem)
                             self.assertListEqual(expected_Station_Names,currentSystem.Station_Names)
@@ -152,9 +111,8 @@ class Test_EDSystem(unittest.TestCase):
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
     def test_System_AddRares_Station_Distances(self):
-        '''
-        Test that AddRares is actually... adding rares to a system
-        '''
+        #TODO: This will fail similarly to the above if we get an unexpected repeat of a station in a given system.
+        #       FIX: Remove/ignore the station distance that is repeated
         squishedSystems = []
         for args in self.Test_Params:
             newSystem = EDSystem(**args)
@@ -170,9 +128,6 @@ class Test_EDSystem(unittest.TestCase):
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
     def test_System_AddRares_Total_Cost(self):
-        '''
-        Test that AddRares is actually... adding rares to a system
-        '''
         squishedSystems = []
         for args in self.Test_Params:
             newSystem = EDSystem(**args)
@@ -186,21 +141,34 @@ class Test_EDSystem(unittest.TestCase):
             else:
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
-    def test_System_TotalCost(self):
+    def test_System_Total_Cost(self):
         '''
         Test that we are getting back the expected total cost of items sold in a system
         '''
         for system in self.Test_Systems:
             with self.subTest(system=system):
-                expectedTotal = sum(system.Item_Costs)
+                #Pulling all sets of args out used to construct this system
+                sameSystem = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
+                expectedTotal = sum([args["itemCost"] for args in sameSystem])
                 self.assertAlmostEqual(expectedTotal,system.Total_Cost)
 #------------------------------------------------------------------------------
-    def test_System_ItemCosts(self):
+    def test_System_Item_Costs(self):
         '''
         Test that we get back the expected list of costs for items sold in a system
         '''
-        pass
+        self.fail("TODO")
 #------------------------------------------------------------------------------
+    def assertSystemsEqual(self,system1,system2):
+        '''
+        Custom assert to test system equality on the following:
+        system name, station names, item names, item costs, item supplies, total cost
+
+        ignoring system distances and station distances because if all else is equal we can figure
+        out and wrongness by looking in game.
+        '''
+        #TODO: Decide if this should be here and fail on first assert, or return a custom assert message with no specifics, or have a real long/ugly thing going on with subtests
+        self.assertEqual(system1.System_Name,system2.System_Name)
+        self.assertSetEqual(set(system1.Station_Names),set(system2.Station_Names))
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -231,6 +199,12 @@ def CreateEDSystemParamList(numToCreate: int) -> list:
 
         #TODO: Maybe at some point have this actually have values instead of 0 all
         distToOthers = [0 for _ in range(numToCreate)]
+
+        #Check for and remove/come up with another station name if a given name is already in a system
+        stationsForSystem = [args["stationName"] for args in paramsList if args["systemName"] == systemName]
+        while stationName in stationsForSystem:
+            stationName = ' '.join(random.choice(validStationNames) for _ in range(2))
+        
         paramDict = {"supplyCap":supplyCap,
                      "avgSupply":avgSupply,
                      "itemCost":itemCost,
@@ -245,37 +219,27 @@ def CreateEDSystemParamList(numToCreate: int) -> list:
     
     return paramsList
 #------------------------------------------------------------------------------
-def CreateEDSystems(numToCreate: int) -> list:
+#def CreateEDSystems(numToCreate: int) -> list:
+#    '''
+#    "Factory" whatever for making EDSystems to use in testing
+#    '''
+#    generatedSystems = []
+#    paramsList = CreateEDSystemParamList(numToCreate)
+#    for args in paramsList:
+#        currentSystem = EDSystem(**args)
+#        if generatedSystems.count(currentSystem) != 0:
+#            for system in generatedSystems:
+#                if system == currentSystem:
+#                    system.AddRares(currentSystem)
+#        else:
+#            generatedSystems.append(currentSystem)
+#    return generatedSystems
+#------------------------------------------------------------------------------
+def CreateSystemsFromParams(paramsList: list) -> list:
     '''
     "Factory" whatever for making EDSystems to use in testing
     '''
-    '''
-    validSystemNames,validStationNames,validItemNames = [],[],[]
-
-    with open("systems.txt") as systemNames:
-        validSystemNames = systemNames.read().split()
-    with open("stations.txt") as stationNames:
-        validStationNames = stationNames.read().split()
-    with open("items.txt") as itemNames:
-        validItemNames = itemNames.read().split()
-        
     generatedSystems = []
-    for i in range(numToCreate):
-        systemName = ' '.join(random.choice(validSystemNames) for _ in range(random.randint(1,2)))
-        stationName = ' '.join(random.choice(validStationNames) for _ in range(2))
-        index = i
-        supplyCap = random.randint(1,15)
-        avgSupply = supplyCap
-        itemCost = random.randrange(7000)
-        itemName = ' '.join(random.choice(validItemNames) for _ in range(random.randint(2,3)))
-        distToStation = random.randrange(10000)
-        permitReq = (random.randrange(100)%10 == 0)
-
-        #TODO: Maybe at some point have this actually have values instead of 0 all
-        distToOthers = [0 for _ in range(numToCreate)]
-    '''
-    generatedSystems = []
-    paramsList = CreateEDSystemParamList(numToCreate)
     for args in paramsList:
         currentSystem = EDSystem(**args)
         if generatedSystems.count(currentSystem) != 0:

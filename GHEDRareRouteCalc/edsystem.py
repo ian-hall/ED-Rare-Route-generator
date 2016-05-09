@@ -5,7 +5,7 @@
 class EDSystem( object ):
     #TODO: Maybe a better way to do this?
     #      Also constructor args types don't seem to actually do any type checking, thanks python
-    #      Also i never realized how bad this was with so many values being passed, but i just read from csv so ???
+    #      Also i never realized how bad this was with so many values being passed, but i just read from a csv file so ???
 #------------------------------------------------------------------------------
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
@@ -119,13 +119,6 @@ class EDSystem( object ):
                 self.__Station_Names.append(other.__Station_Names[i])
                 self.__Station_Distances.append(other.__Station_Distances[i])
 
-        #self.__Supply_Numbers.extend(other.__Supply_Numbers)
-        #self.__Costs.extend(other.__Costs)
-        #self.__Items.extend(other.__Items)
-        #self.__Max_Supply += other.Max_Supply
-        #if self.__Station_Names != other.__Station_Names:
-        #    self.__Station_Names.extend(other.__Station_Names)
-        #    self.__Station_Distances.extend(other.__Station_Distances)
 #------------------------------------------------------------------------------
     def __str__(self):
         #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
