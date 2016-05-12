@@ -103,6 +103,7 @@ class Test_EDSystem(unittest.TestCase):
                             expected_Station_Names = currentSystem.Station_Names
                             #Checking for duplicates because ingame a system cannot have multiple stations with the same name (i think)
                             #This arises from not doing a check on previously generated systems when creating the paramater lists
+                            #This is fixed now
                             #expected_Station_Names.extend([station for station in newSystem.Station_Names if station not in expected_Station_Names])
                             expected_Station_Names.extend(newSystem.Station_Names)
                             currentSystem.AddRares(newSystem)
@@ -148,15 +149,52 @@ class Test_EDSystem(unittest.TestCase):
         for system in self.Test_Systems:
             with self.subTest(system=system):
                 #Pulling all sets of args out used to construct this system
-                sameSystem = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
-                expectedTotal = sum([args["itemCost"] for args in sameSystem])
+                sameSystems = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
+                expectedTotal = sum([args["itemCost"] for args in sameSystems])
                 self.assertAlmostEqual(expectedTotal,system.Total_Cost)
 #------------------------------------------------------------------------------
     def test_System_Item_Costs(self):
         '''
         Test that we get back the expected list of costs for items sold in a system
         '''
-        self.fail("TODO")
+        for system in self.Test_Systems:
+            with self.subTest(system=system):
+                #Pulling all sets of args out used to construct this system
+                sameSystems = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
+                expectedItemCosts = [args["itemCost"] for args in sameSystems]
+                self.assertListEqual(expectedItemCosts,system.Item_Costs)
+#------------------------------------------------------------------------------
+    def test_System_Item_Names(self):
+        for system in self.Test_Systems:
+            with self.subTest(system=system):
+                #Pulling all sets of args out used to construct this system
+                sameSystems = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
+                expectedItemNames = [args["itemName"] for args in sameSystems]
+                self.assertListEqual(expectedItemNames,system.Item_Names)
+#------------------------------------------------------------------------------
+    def test_System_Item_Counts(self):
+        for system in self.Test_Systems:
+            with self.subTest(system=system):
+                #Pulling all sets of args out used to construct this system
+                sameSystems = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
+                expectedItemCounts = [args["avgSupply"] for args in sameSystems]
+                self.assertListEqual(expectedItemCounts,system.Item_Supply_Counts)
+#------------------------------------------------------------------------------
+    def test_System_Items(self):
+        '''
+        Test that item info in a system maintains form when pulling it back out
+        '''
+        for system in self.Test_Systems:
+            with self.subTest(system=system.System_Name):
+                #Pulling all sets of args out used to construct this system
+                sameSystems = [args for args in self.Test_Params if args["systemName"] == system.System_Name]
+                for args in sameSystems:
+                    with self.subTest(i=args["systemIndex"]):
+                        itemInfo = (args["itemName"],args["itemCost"],args["avgSupply"])
+                        self.assertIn(itemInfo,system.Items_Info)
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def assertSystemsEqual(self,system1,system2):
         '''
@@ -166,9 +204,14 @@ class Test_EDSystem(unittest.TestCase):
         ignoring system distances and station distances because if all else is equal we can figure
         out and wrongness by looking in game.
         '''
-        #TODO: Decide if this should be here and fail on first assert, or return a custom assert message with no specifics, or have a real long/ugly thing going on with subtests
+        #TODO:  Decide if this should be here and fail on first assert, or return a custom assert message with no specifics, or have a real long/ugly thing going on with subtests
+        #       Maybe this isn't even needed?
         self.assertEqual(system1.System_Name,system2.System_Name)
         self.assertSetEqual(set(system1.Station_Names),set(system2.Station_Names))
+        self.assertSetEqual(set(system1.Item_Names),set(system2.Item_Names))
+        self.assertSetEqual(set(system1.Item_Costs),set(system2.Item_Costs))
+        self.assertSetEqual(set(system1.Item_Supply_Counts),set(system2.Item_Supply_Counts))
+        self.assertAlmostEqual(system1.Total_Cost,system2.Total_Cost)
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

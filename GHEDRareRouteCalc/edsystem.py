@@ -38,8 +38,11 @@ class EDSystem( object ):
         return self.__Max_Supply
 #------------------------------------------------------------------------------
     @property
-    def Items_And_Costs(self) -> list:
-        return list(zip(self.__Items,self.__Costs))
+    def Items_Info(self) -> list:
+        '''
+        Returns a list with elements of for (item name, item cost, item supply)
+        '''
+        return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers))
 #------------------------------------------------------------------------------
     @property
     def Item_Names(self) -> list:
@@ -48,6 +51,10 @@ class EDSystem( object ):
     @property
     def Item_Costs(self) -> list:
         return [cost for cost in self.__Costs]
+#------------------------------------------------------------------------------
+    @property
+    def Item_Supply_Counts(self) -> list:
+        return [supply for supply in self.__Supply_Numbers]
 #------------------------------------------------------------------------------
     @property
     def Station_Names(self) -> list:
@@ -113,7 +120,7 @@ class EDSystem( object ):
                 self.__Costs.append(other.__Costs[i])
                 self.__Supply_Numbers.append(other.__Supply_Numbers[i])
                 self.__Max_Supply += other.__Supply_Numbers[i]
-        
+                        
         for i in range(other.__Station_Names.__len__()):
             if other.__Station_Names[i] not in self.__Station_Names:
                 self.__Station_Names.append(other.__Station_Names[i])
