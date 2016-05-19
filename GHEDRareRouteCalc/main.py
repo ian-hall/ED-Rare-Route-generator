@@ -8,7 +8,7 @@ import csv
 import re
 import time
 from urllib import request
-
+from fuzzywuzzy import fuzz
 #------------------------------------------------------------------------------
 def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
     '''
@@ -111,6 +111,13 @@ def __TryFloat(val: str) -> bool:
     except:
         return False
 #------------------------------------------------------------------------------
+def __TryInt(val: str) -> bool:
+    try:
+        int(val)
+        return True
+    except:
+        return False
+#------------------------------------------------------------------------------
 def ReadSystems(file:str = None) ->list:
     cleanedCSV = []
     allSystems = []
@@ -175,6 +182,109 @@ def ReadSystems(file:str = None) ->list:
     return allSystems
 
 #------------------------------------------------------------------------------
+def __GetUserInput(systemsDict:dict) -> tuple:
+    '''
+    Gets the user input for running the genetic. Tuple will have form (bool,int,list).
+    bool will be true if the input gathered was valid.
+    int will be the choice selected
+    list will either be a list of args to run the genetic with [max station dist, route len, permit status] or a list of systems to run it with.
+    '''
+    #Using try float so I 
+    readyToRun = False
+    argsOrSystems = []
+    sb = []
+    sb.append("Please select an option:\n")
+    sb.append("\t1) generate route by length\n")
+    sb.append("\t2) generate route by system list\n")
+    sb.append("\t3) exit")
+    print(''.join(sb))
+    optionChoice = input("Your choice: ")
+    numChoices = 3
+    while not( __TryInt(optionChoice) and not (int(optionChoice) < 1 or int(optionChoice) > numChoices) ):
+        print("Invalid entry")
+        optionChoice = input("Your choice: ")
+    
+    if float(optionChoice) == 1:
+        argsToUse = []      
+        stationDist = input("Max distance to station (ly): ")
+        while not (__TryInt(stationDist) and int(stationDist) >= 1):
+            print("Please enter a number between 1 and whatever")
+            stationDist = input("Max distance to station (ly): ")
+        
+        routeLen = input("Route length [6-35]: ")
+        while not (__TryInt(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 35)):
+            print("Please enter a length from 6 up to and including 35.")
+            routeLen = input("Route length [6-35]: ")
+
+        validPermitEntry = False
+        permitsStr = input("Allow permit systems [Y/N]? ")
+        if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'Y'):
+            validPermitEntry = True
+        while not validPermitEntry:
+            print("Please enter just Y or N")
+            permitsStr = input("Allow permit systems [Y/N]? ")
+            if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'Y'):
+                validPermitEntry = True
+        
+        permitVal = 1 if (permitsStr == "Y") else 0
+
+        argsToUse = [int(stationDist),int(routeLen),permitVal]
+        argsOrSystems = argsToUse
+        readyToRun = True
+    
+        
+    elif float(optionChoice) == 2:
+        #Maybe have this be a selection list of all known systems
+        systemsToUse = []
+        count = 0
+        stopReadLoop = False
+        minSystems = 6;
+        print("Please enter at least {0} systems.".format(minSystems))
+        print("Type \"stop\" to...stop")
+        print("Note: All systems you enter will be used.")
+        while not stopReadLoop:
+            count += 1
+            checkSystem = input("\t{0}) ".format(count))
+            #If they type exit, we exit
+            if checkSystem.lower() == "stop":
+                stopReadLoop = True
+                continue
+            if checkSystem in systemsDict:
+                #If the system is in the systems dict, meaning its spelled exactly the same, we add to the list of systems
+                if systemsDict[checkSystem] not in systemsToUse:
+                    systemsToUse.append(systemsDict[checkSystem])
+                else:
+                    print("System already in list, try another.")
+                    count -= 1
+            else:
+                #Otherwise, we use fuzz to check for similar strings and give spelling suggestions
+                possibleSysNames = []
+                for k,v in systemsDict.items():
+                    if fuzz.ratio(checkSystem,k) >= 60:
+                        possibleSysNames.append(k)
+                if possibleSysNames.__len__() == 0:
+                    print("No system with that name found. Please try another")
+                elif possibleSysNames.__len__() == 1:
+                    print("Did you mean \"{0}\"?".format(possibleSysNames[0]))
+                else:
+                    print("Did you mean one of these?")
+                    print("\t{0}".format(' '.join(possibleSysNames)))
+                count -= 1
+        
+        if systemsToUse.__len__() < minSystems:
+            print("Not enough systems entered. Exiting.")
+        else:
+            readyToRun = True
+            argsOrSystems = systemsToUse
+
+    elif float(optionChoice) == 3:
+        print("Goodbye")
+
+            
+    
+
+    return (readyToRun,int(optionChoice),argsOrSystems)
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 # Main starts here
 #------------------------------------------------------------------------------
@@ -207,23 +317,47 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
 
-    '''
-    TODO: Allow users to enter the values for length/station distance.
-    '''
-    maxStationDistance = 5000
-    systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-    length = 11
-    popSize = 333
-    __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+    
+    #TODO: Allow users to enter the values for length/station distance.
+    #      Allow users to input a list of system names for a route
+    
+    prompt = False
+    
+    if prompt:
+        userInput = __GetUserInput(systemsDict)
+        ready = userInput[0]
+        if ready:
+            runType = userInput[1]
+            if runType == 1:
+                maxStationDistance = userInput[2][0]
+                length = userInput[2][1]
+                allowPermits = (userInput[2][2] == 1)
+                systemsSubset = []
+                if allowPermits:
+                    systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance]
+                else:
+                    systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
+                __RunGenetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+            if runType == 2:
+                userSystems = userInput[2]
+                routeLen = userSystems.__len__()
+                __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+        
+    else:
+        maxStationDistance = 5000
+        systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
+        length = 11
+        popSize = 333
+        __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
 
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-    #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
 
-    #PerformanceCalc.TestSystems(systemsDict,FitnessType.EvenSplit)
+        #PerformanceCalc.TestSystems(systemsDict,FitnessType.EvenSplit)
 
-    #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
-    #print(fullRoute)
-    #fullRoute.PrintRoute()
-    #fullRoute.DrawRoute(showLines=False)
+        #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+        #print(fullRoute)
+        #fullRoute.PrintRoute()
+        #fullRoute.DrawRoute(showLines=False)
 #------------------------------------------------------------------------------

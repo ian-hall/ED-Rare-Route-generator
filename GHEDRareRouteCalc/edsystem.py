@@ -18,7 +18,7 @@ class EDSystem( object ):
         if not isinstance(distToOthers,list):
             raise TypeError       
 
-        self.__Max_Supply = supplyCap # Float
+        self.__Supply_Caps = [supplyCap] # Float
         self.__Supply_Numbers = [avgSupply] # Float
         self.__Costs = [itemCost] # Int
         self.__Items = [itemName] # String
@@ -36,14 +36,14 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     @property
     def Max_Supply(self) -> float:
-        return self.__Max_Supply
+        return sum(self.__Supply_Caps)
 #------------------------------------------------------------------------------
     @property
     def Items_Info(self) -> list:
         '''
         Returns a list with elements of for (item name, item cost, item supply)
         '''
-        return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers))
+        return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers, self.__Supply_Caps))
 #------------------------------------------------------------------------------
     @property
     def Item_Names(self) -> list:
@@ -120,7 +120,7 @@ class EDSystem( object ):
                 self.__Items.append(other.__Items[i])
                 self.__Costs.append(other.__Costs[i])
                 self.__Supply_Numbers.append(other.__Supply_Numbers[i])
-                self.__Max_Supply += other.__Supply_Numbers[i]
+                self.__Supply_Caps.append(other.__Supply_Caps[i])
                         
         for i in range(other.__Station_Names.__len__()):
             if other.__Station_Names[i] not in self.__Station_Names:
@@ -145,7 +145,7 @@ class EDSystem( object ):
             strBuilder.append("{0} - {1}cr".format(self.__Items[i],self.__Costs[i]))
             if i != self.__Items.__len__() - 1:
                 strBuilder.append(", ")
-        strBuilder.append("}} ({0}T)".format(self.__Max_Supply))
+        strBuilder.append("}} ({0}T)".format(self.Max_Supply))
 
         return ''.join(strBuilder)
         

@@ -177,7 +177,7 @@ class Test_EDSystem(unittest.TestCase):
                 sameSystems = [args for args in self.Test_Args if args["systemName"] == system.System_Name]
                 for args in sameSystems:
                     with self.subTest(i=args["systemIndex"]):
-                        itemInfo = (args["itemName"],args["itemCost"],args["avgSupply"])
+                        itemInfo = (args["itemName"],args["itemCost"],args["avgSupply"],args["supplyCap"])
                         self.assertIn(itemInfo,system.Items_Info)
 #------------------------------------------------------------------------------
     def test_System_Total_Supply(self):
@@ -207,8 +207,7 @@ class Test_EDSystem(unittest.TestCase):
         self.assertSetEqual(set(system1.Item_Supply_Counts),set(system2.Item_Supply_Counts))
         self.assertAlmostEqual(system1.Total_Cost,system2.Total_Cost)
 #------------------------------------------------------------------------------
-    @classmethod
-    def __PullValsForArg(cls,argsDictList,argToPull,systemName):
+    def __PullValsForArg(self,argsDictList,argToPull,systemName):
         '''
         Return a list of values representing the type of argToPull from all args for systems with systemName
         '''
