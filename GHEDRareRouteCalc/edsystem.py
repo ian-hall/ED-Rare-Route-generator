@@ -6,6 +6,7 @@ class EDSystem( object ):
     #TODO: Maybe a better way to do this?
     #      Also constructor args types don't seem to actually do any type checking, thanks python
     #      Also i never realized how bad this was with so many values being passed, but i just read from a csv file so ???
+    #      Add an estimated profit, convert __Max_Supply to a list of caps for all items
 #------------------------------------------------------------------------------
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
@@ -157,7 +158,7 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------  
     def __hash__(self):
         '''
-        Since Index refers to a system's index in the System_Distances list, this should be unique
+        Since Index refers to a system's index in the System_Distances list, this will be unique
         '''
         return hash(self.__Index)
 #------------------------------------------------------------------------------
