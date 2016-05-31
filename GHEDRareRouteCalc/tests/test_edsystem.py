@@ -142,7 +142,12 @@ class Test_EDSystem(unittest.TestCase):
         '''
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                expectedTotal = sum(self.__PullValsForArg(self.Test_Args,"itemCost",system.System_Name))
+                expectedCosts = self.__PullValsForArg(self.Test_Args,"itemCost",system.System_Name)
+                expectedSupplyNums = self.__PullValsForArg(self.Test_Args,"supplyCap",system.System_Name)
+                self.assertEqual(expectedCosts.__len__(),expectedSupplyNums.__len__())
+                expectedTotal = 0
+                for cost,supply in zip(expectedCosts,expectedSupplyNums):
+                    expectedTotal += (cost * supply)
                 self.assertAlmostEqual(expectedTotal,system.Total_Cost)
 #------------------------------------------------------------------------------
     def test_System_Item_Costs(self):
@@ -187,7 +192,19 @@ class Test_EDSystem(unittest.TestCase):
                 self.assertAlmostEqual(expectedTotal,system.Max_Supply)
 #------------------------------------------------------------------------------
     def test_System_Permit(self):
-        self.fail("TODO")
+        for system in self.Test_Systems:
+            with self.subTest(sysName = system.System_Name):
+                #Only check the first instance of the system in the args list, adding items does not change the permit req for a system
+                expectedPermitReq = self.__PullValsForArg(self.Test_Args,"permit",system.System_Name)[0]
+                self.assertTrue(system.Needs_Permit == expectedPermitReq)                
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#Test properties cannot be set
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def assertSystemsEqual(self,system1,system2):

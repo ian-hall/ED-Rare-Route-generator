@@ -4,9 +4,8 @@
 #------------------------------------------------------------------------------
 class EDSystem( object ):
     #TODO: Maybe a better way to do this?
-    #      Also constructor args types don't seem to actually do any type checking, thanks python
-    #      Also i never realized how bad this was with so many values being passed, but i just read from a csv file so ???
-    #      Add an estimated profit, convert __Max_Supply to a list of caps for all items
+    #      Maybe not enough data for est profit
+    #          all rares have different variables for deciding sell val 
 #------------------------------------------------------------------------------
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
@@ -31,8 +30,16 @@ class EDSystem( object ):
         self.__Location = dict(x=0, y=0, z=0)    
 #------------------------------------------------------------------------------
     @property
-    def Total_Cost(self) -> int:
-        return sum(self.__Costs)
+    def Total_Cost(self) -> float:
+        '''
+        A number that represents the total cost of buying the max number of rare goods in a system.
+        '''
+        total = 0
+        for i in range(self.__Items.__len__()):
+            cost = self.__Costs[i]
+            supply = self.__Supply_Caps[i]
+            total += (cost * supply)
+        return total
 #------------------------------------------------------------------------------
     @property
     def Max_Supply(self) -> float:
@@ -41,7 +48,7 @@ class EDSystem( object ):
     @property
     def Items_Info(self) -> list:
         '''
-        Returns a list with elements of for (item name, item cost, item supply)
+        Returns a list with elements (item name, item cost, item supply, supply cap)
         '''
         return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers, self.__Supply_Caps))
 #------------------------------------------------------------------------------
@@ -110,8 +117,6 @@ class EDSystem( object ):
         '''
         Add rare goods to a system. This will add duplicates if the same good is in self and other.
         '''
-        #TODO:  Change this to address the duplicates thing by looping through costs/supply/items and adding those not already in
-        #           This assumes those all have the same length, which they should.
         if self.__System_Name != other.__System_Name:
             raise Exception("Can only add rares to the same system")
 

@@ -317,10 +317,6 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
 
-    
-    #TODO: Allow users to enter the values for length/station distance.
-    #      Allow users to input a list of system names for a route
-    
     prompt = False
     
     if prompt:
@@ -346,15 +342,14 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 11
+        length = 6
         popSize = 333
         __RunGenetic(systemsSubset,length,popSize,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Farthest)
 
-        #PerformanceCalc.TestSystems(systemsDict,FitnessType.EvenSplit)
+        #PerformanceCalc.TestSystems(systemsDict,FitnessType.FirstOver)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
         #print(fullRoute)

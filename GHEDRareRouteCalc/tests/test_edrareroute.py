@@ -28,20 +28,16 @@ class Test_EDRareRoute(unittest.TestCase):
         self.assertNotEqual(sysList1,sysList2,"shuffle didn't shuffle")
 
         splitRoute1 = EDRareRoute(sysList1,FitnessType.EvenSplit)
-        farRoute1 = EDRareRoute(sysList1,FitnessType.Farthest)
         firstRoute1 = EDRareRoute(sysList1,FitnessType.FirstOver)
 
-        self.assertNotEqual(splitRoute1,farRoute1)
         self.assertNotEqual(splitRoute1,firstRoute1)
-        self.assertNotEqual(farRoute1,firstRoute1)
+        self.assertNotEqual(firstRoute1,splitRoute1)
 
 
         splitRoute2 = EDRareRoute(sysList2,FitnessType.EvenSplit)
-        farRoute2 = EDRareRoute(sysList2,FitnessType.Farthest)
         firstRoute2 = EDRareRoute(sysList2,FitnessType.FirstOver)
 
         self.assertNotEqual(splitRoute1,splitRoute2)
-        self.assertNotEqual(farRoute1,farRoute2)
         self.assertNotEqual(firstRoute1,firstRoute2)
 #------------------------------------------------------------------------------
     def test_Route_Eq(self):
@@ -119,16 +115,6 @@ class Test_EDRareRoute(unittest.TestCase):
         '''
         fType = FitnessType.FirstOver
         expectedRouteTypes = [RouteType.FirstOver, RouteType.FirstOverLong]
-        for sysList in self.System_Lists:
-            currRoute = EDRareRoute(sysList,fType)
-            self.assertIn(currRoute.Route_Type,expectedRouteTypes)
-#------------------------------------------------------------------------------
-    def test_Route_RouteType_Farthest(self):
-        '''
-        Test that we are getting only the expected RouteTypes back from certain FitnessTypes
-        '''
-        fType = FitnessType.Farthest
-        expectedRouteTypes = [RouteType.Farthest, RouteType.FarthestLong]
         for sysList in self.System_Lists:
             currRoute = EDRareRoute(sysList,fType)
             self.assertIn(currRoute.Route_Type,expectedRouteTypes)

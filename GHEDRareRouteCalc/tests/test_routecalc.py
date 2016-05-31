@@ -138,18 +138,16 @@ class Test_RouteCalc(unittest.TestCase):
                 with self.assertRaises(Exception):
                     RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.EvenSplit)
 
-        #FirstOver and Farthest should throw exception on routes under len 6 and over 35
+        #FirstOver should throw exception on routes under len 6 and over 35
         for routeLen in range(6):
             with self.subTest(routeLen=routeLen):
                 with self.assertRaises(Exception):
                     RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.FirstOver)
-                    RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.Farthest)
 
         for routeLen in range(36,39):
             with self.subTest(routeLen=routeLen):
                 with self.assertRaises(Exception):
                     RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.FirstOver)
-                    RouteCalc.GeneticSolverStart(self.Pop_Size,self.All_Systems,routeLen,True,FitnessType.Farthest)
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     unittest.main()
