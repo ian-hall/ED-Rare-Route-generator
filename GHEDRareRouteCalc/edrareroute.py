@@ -211,8 +211,7 @@ class EDRareRoute(object):
         weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
   
         totalGoodsCost = sum([system.Total_Cost for system in self.__Route])
-        #using log because these values can be very high
-        weightedCost = math.log(totalGoodsCost,10000)
+        weightedCost = totalGoodsCost/(routeLength * 10000)
 
 
 
@@ -280,7 +279,6 @@ class EDRareRoute(object):
             sold = []
             unsold = []
             #Go through at most twice, since if a systems doesnt sell by then it won't sell
-            #TODO: GO through the route in reverse at the same time, i forgot why though
             for i in range(routeLength*2):
                 currentSys = self.__Route[i%routeLength];
                 unsold.append(currentSys)
@@ -324,9 +322,9 @@ class EDRareRoute(object):
         weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
   
         totalGoodsCost = sum([system.Total_Cost for system in self.__Route])
-        #using log because these values can be very high
-        weightedCost = math.log(totalGoodsCost,10000)
-
+        #Base this on an average purchase price of 1x000cr per system   
+        weightedCost = totalGoodsCost/(routeLength * 15000)
+        
         totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
         
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
@@ -673,7 +671,7 @@ class EDRareRoute(object):
 
         strList.append("\nTotal distance: {0:.3f}ly".format(self.__Total_Distance))
         strList.append("\nLongest jump: {0:.3f}ly".format(self.__Longest_Jump))
-        strList.append("\nTotal cargo: {0:.2f}T".format(self.__Total_Cargo))
+        strList.append("\nTotal cargo purchased: {0:.2f}T".format(self.__Total_Cargo))
         strList.append("\nRequired cargo space: {0}T".format(self.__Max_Cargo))
         strList.append("\nRequired credits: {0:.2f}cr".format(totalCost))
         strList.append("\nType: {0}".format(self.__Route_Type.name))

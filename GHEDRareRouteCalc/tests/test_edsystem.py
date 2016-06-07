@@ -198,10 +198,65 @@ class Test_EDSystem(unittest.TestCase):
                 expectedPermitReq = self.__PullValsForArg(self.Test_Args,"permit",system.System_Name)[0]
                 self.assertTrue(system.Needs_Permit == expectedPermitReq)                
 #------------------------------------------------------------------------------
+    def test_Systems_Add_Commutative(self):
+        '''
+        Assert that we get the "same" systems regardless of the order we add rares to them
+        '''
+        systemsForward = []
+        systemsReverse = []
+        reverseArgs = self.Test_Args[::-1]
+        
+        for args in self.Test_Args:
+            newSystem = EDSystem(**args)
+            if systemsForward.count(newSystem) != 0:
+                for currentSystem in systemsForward:
+                    if currentSystem == newSystem:
+                        currentSystem.AddRares(newSystem)
+            else:
+                systemsForward.append(newSystem)
+
+        for args in reverseArgs:
+            newSystem = EDSystem(**args)
+            if systemsReverse.count(newSystem) != 0:
+                for currentSystem in systemsReverse:
+                    if currentSystem == newSystem:
+                        currentSystem.AddRares(newSystem)
+            else:
+                systemsReverse.append(newSystem)
+        #Yeah I said one assert per test but bleh
+        #First make sure equal number of systems are created
+        self.assertEqual(systemsForward.__len__(),systemsReverse.__len__(),msg="Should create equal number of systems")
+
+        #Next assert that systems with the same System_Name are essentially the same
+        for system in systemsForward:
+            with self.subTest(sysName=system.System_Name):
+                revSystem = [rSys for rSys in systemsReverse if rSys.System_Name == system.System_Name][0]
+                self.assertSystemsEqual(system,revSystem)
+                self.assertSystemsEqual(revSystem,system)
+#------------------------------------------------------------------------------
+    def test_System_Distances(self):
+        '''
+        Going to use the spreadsheet for now until I get my factory working as intended
+        '''
+        import main
+        systemsToCheck  = main.ReadSystems("RareGoods.csv")
+        for system in systemsToCheck:
+            randSystem = random.choice(systemsToCheck)
+            sysToRand = system.GetDistanceTo(randSystem)
+            randToSys = randSystem.GetDistanceTo(system)
+            self.assertEqual(sysToRand,randToSys)
 #------------------------------------------------------------------------------
 #Test properties cannot be set
 #------------------------------------------------------------------------------
+    def test_System_Name_Setter(self):
+        for system in self.Test_Systems:
+            with self.assertRaises(AttributeError):
+                system.System_Name = "Another Name"
 #------------------------------------------------------------------------------
+    def test_System_Index_Setter(self):
+        for system in self.Test_Systems:
+            with self.assertRaises(AttributeError):
+                system.Index = 99
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -216,7 +271,6 @@ class Test_EDSystem(unittest.TestCase):
         out and wrongness by looking in game.
         '''
         #TODO:  Decide if this should be here and fail on first assert, or return a custom assert message with no specifics, or have a real long/ugly thing going on with subtests
-        #       Maybe this isn't even needed?
         self.assertEqual(system1.System_Name,system2.System_Name)
         self.assertSetEqual(set(system1.Station_Names),set(system2.Station_Names))
         self.assertSetEqual(set(system1.Item_Names),set(system2.Item_Names))
@@ -258,6 +312,9 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
         permitReq = (random.randrange(100)%10 == 0)
 
         #TODO: Maybe at some point have this actually have values instead of 0 all
+        #           Maybe keep track of i and create a random list of ints for the distances.
+        #           Since distance from i to i+1 is that same as i+1 to i we can go through and copy distances over
+        #               Exception being systems with the same name get distance of 0
         distToOthers = [0 for _ in range(numToCreate)]
 
         #Check for and remove/come up with another station name if a given name is already in a system
