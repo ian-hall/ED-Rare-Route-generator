@@ -124,14 +124,15 @@ class EDRareRoute(object):
             system2Index = self.__Route.index(system2)
             systemJumpsApart = abs(system1Index-system2Index)
 
-            if routeLength%2 == 0 :
-                if systemJumpsApart != math.floor(routeLength/2):
-                    continue
-            else:
-                if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
-                    continue
+            #if routeLength%2 == 0 :
+            #    if systemJumpsApart != math.floor(routeLength/2):
+            #        continue
+            #else:
+            if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
+                continue
 
             #TODO: Fix spacing
+            #      I don't even remember what the heck this is supposed to be
             system1Sellers = []
             system1LastIndex = -999
             system2Sellers = []
@@ -211,7 +212,7 @@ class EDRareRoute(object):
         weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
   
         totalGoodsCost = sum([system.Total_Cost for system in self.__Route])
-        weightedCost = totalGoodsCost/(routeLength * 10000)
+        weightedCost = totalGoodsCost/(routeLength * 15000)
 
 
 
@@ -683,6 +684,54 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     def __eq__(self,other):
         return self.__key() == other.__key()
+#------------------------------------------------------------------------------
+    def __AnotherFitnessRedo(self):
+        '''
+        Another attempt at making the EvenSplit type routes calculate faster
+        '''
+        routeLength = self.Length
+        self.__Total_Distance = 0     
+       
+        clusterShortLY = 50
+        clusterLongLY = 145
+        spreadMaxLY = 110
+        maxJumpRangeLY = 200
+        clusterShort = 0
+        clusterLong = 0
+        spreadJumps = 0
+        longestJump = -999
+
+        for i in range(0,routeLength):
+            currentSystem = self.__Route[i]
+            nextSystem = self.__Route[(i+1)%routeLength]
+            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
+            self.__Total_Distance += jumpDistance
+            longestJump = jumpDistance if jumpDistance > longestJump else longestJump
+            if jumpDistance <= clusterShortLY:
+                clusterShort += 1
+            if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
+                clusterLong += 1 
+            if jumpDistance <= spreadMaxLY:
+                spreadJumps += 1 
+        self.__Longest_Jump = longestJump
+        #Route has 2 groups of systems separated by a long jump
+        if clusterLong == 2 and (clusterLong + clusterShort) == routeLength:
+           self.__Route_Type = RouteType.Cluster
+
+        #Route has fairly evenly spaced jumps
+        if spreadJumps == routeLength:
+            self.__Route_Type = RouteType.Spread
+
+        systemsBySeller = {}
+        for seller in self.__Route:
+            systemsBySeller[seller] = []
+            for system in self.__Route:
+                if seller.GetDistanceTo(system) >= self.__Seller_Min:
+                    systemsBySeller[seller].append(system)
+        ableToSell = routeLength
+        for k,v in systemsBySeller.items():
+            if v.__len__() == 0:
+                ableToSell -= 1
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

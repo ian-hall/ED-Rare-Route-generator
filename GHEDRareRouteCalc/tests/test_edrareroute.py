@@ -179,6 +179,27 @@ class Test_EDRareRoute(unittest.TestCase):
                     random.shuffle(changedSystems)
                     self.assertNotEqual(testRoute.Systems,changedSystems,msg="EDRareRoute systems indirectly changed")
 #------------------------------------------------------------------------------
+    def test_Route_Fitness_SysOrderEqual(self):
+        '''
+        Routes should always have the same fitness value when given systems in the same order
+        but with different positions in the system list.
+        '''
+        #TODO:  Regularly fails with EvenSplit fitness types
+        #           Most likely because of the use of itertools.combos to find sellers,
+        #           Different route order means different seller selection order and the first will be chosen
+        #           Maybe can't do anything about this
+        import collections
+        for systemList in self.System_Lists:
+            for name,fType in FitnessType.__members__.items():
+                with self.subTest(fType=fType):
+                    sysDQ = collections.deque(systemList)
+                    numToRotate = random.randrange(systemList.__len__())
+                    sysDQ.rotate(numToRotate)
+                    rotatedList = list(sysDQ)
+                    route = EDRareRoute(systemList,fType)
+                    rotatedRoute = EDRareRoute(rotatedList,fType)
+                    self.assertAlmostEqual(route.Fitness,rotatedRoute.Fitness)
+#------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 if __name__ == '__main__':

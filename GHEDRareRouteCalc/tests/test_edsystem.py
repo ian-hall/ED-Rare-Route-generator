@@ -313,7 +313,7 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
 
         #TODO: Maybe at some point have this actually have values instead of 0 all
         #           Maybe keep track of i and create a random list of ints for the distances.
-        #           Since distance from i to i+1 is that same as i+1 to i we can go through and copy distances over
+        #           Since distance from i to i+n is that same as i+n to i we can go through and copy distances over
         #               Exception being systems with the same name get distance of 0
         distToOthers = [0 for _ in range(numToCreate)]
 

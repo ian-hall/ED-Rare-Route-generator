@@ -27,7 +27,6 @@ class RouteCalc(object):
         Population is a list of EDRareRoutes
         '''
         #TODO:  Eventually add something here that calculates popSize based on route length
-        #       Flag tests so I dont accidently run this and cause everything to hang for several minutes
         RouteCalc.__Fit_Type = fitType
         if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
             if routeLength < 3 or routeLength > 15:
@@ -45,8 +44,6 @@ class RouteCalc(object):
             raise Exception("Not enough systems for a route...")
 
         population = [EDRareRoute(sysList, fitType) for sysList in GenerateSystemLists(popSize,routeLength,validSystems)]
-        #for sysList in GenerateSystemLists(popSize,routeLength,validSystems):
-        #    population.append(EDRareRoute(sysList,fitType))
 
         return cls.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
@@ -67,7 +64,7 @@ class RouteCalc(object):
         bestRoute = max(currentPopulation,key=operator.attrgetter('Fitness'))
 
         #Want the program to keep running until it finds something, which it will eventually (maybe).
-        #Going to increase the mutation chance for every couple generations it goes without increasing
+        #Going to increase the mutation chance for every x00 generations it goes without increasing
         #the value of the best route.
         mutationIncrease = 0.35
         timeBetweenIncrease = 350
@@ -91,14 +88,14 @@ class RouteCalc(object):
 
             if possibleRoute.Fitness > bestRoute.Fitness:
                 if not silent:
-                    print("{0:>7}-> {1:.5f}".format(currentGeneration,possibleRoute.Fitness))
+                    print("{0:>7} -> {1:.5f}".format(currentGeneration,possibleRoute.Fitness))
                 bestRoute = possibleRoute
                 lastRouteFoundOn = currentGeneration
                 #Reset mutation chance when finding a new best route
                 if mutationChance != baseMutation:
                     mutationChance = baseMutation
                     if not silent:
-                        print("{0:>7}-> mutation chance: {1:.1f}%".format("",mutationChance*100))
+                        print("{0:>7} -> mutation chance: {1:.1f}%".format("",mutationChance*100))
 
             #Exit if we are at least at the Route_Cutoff value and its been X generations since last increase
             if bestRoute.Fitness >= RouteCalc.Route_Cutoff and currentGeneration - lastRouteFoundOn >= cutoffAfterRouteFound:
@@ -120,7 +117,7 @@ class RouteCalc(object):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
 
                 if not silent:
-                    print("{0:>7}-> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
+                    print("{0:>7} -> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
 
             relativeFitnessVals = cls.__CalculateRelativeFitness(currentPopulation)
 
