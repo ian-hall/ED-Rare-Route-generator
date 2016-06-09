@@ -12,16 +12,16 @@ class PerformanceCalc(object):
     def CheckPerformance(cls,systemsList: list,fitType: FitnessType):
         maxTests = 10
 
-        minPopSize = 250
-        maxPopSize = 250
+        minPopSize = 555
+        maxPopSize = 555
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 8
-        maxLength = 8
+        minLength = 15
+        maxLength = 15
         lengths = range(minLength,maxLength+1,1)
 
-        print("Fitness Type: {0}".format(fitType.name))
+        print("\nFitness Type: {0}".format(fitType.name))
         for routeLength in lengths:
             for popSize in popSizes:
                 stats = PerformanceMetrics(routeLength,popSize)
@@ -242,7 +242,7 @@ class PerformanceMetrics(object):
         avgGensSolved = totalGensSolved/numSolved if numSolved > 0 else 0 
         avgGensUnsolved = totalGensUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0  
 
-        strList.append("\nRoute Length {0}, Pop Size {1}".format(self.Route_Length,self.Pop_Size))
+        strList.append("Route Length {0}, Pop Size {1}".format(self.Route_Length,self.Pop_Size))
         strList.append("\n\tSolved {0:.2%}".format((numSolved/numEntries)))
         if numSolved > 0:
             strList.append("\n\tAvg route value: {0:.5f}".format(avgSolvedValue))
