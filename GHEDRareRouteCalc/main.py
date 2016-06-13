@@ -204,7 +204,7 @@ def __GetUserInput(systemsDict:dict) -> tuple:
         print("Invalid entry")
         optionChoice = input("Your choice: ")
     
-    if float(optionChoice) == 1:
+    if int(optionChoice) == 1:
         argsToUse = []      
         stationDist = input("Max distance to station (ly): ")
         while not (__TryInt(stationDist) and int(stationDist) >= 1):
@@ -233,7 +233,7 @@ def __GetUserInput(systemsDict:dict) -> tuple:
         readyToRun = True
     
         
-    elif float(optionChoice) == 2:
+    elif int(optionChoice) == 2:
         #Maybe have this be a selection list of all known systems
         systemsToUse = []
         count = 0
@@ -277,7 +277,7 @@ def __GetUserInput(systemsDict:dict) -> tuple:
             readyToRun = True
             argsOrSystems = systemsToUse
 
-    elif float(optionChoice) == 3:
+    elif int(optionChoice) == 3:
         print("Goodbye")
 
             
@@ -342,16 +342,16 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 7
-        popSize = 300
-        fitType = FitnessType.Tester
+        length = 15
+        popSize = 1000
+        fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
-        #__RunGenetic(commonSystems,length,popSize,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
 
         #PerformanceCalc.TestSystems(systemsDict,FitnessType.Tester)
 

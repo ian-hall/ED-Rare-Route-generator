@@ -18,7 +18,7 @@ class Test_EDSystem(unittest.TestCase):
 #------------------------------------------------------------------------------
     def setUp(self):
         self.Test_Args = CreateEDSystemArgsList(500)
-        self.Test_Systems = CreateSystemsFromParams(self.Test_Args)
+        self.Test_Systems = CreateSystemsFromArgs(self.Test_Args)
 #------------------------------------------------------------------------------
     def test_System_Contructor(self):        
         systemName = "test system"
@@ -198,7 +198,7 @@ class Test_EDSystem(unittest.TestCase):
                 expectedPermitReq = self.__PullValsForArg(self.Test_Args,"permit",system.System_Name)[0]
                 self.assertTrue(system.Needs_Permit == expectedPermitReq)                
 #------------------------------------------------------------------------------
-    def test_Systems_Add_Commutative(self):
+    def test_System_Add_Commutative(self):
         '''
         Assert that we get the "same" systems regardless of the order we add rares to them
         '''
@@ -237,6 +237,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_Distances(self):
         '''
         Going to use the spreadsheet for now until I get my factory working as intended
+        Make sure distance from a to b is the same as b to a
         '''
         import main
         systemsToCheck  = main.ReadSystems("RareGoods.csv")
@@ -245,6 +246,23 @@ class Test_EDSystem(unittest.TestCase):
             sysToRand = system.GetDistanceTo(randSystem)
             randToSys = randSystem.GetDistanceTo(system)
             self.assertEqual(sysToRand,randToSys)
+#------------------------------------------------------------------------------
+    def test_System_Distances_Failure(self):
+        '''
+        Attempting to get the distance to a system whose index is not in the list should return -1
+        '''
+        for system in self.Test_Systems:
+            with self.subTest(sysName = system.System_Name):
+                badSystemArgs = CreateEDSystemArgsList(1)[0]
+                badSystemArgs["systemIndex"] = -1
+                badSystem = EDSystem(**badSystemArgs)
+                distToBad = system.GetDistanceTo(badSystem)
+                self.assertEqual(-1,distToBad)     
+                
+                badSystemArgs["systemIndex"] = 99999999999999
+                badSystem = EDSystem(**badSystemArgs)
+                distToBad = system.GetDistanceTo(badSystem)
+                self.assertEqual(-1,distToBad)                        
 #------------------------------------------------------------------------------
 #Test properties cannot be set
 #------------------------------------------------------------------------------
@@ -258,8 +276,26 @@ class Test_EDSystem(unittest.TestCase):
             with self.assertRaises(AttributeError):
                 system.Index = 99
 #------------------------------------------------------------------------------
+    def test_System_Total_Cost_Setter(self):
+        for system in self.Test_Systems:
+            with self.assertRaises(AttributeError):
+                system.Total_Cost = 219
 #------------------------------------------------------------------------------
+    def test_System_Max_Suppy_Setter(self):
+        for system in self.Test_Systems:
+            with self.assertRaises(AttributeError):
+                system.Max_Supply = 219
 #------------------------------------------------------------------------------
+    def test_System_Item_Info_Setter(self):
+        for system in self.Test_Systems:
+            originalList = system.Items_Info
+            with self.assertRaises(AttributeError):
+                system.Items_Info = ["a bad list that shouldn't work"]
+            for i in range(originalList.__len__()):
+                system.Items_Info[i] = "A different value"
+            
+            #Make sure we get the original list back with no elements actually changed
+            self.assertListEqual(originalList,system.Items_Info)
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def assertSystemsEqual(self,system1,system2):
@@ -270,7 +306,6 @@ class Test_EDSystem(unittest.TestCase):
         ignoring system distances and station distances because if all else is equal we can figure
         out and wrongness by looking in game.
         '''
-        #TODO:  Decide if this should be here and fail on first assert, or return a custom assert message with no specifics, or have a real long/ugly thing going on with subtests
         self.assertEqual(system1.System_Name,system2.System_Name)
         self.assertSetEqual(set(system1.Station_Names),set(system2.Station_Names))
         self.assertSetEqual(set(system1.Item_Names),set(system2.Item_Names))
@@ -336,12 +371,12 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
     
     return argsDictList
 #------------------------------------------------------------------------------
-def CreateSystemsFromParams(paramsList: list) -> list:
+def CreateSystemsFromArgs(argsList: list) -> list:
     '''
     "Factory" whatever for making EDSystems to use in testing
     '''
     generatedSystems = []
-    for args in paramsList:
+    for args in argsList:
         currentSystem = EDSystem(**args)
         if generatedSystems.count(currentSystem) != 0:
             for system in generatedSystems:

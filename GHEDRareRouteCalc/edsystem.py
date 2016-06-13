@@ -6,6 +6,7 @@ class EDSystem( object ):
     #TODO: Maybe a better way to do this?
     #      Maybe not enough data for est profit
     #          all rares have different variables for deciding sell val 
+    #       Maybe change System_Distance to a dict, but this would require knowing all systems ahead of time when reading from the csv
 #------------------------------------------------------------------------------
     def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                        stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
@@ -108,7 +109,7 @@ class EDSystem( object ):
         Get the distance from self to the other system. If the other system's index
         is not in the system distances list return -1
         '''
-        if other.__Index < self.__System_Distances.__len__():
+        if other.__Index >= 0 and other.__Index < self.__System_Distances.__len__():
             return self.__System_Distances[other.__Index]
         else:
             return -1.0
