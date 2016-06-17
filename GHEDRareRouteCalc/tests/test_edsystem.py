@@ -297,6 +297,48 @@ class Test_EDSystem(unittest.TestCase):
             #Make sure we get the original list back with no elements actually changed
             self.assertListEqual(originalList,system.Items_Info)
 #------------------------------------------------------------------------------
+    def test_System_Item_Names_Setter(self):
+        for system in self.Test_Systems:
+            originalList = system.Item_Names
+            with self.assertRaises(AttributeError):
+                system.Item_Names = ["a bad list that shouldn't work"]
+            for i in range(originalList.__len__()):
+                system.Item_Names[i] = "A different value"
+            
+            #Make sure we get the original list back with no elements actually changed
+            self.assertListEqual(originalList,system.Item_Names)
+#------------------------------------------------------------------------------
+    def test_System_Location_Setter(self):
+        for system in self.Test_Systems:
+            with self.subTest(sysName=system.System_Name):
+                originalLocation = system.Location
+                badLocation = {'x':random.randrange(-200,200),
+                               'y':random.randrange(-200,200),
+                               'z':random.randrange(-200,200),
+                               'w':random.randrange(-200,200)}
+                with self.assertRaises(AttributeError):
+                    system.Location=badLocation
+            
+                badLocation = {'x':random.randrange(-200,200),
+                               'y':random.randrange(-200,200)}
+                with self.assertRaises(AttributeError):
+                    system.Location=badLocation
+            
+                badLocation = {'x':"Not a number",
+                               'y':random.randrange(-200,200),
+                               'z':random.randrange(-200,200)}
+                with self.assertRaises(AttributeError):
+                    system.Location=badLocation
+                self.assertDictEqual(originalLocation,system.Location)
+
+                goodLocation = {'x':random.randrange(-200,200),
+                                'y':random.randrange(-200,200),
+                                'z':random.randrange(-200,200)}
+                system.Location=goodLocation
+                self.assertDictEqual(goodLocation,system.Location)
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
     def assertSystemsEqual(self,system1,system2):
         '''

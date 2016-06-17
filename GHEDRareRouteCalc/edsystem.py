@@ -81,10 +81,25 @@ class EDSystem( object ):
     def Station_Distances(self) -> list:
         return [dist for dist in self.__Station_Distances]
 #------------------------------------------------------------------------------
-    #TODO: Maybe a better way to get location so it can't be set
     @property
     def Location(self) -> dict:
-        return self.__Location
+        return dict(self.__Location)
+#------------------------------------------------------------------------------
+    @Location.setter
+    def Location(self,newLoc:dict):
+        '''
+        Sets the location of the system with the given value.
+        Only accepts dicts with keys of x, y, and z and values of
+        floats.
+        '''
+        if newLoc.__len__() != 3:
+            raise AttributeError
+        for key,value in newLoc.items():
+            if not ((key=='x') or (key=='y') or (key=='z')):
+                raise AttributeError
+            if not TryFloat(value):
+                raise AttributeError            
+        self.__Location = dict(newLoc)
 #------------------------------------------------------------------------------
     @property
     def Needs_Permit(self) -> bool:
@@ -191,4 +206,11 @@ class DisplayLocation(object):
         return hash((self.Col,self.Row))
 #------------------------------------------------------------------------------
 ###############################################################################
+#------------------------------------------------------------------------------
+def TryFloat(val: str) -> bool:
+    try:
+        float(val)
+        return True
+    except:
+        return False
 #------------------------------------------------------------------------------

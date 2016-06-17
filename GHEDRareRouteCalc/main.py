@@ -164,6 +164,10 @@ def ReadSystems(file:str = None) ->list:
     headers = cleanedCSV[0]
     for i in range(1,cleanedCSV.__len__()-1):
         currentSystem = __ValidateLine(cleanedCSV[i],i)
+        location = {'x':coordLists['x'][currentSystem.Index],
+                    'y':coordLists['y'][currentSystem.Index],
+                    'z':coordLists['z'][currentSystem.Index]}
+        currentSystem.Location = location
         '''
         Putting all systems with multiple stations/rares/whatever into one EDSystem object
         '''   
@@ -174,10 +178,11 @@ def ReadSystems(file:str = None) ->list:
         else:
             allSystems.append(currentSystem)
 
-    for system in allSystems:
-        system.Location['x'] = coordLists['x'][system.Index]
-        system.Location['y'] = coordLists['y'][system.Index]
-        system.Location['z'] = coordLists['z'][system.Index]
+    #for system in allSystems:
+    #    location = {'x':coordLists['x'][system.Index],
+    #                'y':coordLists['y'][system.Index],
+    #                'z':coordLists['z'][system.Index]}
+    #    system.Location = location
 
     return allSystems
 
@@ -280,9 +285,6 @@ def __GetUserInput(systemsDict:dict) -> tuple:
     elif int(optionChoice) == 3:
         print("Goodbye")
 
-            
-    
-
     return (readyToRun,int(optionChoice),argsOrSystems)
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -317,8 +319,7 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
 
-    prompt = False
-    
+    prompt = False    
     if prompt:
         userInput = __GetUserInput(systemsDict)
         ready = userInput[0]
@@ -337,14 +338,13 @@ if __name__ == '__main__':
             if runType == 2:
                 userSystems = userInput[2]
                 routeLen = userSystems.__len__()
-                __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
-        
+                __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 15
-        popSize = 1000
-        fitType = FitnessType.EvenSplit
+        length = 8
+        popSize = 500
+        fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = True
         __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
