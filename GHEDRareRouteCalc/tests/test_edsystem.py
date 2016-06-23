@@ -319,7 +319,8 @@ class Test_EDSystem(unittest.TestCase):
                 with self.assertRaises(AttributeError):
                     system.Location=badLocation
             
-                badLocation = {'x':random.randrange(-200,200),
+                badLocation = {'w':random.randrange(-200,200),
+                               'x':random.randrange(-200,200),
                                'y':random.randrange(-200,200)}
                 with self.assertRaises(AttributeError):
                     system.Location=badLocation
@@ -329,11 +330,20 @@ class Test_EDSystem(unittest.TestCase):
                                'z':random.randrange(-200,200)}
                 with self.assertRaises(AttributeError):
                     system.Location=badLocation
+                
+                #Confirm the original is not changed    
                 self.assertDictEqual(originalLocation,system.Location)
 
-                goodLocation = {'x':random.randrange(-200,200),
+                #Confirm that changing a value of system.Location does not change the value in the 
+                #system object
+                changedValues = system.Location
+                changedValues['x'] = -999999999
+                self.assertNotEqual(changedValues,system.Location);
+
+                #Confirm that a valid location can be set
+                goodLocation = {'z':random.randrange(-200,200),
                                 'y':random.randrange(-200,200),
-                                'z':random.randrange(-200,200)}
+                                'x':random.randrange(-200,200)}
                 system.Location=goodLocation
                 self.assertDictEqual(goodLocation,system.Location)
 #------------------------------------------------------------------------------

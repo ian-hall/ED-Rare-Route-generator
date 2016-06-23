@@ -178,12 +178,6 @@ def ReadSystems(file:str = None) ->list:
         else:
             allSystems.append(currentSystem)
 
-    #for system in allSystems:
-    #    location = {'x':coordLists['x'][system.Index],
-    #                'y':coordLists['y'][system.Index],
-    #                'z':coordLists['z'][system.Index]}
-    #    system.Location = location
-
     return allSystems
 
 #------------------------------------------------------------------------------
@@ -194,14 +188,13 @@ def __GetUserInput(systemsDict:dict) -> tuple:
     int will be the choice selected
     list will either be a list of args to run the genetic with [max station dist, route len, permit status] or a list of systems to run it with.
     '''
-    #Using try float so I 
     readyToRun = False
     argsOrSystems = []
     sb = []
     sb.append("Please select an option:\n")
-    sb.append("\t1) generate route by length\n")
-    sb.append("\t2) generate route by system list\n")
-    sb.append("\t3) exit")
+    sb.append("\t1) Generate route by length\n")
+    sb.append("\t2) Generate route by system list\n")
+    sb.append("\t3) Exit")
     print(''.join(sb))
     optionChoice = input("Your choice: ")
     numChoices = 3
@@ -231,7 +224,7 @@ def __GetUserInput(systemsDict:dict) -> tuple:
             if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'Y'):
                 validPermitEntry = True
         
-        permitVal = 1 if (permitsStr == "Y") else 0
+        permitVal = (permitsStr == "Y")
 
         argsToUse = [int(stationDist),int(routeLen),permitVal]
         argsOrSystems = argsToUse
@@ -319,16 +312,14 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
 
-    prompt = False    
+    prompt = True    
     if prompt:
-        userInput = __GetUserInput(systemsDict)
-        ready = userInput[0]
+        ready,runType,userArgs = __GetUserInput(systemsDict)
         if ready:
-            runType = userInput[1]
             if runType == 1:
-                maxStationDistance = userInput[2][0]
-                length = userInput[2][1]
-                allowPermits = (userInput[2][2] == 1)
+                maxStationDistance = userArgs[0]
+                length = userArgs[1]
+                allowPermits = userArgs[2]
                 systemsSubset = []
                 if allowPermits:
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance]
@@ -336,18 +327,18 @@ if __name__ == '__main__':
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
                 __RunGenetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
             if runType == 2:
-                userSystems = userInput[2]
+                userSystems = userArgs
                 routeLen = userSystems.__len__()
                 __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 8
+        length = 6
         popSize = 500
-        fitType = FitnessType.FirstOver
+        fitType = FitnessType.Tester
         silenceOutput = False
         stopShort = True
-        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
+        __RunGenetic(commonSystems,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)

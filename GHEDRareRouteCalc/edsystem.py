@@ -94,9 +94,9 @@ class EDSystem( object ):
         '''
         if newLoc.__len__() != 3:
             raise AttributeError
-        for key,value in newLoc.items():
-            if not ((key=='x') or (key=='y') or (key=='z')):
-                raise AttributeError
+        if set(newLoc.keys()) != set(['x','y','z']):
+            raise AttributeError
+        for _,value in newLoc.items():
             if not TryFloat(value):
                 raise AttributeError            
         self.__Location = dict(newLoc)
