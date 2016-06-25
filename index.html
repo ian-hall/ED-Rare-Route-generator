@@ -1,64 +1,85 @@
-<!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on https://github.com/jonrohan -->
+﻿<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<head>
+		<meta charset='utf-8'>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="http://www.imhall.com/stylesheets/bootstrap.space.mod.css" title="base">
+		<link rel="stylesheet" href="http://www.imhall.com/stylesheets/site.css" title="base">
+		<link rel="alt stylesheet" href="http://www.imhall.com/stylesheets/219.css" title="219">
+		<link rel="alt stylesheet" href="http://www.imhall.com/stylesheets/219site.css" title="219">
+        <link rel="shortcut icon" href="http://www.iconj.com/icon.php?pid=u8tuc0fwqi" type="image/x-icon" /> 
+		<title>imhall.com</title>
+	</head>
+	<body onload="set_style_from_cookie()">
+	    <div class="navbar navbar-default navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="http://www.imhall.com">{imhall.com}</a>
+				</div>
+				<div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="http://www.imhall.com/projects.html">projects</a></li>
+                        <li><a href="http://www.imhall.com/photos.html">photos</a></li>
+                    </ul>
+				</div>
+			</div>
+		</div>
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
-  <link rel="stylesheet" href="stylesheets/github-dark.css">
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+	    <div class="container body-content">
+			<h2>Elite: Dangerous Rare Routes</h2>
+            <div class="col-md-12">           
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <p class="lead">
+                            A program I put together to generate rare trade routes for the game <a href="https://www.elitedangerous.com/">Elite: Dangerous</a>. 
+                            Uses a genetic algorithm to throw a bunch of systems together until it gets a group of systems that isn't completely horrible. Based off 
+                            <a href="https://docs.google.com/spreadsheets/d/17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4/pubhtml">this</a> spreadsheet, it takes 
+                            anywhere from a couple of seconds for a 10 systems or less, up to a few minutes for routes of length 35. 
+                            <a href="https://github.com/ian-hall/ED-Rare-Route-generator">You can find it here on GitHub.</a>
+                            <br /><br />
+                            If you don't know what the heck any of this means, you can go to my other page to make some fake rare items: <a href="http://www.imhall.com/RandomRares/">Random Rares</a>
+                            <br /><br />
+                            There isn't much to show as far as features go so have some trade routes that might be good. Click on them to open them to a size that you can probably read:
+                        </p>
+                    </div>
+                </div>
+				<br />
+                <a href="http://imgur.com/IU4D7We"><img src="http://i.imgur.com/IU4D7We.jpg" title="source: imgur.com" class="img-responsive"/></a>
+				<br /><br />
+                <a href="http://imgur.com/DmvPoVZ"><img src="http://i.imgur.com/DmvPoVZ.jpg" title="source: imgur.com" class="img-responsive"/></a>
+				<br /><br />
+                <a href="http://imgur.com/2hflYI8"><img src="http://i.imgur.com/2hflYI8.png" title="source: imgur.com" class="img-responsive"/></a>
+                <br /><br />
+                <a href="http://imgur.com/8S6aCm9"><img src="http://i.imgur.com/8S6aCm9.jpg" title="source: imgur.com" class="img-responsive"/></a>
+				<br /><br />
+                <a href="http://imgur.com/5b8lUYF"><img src="http://i.imgur.com/5b8lUYF.jpg" title="source: imgur.com" class="img-responsive"/></a>
+				<br />
+            </div>
+		</div>
 
-  <title>Elite:Dangerous Rare Routes</title>
-  <meta name="description" content="">
-
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-
-</head>
-
-<body>
-
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Elite:Dangerous Rare Routes</h1>
-    </header>
-    <div id="container">
-      <p class="tagline"></p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/ian-hall/ED-Rare-Route-generator/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/ian-hall/ED-Rare-Route-generator/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/ian-hall/ED-Rare-Route-generator" class="code">View Elite:Dangerous Rare Routes on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <p>i'm working on it so have a screenshot for now.</p>
-
-<p><a href="http://i.imgur.com/2hflYI8.png"><img src="http://i.imgur.com/2hflYI8.png" alt="Imgur"></a></p>
-        </article>
-      </div>
-    </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/ian-hall" class="avatar"><img src="https://avatars3.githubusercontent.com/u/5023838?v=3&amp;s=60" width="48" height="48"></a> <a href="https://github.com/ian-hall">ian-hall</a> maintains <a href="https://github.com/ian-hall/ED-Rare-Route-generator">Elite:Dangerous Rare Routes</a></p>
-
-
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/ian-hall/ED-Rare-Route-generator/tarball/master" class="tar">tar</a><a href="https://github.com/ian-hall/ED-Rare-Route-generator/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
-
-  
-</body>
+		<footer class="footer">
+			<div class="container">
+				<div class="row">
+					<p class="text-footer">
+						<ul class="list-inline">
+                            <li>&copy; 2016 - <a href="http://www.github.com/ian-hall">Ian Hall<img src="http://www.imhall.com/images/blacktocat.png"></a></li>
+							<li class="btn-group pull-right">
+								<button type="submit" onclick="switch_style('base');return false;" name="theme" value="Light Theme" id="base" class="btn btn-default">Light</button>
+								<button type="submit" onclick="switch_style('219');return false;" name="theme" value="Dark Theme" id="219" class="btn btn-default">Dark</button>
+							</li>
+						</ul>
+					</p>
+				</div>
+			</div>
+		</footer>
+        <script src="http://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+		<script src="http://www.imhall.com/scripts/themeswitch.js"></script>
+	</body>
 </html>
