@@ -191,3 +191,4 @@ ModelManifest.xml
 /GHEDRareRouteCalc/__pycache__
 *.pyperf
 *.playlist
+/.vs/config/applicationhost.config

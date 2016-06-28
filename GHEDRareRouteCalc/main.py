@@ -89,19 +89,16 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
         print("Run: {0}".format(runNum))
-        routeTuple = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent,fitType)
+        bestRoute,numGenerations = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent,fitType)
         geneticEnd = time.time()
-        if routeTuple:
-            bestRoute = routeTuple[0]
-            if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
-                exitTestLoop = True
-            if bestRoute.Fitness < RouteCalc.Route_Cutoff:
-                print("No good route found".format(bestRoute.Fitness))
-            print(bestRoute)
-            print("Generations: {0}".format(routeTuple[1]))
-            print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
-            bestRoute.PrintRoute()
-    if bestRoute is not None:
+        if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
+            exitTestLoop = True
+        if bestRoute.Fitness < RouteCalc.Route_Cutoff:
+            print("No good route found")
+        print(bestRoute)
+        bestRoute.DisplayInConsole()
+        print("Generations: {0}".format(numGenerations))
+        print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
         bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
 def __TryFloat(val: str) -> bool:
@@ -312,7 +309,7 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
 
-    prompt = True    
+    prompt = False    
     if prompt:
         ready,runType,userArgs = __GetUserInput(systemsDict)
         if ready:
@@ -333,12 +330,12 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 6
-        popSize = 500
-        fitType = FitnessType.Tester
+        length = 8
+        popSize = 300
+        fitType = FitnessType.FirstOver
         silenceOutput = False
-        stopShort = True
-        __RunGenetic(commonSystems,length,popSize,fitType,silenceOutput,stopShort)
+        stopShort = False
+        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
@@ -348,6 +345,6 @@ if __name__ == '__main__':
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
         #print(fullRoute)
-        #fullRoute.PrintRoute()
+        #fullRoute.DisplayInConsole()
         #fullRoute.DrawRoute(showLines=False)
 #------------------------------------------------------------------------------

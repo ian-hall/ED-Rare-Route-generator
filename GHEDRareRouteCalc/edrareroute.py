@@ -354,7 +354,7 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
     #       Add a better way to represent large routes than first letter of system, too many duplicates
-    def PrintRoute(self):
+    def DisplayInConsole(self):
         '''
         prints the route with the power of the console
         '''
@@ -763,8 +763,15 @@ class EDRareRoute(object):
                         continue
                     if k2 in visited:
                         continue
-                    if(set.union(v1,v2) == routeSet):
-                        if abs(v1.__len__() - v2.__len__()) <= 1:
+                    #This is the slow part
+                    #if(set.union(v1,v2) == routeSet):
+                    if abs(v1.__len__() - v2.__len__()) <= 1:
+                        maybeGood = True
+                        for system in routeSet:
+                            if not (system in v1 or system in v2):
+                                maybeGood = False
+                                break
+                        if maybeGood:
                             possibleSellers.append((k1,k2))
 
             goodSellers = []
