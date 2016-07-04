@@ -15,6 +15,7 @@ class RouteType(Enum):
     Spread = 2
     FirstOver = 3
     FirstOverLong = 4
+    Distance = 5
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -22,7 +23,9 @@ class RouteType(Enum):
 class FitnessType(Enum):
     EvenSplit = 0
     FirstOver = 1
-    Tester = 2
+    Distance = 2
+    Tester = 3
+
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -49,6 +52,8 @@ class EDRareRoute(object):
             self.__Fitness_Value = self.__CalcFitnessAlt()
         elif fType == FitnessType.Tester:
             self.__Fitness_Value = self.__AnotherFitnessRedo()
+        elif fType == FitnessType.Distance:
+            self.__Fitness_Value = self.__CalcFitness_Distance()
         else:
             self.__Fitness_Value = self.__CalcFitness()
 #------------------------------------------------------------------------------
@@ -816,6 +821,19 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.7
 
         return totalValue
+#------------------------------------------------------------------------------
+    def __CalcFitness_Distance(self):
+        self.__Route_Type = RouteType.Distance
+        routeLength = self.Length
+        self.__Total_Distance = 0
+        for i in range(0,routeLength):
+            currentSystem = self.__Route[i]
+            nextSystem = self.__Route[(i+1)%routeLength]
+            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
+            self.__Total_Distance += jumpDistance
+        
+        maxGoodDistance = routeLength * 100
+        return (maxGoodDistance/self.__Total_Distance) * 5   
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

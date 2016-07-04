@@ -31,6 +31,8 @@ class RouteCalc(object):
         if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
             if routeLength < 3 or routeLength > 15:
                 raise Exception("Split routes must have lengths [3-15]")
+        elif RouteCalc.__Fit_Type == FitnessType.Distance:
+            pass
         else:
             if routeLength < 6 or routeLength > 35:
                 raise Exception("Alternate type routes must have lengths [6-35]")
@@ -122,11 +124,10 @@ class RouteCalc(object):
             relativeFitnessVals = cls.__CalculateRelativeFitness(currentPopulation)
 
             while nextPopulation.__len__() != currentPopulation.__len__():
-                children = cls.__Reproduce(currentPopulation,relativeFitnessVals)
-                child1 = children[0]
-                child2 = children[1]
+                child1,child2 = cls.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
                     child1 = cls.__Mutate(child1)
+                if random.random() <= mutationChance:
                     child2 = cls.__Mutate(child2)
                 nextPopulation.append(EDRareRoute(child1,RouteCalc.__Fit_Type))
                 if nextPopulation.__len__() < currentPopulation.__len__():
