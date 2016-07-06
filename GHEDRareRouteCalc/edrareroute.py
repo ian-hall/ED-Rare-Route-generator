@@ -387,7 +387,7 @@ class EDRareRoute(object):
 
         #Everything is shifted so mins are 0 and max() is the difference between points
         #Round stuff to graph it
-        if xMax == 0 or yMax == 0:
+        if xMax == 0 and yMax == 0:
             print("Unable to draw route")
             return
 
@@ -491,7 +491,7 @@ class EDRareRoute(object):
         zMax = max(zVals)
         points = []
 
-        if xMax == 0 or yMax == 0:
+        if xMax == 0 and yMax == 0:
             print("Unable to draw route")
             return
 
@@ -833,7 +833,11 @@ class EDRareRoute(object):
             self.__Total_Distance += jumpDistance
         
         maxGoodDistance = routeLength * 100
-        return (maxGoodDistance/self.__Total_Distance) * 5   
+        weightedDistance = (maxGoodDistance/self.__Total_Distance)
+        if weightedDistance < 0.75:
+            return weightedDistance * 6
+        else:
+            return weightedDistance * 10
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

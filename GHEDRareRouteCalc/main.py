@@ -328,14 +328,14 @@ if __name__ == '__main__':
                 routeLen = userSystems.__len__()
                 __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
-        maxStationDistance = 1000
+        maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 3
-        popSize = 500
-        fitType = FitnessType.Distance
+        length = 13
+        popSize = 750
+        fitType = FitnessType.Tester
         silenceOutput = False
-        stopShort = False
-        __RunGenetic(allSystems,length,popSize,fitType,silenceOutput,stopShort)
+        stopShort = True
+        #__RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
