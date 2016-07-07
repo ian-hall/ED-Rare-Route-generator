@@ -341,7 +341,7 @@ if __name__ == '__main__':
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
 
-        #PerformanceCalc.TestSystems(systemsDict,FitnessType.Tester)
+        PerformanceCalc.TestSystems(systemsDict,FitnessType.Tester)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
         #print(fullRoute)
