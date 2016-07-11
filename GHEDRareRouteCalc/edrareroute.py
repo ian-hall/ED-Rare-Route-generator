@@ -704,7 +704,7 @@ class EDRareRoute(object):
         #          11           {2,3}               {1,2,3,4,5,6,7,8,1} ##ALL SOLD
         routeLength = self.Length
         self.__Total_Distance = 0     
-       
+        sellerScale = 1
         clusterShortLY = 50
         clusterLongLY = 145
         spreadMaxLY = 110
@@ -743,27 +743,46 @@ class EDRareRoute(object):
                 if seller.GetDistanceTo(system) >= self.__Seller_Min:
                     systemsBySeller[seller].append(system)
         ableToSell = 0
-        badSellers = []
-        for k,v in systemsBySeller.items():
-            if v.__len__() < math.floor(routeLength/2):
-                badSellers.append(k)
-            else:
-                ableToSell += v.__len__()
-        for badSys in badSellers:
-            systemsBySeller.pop(badSys)
+        goodPairs = []
+        #TODO: Do a stupid thing where I actually check that all systems are accounted for in systemsBySeller
+        for seller1,seller2 in itertools.combinations(systemsBySeller,2):
+            sellableSystems = set(systemsBySeller[seller1] + systemsBySeller[seller2])
+            ableToSell = max(ableToSell,sellableSystems.__len__())
+            if sellableSystems == set(self.__Route):
+                goodPairs.append((seller1,seller2))
+
+        #for k,v in systemsBySeller.items():
+        #    if v.__len__() < math.floor(routeLength/2):
+        #        badSellers.append(k)
+        #    else:
+        #        ableToSell += v.__len__()
+        #for badSys in badSellers:
+        #    systemsBySeller.pop(badSys)
         sellersValue = min(ableToSell,routeLength)/routeLength * baseValue
         maxCargo = 0
 
         if sellersValue >= baseValue:
-            for seller1,seller2 in itertools.combinations(systemsBySeller,2):
+            for seller1,seller2 in goodPairs:
                 seller1Idx = self.__Route.index(seller1)
                 seller2Idx = self.__Route.index(seller2)
                 systemJumpsApart = abs(seller1Idx-seller2Idx)
+                #continue if things aren't evenly spaced
                 if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
                     continue
+                #continue if number of sellers per system isnt off by at most 1
+                #TODO: This does not seem to be catching pairs that have uneven number of sellers
+                if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
+                    continue
+                #sellableSystems = systemsBySeller[seller1] + systemsBySeller[seller2]
+                #if set(sellableSystems) == set(self.__Route):
+                #    self.__Sellers_Dict = {}
+                #    self.__Sellers_Dict[seller1] = systemsBySeller[seller1]
+                #    self.__Sellers_Dict[seller2] = systemsBySeller[seller2]
+                #    break
+                #TODO: Actually need to do this to calculate maxCargo
                 sold = []
                 unsold = []
-
+                self.__Sellers_Dict = None
                 for i in range(routeLength*2):
                     currentSys = self.__Route[i%routeLength];
                     unsold.append(currentSys)
@@ -786,16 +805,35 @@ class EDRareRoute(object):
                     for sys in toRemove:
                         unsold.remove(sys)
                         numSold = numSold + 1
-                    if set(sold) == set(self.__Route):
+                    #We know that each pair represents two sellers that can represent the selling of all rares in the route
+                    #We can just check the length here instead of doing a check on members of sold and route
+                    if sold.__len__() >= self.__Route.__len__():
                         #We have every system accounted for in sold, exit the for loop
-                        #TODO: We need to remove any unused systems from the systemsbyseller dict
                         break
-        else:
-            #Scale overall value down
+                if self.__Sellers_Dict is not None:
+                    break
+        if self.__Sellers_Dict is None:
             sellerScale = 0.25
 
-        #TODO Add the rest of the stuff here for distance/items/cost/whatever
-        return sellersValue
+        maxGoodDistance = routeLength * 100
+        weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
+        
+        minSupply = routeLength * 10
+        weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
+  
+        totalGoodsCost = sum([system.Total_Cost for system in self.__Route])
+        #Base this on an average purchase price of 1x000cr per system   
+        weightedCost = totalGoodsCost/(routeLength * 15000)
+        
+        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
+        
+        if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
+            totalValue = totalValue * 0.5
+        if sellersValue < baseValue/2:
+            totalValue = totalValue * 0.25
+        
+        self.__Max_Cargo = maxCargo
+        return totalValue
 #------------------------------------------------------------------------------
     def __CalcFitness_Distance(self):
         self.__Route_Type = RouteType.Distance
