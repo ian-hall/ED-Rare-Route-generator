@@ -9,6 +9,7 @@ import re
 import time
 from urllib import request
 from fuzzywuzzy import fuzz
+import pandas as pd
 #------------------------------------------------------------------------------
 def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
     '''
@@ -76,7 +77,7 @@ def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
         avgSupply = supplyCap
 
 
-    return EDSystem(supplyCap, avgSupply, itemCost, itemName,
+    return EDSystem.Create_From_Args(supplyCap, avgSupply, itemCost, itemName,
                     distToStation, stationName, systemName, index,
                     distToOthers, permit)
 #------------------------------------------------------------------------------
@@ -114,6 +115,12 @@ def __TryInt(val: str) -> bool:
         return True
     except:
         return False
+#------------------------------------------------------------------------------
+def ReadCSVPD(file:str = None) -> list:
+    mainCSV = pd.read_csv(file,skiprows=15,skipfooter=14,engine='python')
+    systems = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
+    for row in systems:
+        print(EDSystem.Create_From_CSV(row))      
 #------------------------------------------------------------------------------
 def ReadSystems(file:str = None) ->list:
     cleanedCSV = []
@@ -283,6 +290,7 @@ def __GetUserInput(systemsDict:dict) -> tuple:
 if __name__ == '__main__':
     csvFile = "RareGoods.csv"
     allSystems = ReadSystems(csvFile);
+    ReadCSVPD(csvFile)
 
     systemsDict = {}
     for system in allSystems:
@@ -330,12 +338,12 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 15
-        popSize = 500
+        length = 8
+        popSize = 150
         fitType = FitnessType.Tester
         silenceOutput = False
         stopShort = True
-        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
+        __RunGenetic(commonSystems,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)

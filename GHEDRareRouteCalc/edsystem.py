@@ -8,27 +8,99 @@ class EDSystem( object ):
     #          all rares have different variables for deciding sell val 
     #       Maybe change System_Distance to a dict, but this would require knowing all systems ahead of time when reading from the csv
 #------------------------------------------------------------------------------
-    def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
-                       stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
+    #def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
+    #                   stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
 
+    #    if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
+    #        (stationName is None) or (systemName is None) or (systemIndex is None) or (distToOthers is None) or (permit is None) ):
+    #        raise Exception("Values cannot be None") 
+        
+    #    if not isinstance(distToOthers,list):
+    #        raise TypeError       
+
+    #    self.__Supply_Caps = [supplyCap] # Float
+    #    self.__Supply_Numbers = [avgSupply] # Float
+    #    self.__Costs = [itemCost] # Int
+    #    self.__Items = [itemName] # String
+    #    self.__Station_Distances = [distToStation] # Float
+    #    self.__Station_Names = [stationName] # String
+    #    self.__System_Name = systemName # String
+    #    self.__Index = systemIndex # Int
+    #    self.__System_Distances = distToOthers # List of Floats
+    #    self.__Permit_Req = permit 
+    #    self.__Location = dict(x=0, y=0, z=0)
+#------------------------------------------------------------------------------
+    @classmethod
+    def Create_From_Args(cls, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
+                              stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
+        
         if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
             (stationName is None) or (systemName is None) or (systemIndex is None) or (distToOthers is None) or (permit is None) ):
             raise Exception("Values cannot be None") 
         
         if not isinstance(distToOthers,list):
             raise TypeError       
+        newSystem = EDSystem()
+        newSystem.__Supply_Caps = [supplyCap] # Float
+        newSystem.__Supply_Numbers = [avgSupply] # Float
+        newSystem.__Costs = [itemCost] # Int
+        newSystem.__Items = [itemName] # String
+        newSystem.__Station_Distances = [distToStation] # Float
+        newSystem.__Station_Names = [stationName] # String
+        newSystem.__System_Name = systemName # String
+        newSystem.__Index = systemIndex # Int
+        newSystem.__System_Distances = distToOthers # List of Floats
+        newSystem.__Permit_Req = permit 
+        newSystem.__Location = dict(x=0, y=0, z=0)  
+        return newSystem  
+#------------------------------------------------------------------------------
+    @classmethod
+    def Create_From_CSV(cls,tuple):
+        import re
+        newSystem = EDSystem()
+        supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName = tuple
+        itemName        = itemName.strip().replace("\\'","\'")
+        stationName     = stationName.strip().replace("\\'","\'")
+        systemName      = systemName.strip().replace("\\'","\'")
+        permit = False
+        
+        if supplyCap == 'ND':
+            supplyCap = 1
+        else:
+            tempMax = supplyCap.split('-')
+            for i in range(0,tempMax.__len__()):
+                tempMax[i] = int(re.sub("[^0-9]", "", tempMax[i]))
+            supplyCap = sum(tempMax)/len(tempMax)
 
-        self.__Supply_Caps = [supplyCap] # Float
-        self.__Supply_Numbers = [avgSupply] # Float
-        self.__Costs = [itemCost] # Int
-        self.__Items = [itemName] # String
-        self.__Station_Distances = [distToStation] # Float
-        self.__Station_Names = [stationName] # String
-        self.__System_Name = systemName # String
-        self.__Index = systemIndex # Int
-        self.__System_Distances = distToOthers # List of Floats
-        self.__Permit_Req = permit 
-        self.__Location = dict(x=0, y=0, z=0)    
+        if avgSupply == 'ND':
+            avgSupply = 1
+        else:
+            tempSupply = avgSupply.split('-')
+            for i in range(0,tempSupply.__len__()):
+                tempSupply[i] = float(re.sub("[^0-9]", "", tempSupply[i]))
+            avgSupply = sum(tempSupply)/len(tempSupply)
+
+        itemCost = int(re.sub("[^0-9]", "", itemCost))
+
+        if systemName.endswith('(permit)'):
+            permit = True
+            systemName = systemName.partition('(permit)')[0].strip()
+
+        if supplyCap == 1 or avgSupply == 1:
+            supplyCap = max([supplyCap,avgSupply])
+            avgSupply = supplyCap
+        newSystem.__Supply_Caps = [supplyCap] # Float
+        newSystem.__Supply_Numbers = [avgSupply] # Float
+        newSystem.__Costs = [itemCost] # Int
+        newSystem.__Items = [itemName] # String
+        newSystem.__Station_Distances = [distToStation] # Float
+        newSystem.__Station_Names = [stationName] # String
+        newSystem.__System_Name = systemName # String
+        #newSystem.__Index = -1
+        #newSystem.__System_Distances = distToOthers # List of Floats
+        newSystem.__Permit_Req = permit 
+        newSystem.__Location = dict(x=0, y=0, z=0)  
+        return newSystem
 #------------------------------------------------------------------------------
     @property
     def Total_Cost(self) -> float:
