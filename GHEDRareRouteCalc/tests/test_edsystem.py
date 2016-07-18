@@ -32,35 +32,33 @@ class Test_EDSystem(unittest.TestCase):
         permitReq = False
         distToOthers = [0]
 
-        with self.assertRaises(Exception,msg="no empty constructor"):
-            testSystem = EDSystem()
+        testSystem = EDSystem()
+        self.assertFalse(testSystem.Is_Initialized)
+
         with self.assertRaises(Exception,msg="missing args to constructor"):
-            testSystem = EDSystem(avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)           
-        
-        wrongDistToOthers = 0
-        with self.assertRaises(TypeError,msg="distToOthers needs to be a list"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,wrongDistToOthers,permitReq)
+            testSystem = EDSystem.Create_From_Args(avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)           
+               
         
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(None,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(None,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,None,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,None,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,None,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,None,itemName,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,None,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,None,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,None,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,None,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,None,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,None,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,None,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,None,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,None,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,None,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,None,permitReq)
-        with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,None)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,None)
+
+        self.assertFalse(testSystem.Is_Initialized)
 #------------------------------------------------------------------------------
     def test_System_AddRares_Item_Names(self):
         squishedSystems = []
@@ -402,7 +400,7 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
         #           Maybe keep track of i and create a random list of ints for the distances.
         #           Since distance from i to i+n is that same as i+n to i we can go through and copy distances over
         #               Exception being systems with the same name get distance of 0
-        distToOthers = [0 for _ in range(numToCreate)]
+        #      Since i changed __System_Distances to a dict, can now create the dict based off the names of all the systems generated here
 
         #Check for and remove/come up with another station name if a given name is already in a system
         stationsForSystem = [args["stationName"] for args in argsDictList if args["systemName"] == systemName]
@@ -417,7 +415,6 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
                      "stationName":stationName,
                      "systemName":systemName,
                      "systemIndex":index,
-                     "distToOthers":distToOthers,
                      "permit":permitReq}
         argsDictList.append(argsDict)
     
