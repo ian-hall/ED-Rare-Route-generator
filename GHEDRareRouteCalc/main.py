@@ -330,8 +330,8 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 7
-        popSize = 300
+        length = 15
+        popSize = 500
         fitType = FitnessType.Tester
         silenceOutput = False
         stopShort = True

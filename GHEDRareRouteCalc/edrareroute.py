@@ -750,14 +750,6 @@ class EDRareRoute(object):
             ableToSell = max(ableToSell,sellableSystems.__len__())
             if sellableSystems == set(self.__Route):
                 goodPairs.append((seller1,seller2))
-
-        #for k,v in systemsBySeller.items():
-        #    if v.__len__() < math.floor(routeLength/2):
-        #        badSellers.append(k)
-        #    else:
-        #        ableToSell += v.__len__()
-        #for badSys in badSellers:
-        #    systemsBySeller.pop(badSys)
         sellersValue = min(ableToSell,routeLength)/routeLength * baseValue
         maxCargo = 0
 
@@ -770,15 +762,8 @@ class EDRareRoute(object):
                 if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
                     continue
                 #continue if number of sellers per system isnt off by at most 1
-                #TODO: This does not seem to be catching pairs that have uneven number of sellers
                 if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
                     continue
-                #sellableSystems = systemsBySeller[seller1] + systemsBySeller[seller2]
-                #if set(sellableSystems) == set(self.__Route):
-                #    self.__Sellers_Dict = {}
-                #    self.__Sellers_Dict[seller1] = systemsBySeller[seller1]
-                #    self.__Sellers_Dict[seller2] = systemsBySeller[seller2]
-                #    break
                 #TODO: Actually need to do this to calculate maxCargo
                 sold = []
                 unsold = []

@@ -53,6 +53,10 @@ class PerformanceCalc(object):
         #badRoute = EDRareRoute(brokenRoute4,fitType)
         #print(badRoute)
 
+        brokenRoute9 = EDRareRoute( [ systemsDict["Leesti"], systemsDict["Ngurii"], systemsDict["Jaroua"], systemsDict["Kamitra"], systemsDict["Momus Reach"],
+                                      systemsDict["Witchhaul"], systemsDict["39 Tauri"], systemsDict["Zaonce"], systemsDict["Uszaa"] ], fitType )
+        print(brokenRoute9)
+
         #testingFarthest = EDRareRoute( [ systemsDict['Witchhaul'], systemsDict['George Pantazis'], systemsDict['Diso'], systemsDict['Utgaroar'], systemsDict['Momus Reach'],
         #                                 systemsDict['Yaso Kondi'] ], fitType)
         #print(testingFarthest)
