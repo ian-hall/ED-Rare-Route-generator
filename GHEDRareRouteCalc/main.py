@@ -90,17 +90,17 @@ def __Run_Genetic(systems: list, routeLength: int, popSize: int, fitType: Fitnes
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
         print("Run: {0}".format(runNum))
-        bestRoute,numGenerations = RouteCalc.GeneticSolverStart(popSize,systems,routeLength,silent,fitType)
+        bestRoute,numGenerations = RouteCalc.Start_Genetic_Solver(popSize,systems,routeLength,silent,fitType)
         geneticEnd = time.time()
         if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
             exitTestLoop = True
         if bestRoute.Fitness < RouteCalc.Route_Cutoff:
             print("No good route found")
         print(bestRoute)
-        bestRoute.DisplayInConsole()
+        bestRoute.Display_In_Console()
         print("Generations: {0}".format(numGenerations))
         print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
-        bestRoute.DrawRoute()
+        bestRoute.Draw_Route()
 #------------------------------------------------------------------------------
 def __Try_Float(val: str) -> bool:
     try:
@@ -124,13 +124,11 @@ def Read_Systems_New(file:str = None) -> list:
     mainCSV = pd.read_csv(file,header=15,skipfooter=14,engine='python')
     distances = mainCSV.iloc[:,colOffset:-3]
     locations = pd.read_csv(file,header=None,skiprows=10,chunksize=3)
-    #print(locations.iloc[:,7:-3])
     for line in locations:
         locations = line.iloc[:,colOffset:-3]
         break
     systemArgs = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
     idx = 0
-    #print(locations[colOffset-idx][0],locations[colOffset-idx][1],locations[colOffset-idx][2])
     for row in systemArgs:
         currentSystem = EDSystem.Create_From_CSV(row,idx)
         
@@ -146,7 +144,7 @@ def Read_Systems_New(file:str = None) -> list:
         if currentSystem in allSystems:
             for system in allSystems:
                 if system == currentSystem:
-                    system.AddRares(currentSystem)
+                    system.Add_Rares(currentSystem)
         else:
             allSystems.append(currentSystem)
         idx += 1
@@ -306,21 +304,21 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 45
-        popSize = 555
-        fitType = FitnessType.Distance
+        length = 8
+        popSize = 150
+        fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = True
         __Run_Genetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
-        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
-        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
+        #PerformanceCalc.Check_Performance(systemsSubset,fitType=FitnessType.EvenSplit)
+        #PerformanceCalc.Check_Performance(systemsSubset,fitType=FitnessType.FirstOver)
+        #PerformanceCalc.Check_Performance(systemsSubset,fitType=FitnessType.Tester)
 
-        #PerformanceCalc.TestSystems(systemsDict,FitnessType.Tester)
+        #PerformanceCalc.Check_Test_Systems(systemsDict,FitnessType.FirstOver)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
         #print(fullRoute)
-        #fullRoute.DisplayInConsole()
-        #fullRoute.DrawRoute(showLines=False)
+        #fullRoute.Display_In_Console()
+        #fullRoute.Draw_Route(showLines=False)
 #------------------------------------------------------------------------------

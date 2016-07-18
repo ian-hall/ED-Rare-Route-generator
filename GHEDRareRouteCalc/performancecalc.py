@@ -9,7 +9,7 @@ from collections import Counter
 class PerformanceCalc(object):
 #------------------------------------------------------------------------------
     @classmethod
-    def CheckPerformance(cls,systemsList: list,fitType: FitnessType):
+    def Check_Performance(cls,systemsList: list,fitType: FitnessType):
         maxTests = 10
 
         minPopSize = 300
@@ -28,7 +28,7 @@ class PerformanceCalc(object):
                 for testNum in range(maxTests):
                     solved = False
                     startTime = time.time()
-                    bestRoute,numGenerations = RouteCalc.GeneticSolverStart(popSize,systemsList,routeLength, True,fitType)
+                    bestRoute,numGenerations = RouteCalc.Start_Genetic_Solver(popSize,systemsList,routeLength, True,fitType)
                     endTime = time.time()
                     elapsed = endTime - startTime
                     if bestRoute.Fitness >= RouteCalc.Route_Cutoff:
@@ -43,7 +43,7 @@ class PerformanceCalc(object):
                 print(stats)
 #------------------------------------------------------------------------------
     @classmethod
-    def TestSystems(cls,systemsDict: dict,fitType: FitnessType):
+    def Check_Test_Systems(cls,systemsDict: dict,fitType: FitnessType):
         
         #brokenRoute4 = []
         #brokenRoute4.append(systemsDict['Diso'])  
@@ -53,9 +53,9 @@ class PerformanceCalc(object):
         #badRoute = EDRareRoute(brokenRoute4,fitType)
         #print(badRoute)
 
-        brokenRoute9 = EDRareRoute( [ systemsDict["Leesti"], systemsDict["Ngurii"], systemsDict["Jaroua"], systemsDict["Kamitra"], systemsDict["Momus Reach"],
-                                      systemsDict["Witchhaul"], systemsDict["39 Tauri"], systemsDict["Zaonce"], systemsDict["Uszaa"] ], fitType )
-        print(brokenRoute9)
+        #notBrokenRoute9 = EDRareRoute( [ systemsDict["Leesti"], systemsDict["Ngurii"], systemsDict["Jaroua"], systemsDict["Kamitra"], systemsDict["Momus Reach"],
+        #                              systemsDict["Witchhaul"], systemsDict["39 Tauri"], systemsDict["Zaonce"], systemsDict["Uszaa"] ], fitType )
+        #print(notBrokenRoute9)
 
         #testingFarthest = EDRareRoute( [ systemsDict['Witchhaul'], systemsDict['George Pantazis'], systemsDict['Diso'], systemsDict['Utgaroar'], systemsDict['Momus Reach'],
         #                                 systemsDict['Yaso Kondi'] ], fitType)
@@ -73,13 +73,13 @@ class PerformanceCalc(object):
         print("\n\nYK Loop")
         ykLoop = EDRareRoute(ykLoopList,fitType)
         print(ykLoop)
-        ykLoop.DisplayInConsole()
-        ykLoop.DrawRoute()
+        ykLoop.Display_In_Console()
+        ykLoop.Draw_Route()
         
 
         good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
         print(good5Route)
-        good5Route.DisplayInConsole()
+        good5Route.Display_In_Console()
          
         good8_1 = []
         good8_1.append(systemsDict['Hecate'])
@@ -130,7 +130,7 @@ class PerformanceCalc(object):
         #print("I dont even know if this route is bad or good anymore")
         #unknown11 = EDRareRoute(bad11_1,fitType)
         #print(unknown11)
-        #unknown11.DisplayInConsole()      
+        #unknown11.Display_In_Console()      
 
         #altTestRoute = []
         #altTestRoute.append(systemsDict['Shinrarta Dezhra'])
@@ -202,8 +202,8 @@ class PerformanceCalc(object):
         #altTestRoute.append(systemsDict['CD-75 661'])
         #bigRoute = EDRareRoute(altTestRoute,fitType)	
         #print(bigRoute)
-        #bigRoute.DisplayInConsole()
-        #bigRoute.DrawRoute()
+        #bigRoute.Display_In_Console()
+        #bigRoute.Draw_Route()
         
 #------------------------------------------------------------------------------
 ###############################################################################

@@ -63,7 +63,7 @@ class Test_EDRareRoute(unittest.TestCase):
         for i in range(routeLen):
             currSys = sysList[i%routeLen]
             nextSys = sysList[(i+1)%routeLen]
-            expectedDistance += currSys.GetDistanceTo(nextSys)
+            expectedDistance += currSys.Get_Distance_To(nextSys)
 
         for name,fType in FitnessType.__members__.items():
             with self.subTest(fType=fType):

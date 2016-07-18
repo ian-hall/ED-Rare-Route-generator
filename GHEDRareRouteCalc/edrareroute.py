@@ -49,13 +49,13 @@ class EDRareRoute(object):
         
         self.__Fitness_Value = -1
         if fType == FitnessType.FirstOver:
-            self.__Fitness_Value = self.__CalcFitnessAlt()
+            self.__Fitness_Value = self.__Calc_Fitness_Alt()
         elif fType == FitnessType.Tester:
             self.__Fitness_Value = self.__AnotherFitnessRedo()
         elif fType == FitnessType.Distance:
-            self.__Fitness_Value = self.__CalcFitness_Distance()
+            self.__Fitness_Value = self.__Calc_Fitness_Distance()
         else:
-            self.__Fitness_Value = self.__CalcFitness()
+            self.__Fitness_Value = self.__Calc_Fitness()
 #------------------------------------------------------------------------------
     @property
     def Fitness(self) -> float:
@@ -81,7 +81,7 @@ class EDRareRoute(object):
     def Length(self) -> int:
         return self.__Route.__len__() 
 #------------------------------------------------------------------------------
-    def __CalcFitness(self):
+    def __Calc_Fitness(self):
         '''
         Fitness value based on having a roughly even number of systems between sellers
         '''
@@ -103,7 +103,7 @@ class EDRareRoute(object):
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
+            jumpDistance = currentSystem.Get_Distance_To(nextSystem)
             self.__Total_Distance += jumpDistance
             longestJump = jumpDistance if jumpDistance > longestJump else longestJump
             if jumpDistance <= clusterShortLY:
@@ -149,7 +149,7 @@ class EDRareRoute(object):
             for i in range(1,routeLength):
                 system1IndexToCheck = (i + system1Index) % routeLength
                 currentSystem = self.__Route[system1IndexToCheck]
-                if system1.GetDistanceTo(currentSystem) >= self.__Seller_Min:
+                if system1.Get_Distance_To(currentSystem) >= self.__Seller_Min:
                     if system1LastIndex > 0:
                         if system1Sellers[-1]:
                             system1Sellers.append(True)
@@ -165,7 +165,7 @@ class EDRareRoute(object):
 
                 system2IndexToCheck = (i + system2Index) % routeLength
                 currentSystem = self.__Route[system2IndexToCheck]
-                if system2.GetDistanceTo(currentSystem) >= self.__Seller_Min:
+                if system2.Get_Distance_To(currentSystem) >= self.__Seller_Min:
                     if system2LastIndex > 0:
                         if system2Sellers[-1]:
                             system2Sellers.append(True)
@@ -231,7 +231,7 @@ class EDRareRoute(object):
 
         return totalValue
 #------------------------------------------------------------------------------
-    def __CalcFitnessAlt(self):
+    def __Calc_Fitness_Alt(self):
         '''
         Alternative fitness value based on just accounting for all systems in a route without
         regard to system positions in the route.
@@ -254,7 +254,7 @@ class EDRareRoute(object):
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
+            jumpDistance = currentSystem.Get_Distance_To(nextSystem)
             if jumpDistance > longestJump:
                 longestJump = jumpDistance
             
@@ -268,7 +268,7 @@ class EDRareRoute(object):
         for seller in self.__Route:
             systemsBySeller[seller] = []
             for system in self.__Route:
-                if seller.GetDistanceTo(system) >= self.__Seller_Min:
+                if seller.Get_Distance_To(system) >= self.__Seller_Min:
                     systemsBySeller[seller].append(system)
         ableToSell = routeLength
         for k,v in systemsBySeller.items():
@@ -349,7 +349,7 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
     #       Add a better way to represent large routes than first letter of system, too many duplicates
-    def DisplayInConsole(self):
+    def Display_In_Console(self):
         '''
         prints the route with the power of the console
         '''
@@ -443,7 +443,7 @@ class EDRareRoute(object):
             strList.append('\n')
         print(''.join(strList))
 #------------------------------------------------------------------------------
-    def DrawRoute(self,showLines:bool=True):
+    def Draw_Route(self,showLines:bool=True):
         '''
         Draws the route using tkinter
         '''
@@ -559,7 +559,7 @@ class EDRareRoute(object):
             for i in range(routeLength):
                 currSys = self.__Route[i%routeLength]
                 nextSys = self.__Route[(i+1)%routeLength]
-                jumpDistance = currSys.GetDistanceTo(nextSys)
+                jumpDistance = currSys.Get_Distance_To(nextSys)
                 #gross
                 #also doesnt look as good as I thought
                 if( (self.__Sellers_Dict is not None and nextSys in self.__Sellers_Dict) or 
@@ -616,7 +616,7 @@ class EDRareRoute(object):
             for system in self.__Route:
                 tempSellers = []
                 for distToCheck in self.__Route:
-                    if system.GetDistanceTo(distToCheck) >= self.__Seller_Min:
+                    if system.Get_Distance_To(distToCheck) >= self.__Seller_Min:
                         tempSellers.append(distToCheck)
                 sellersPerSystem[system] = tempSellers
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
@@ -718,7 +718,7 @@ class EDRareRoute(object):
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
+            jumpDistance = currentSystem.Get_Distance_To(nextSystem)
             self.__Total_Distance += jumpDistance
             longestJump = jumpDistance if jumpDistance > longestJump else longestJump
             if jumpDistance <= clusterShortLY:
@@ -740,7 +740,7 @@ class EDRareRoute(object):
         for seller in self.__Route:
             systemsBySeller[seller] = []
             for system in self.__Route:
-                if seller.GetDistanceTo(system) >= self.__Seller_Min:
+                if seller.Get_Distance_To(system) >= self.__Seller_Min:
                     systemsBySeller[seller].append(system)
         ableToSell = 0
         goodPairs = []
@@ -820,14 +820,14 @@ class EDRareRoute(object):
         self.__Max_Cargo = maxCargo
         return totalValue
 #------------------------------------------------------------------------------
-    def __CalcFitness_Distance(self):
+    def __Calc_Fitness_Distance(self):
         self.__Route_Type = RouteType.Distance
         routeLength = self.Length
         self.__Total_Distance = 0
         for i in range(0,routeLength):
             currentSystem = self.__Route[i]
             nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
+            jumpDistance = currentSystem.Get_Distance_To(nextSystem)
             self.__Total_Distance += jumpDistance
         
         maxGoodDistance = routeLength * 100

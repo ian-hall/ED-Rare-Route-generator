@@ -160,7 +160,7 @@ class EDSystem( object ):
         if set(newLoc.keys()) != set(['x','y','z']):
             raise AttributeError
         for _,value in newLoc.items():
-            if not TryFloat(value):
+            if not Try_Float(value):
                 raise AttributeError            
         self.__Location = dict(newLoc)
 #------------------------------------------------------------------------------
@@ -182,7 +182,7 @@ class EDSystem( object ):
         strBuilder.append(")")
         return "".join(strBuilder)
 #------------------------------------------------------------------------------
-    def GetDistanceTo(self, other) -> float:
+    def Get_Distance_To(self, other) -> float:
         '''
         Get the distance from self to the other system. If the other system's index
         is not in the system distances list return -1
@@ -192,7 +192,7 @@ class EDSystem( object ):
         else:
             return self.__Distances_Dict[other.System_Name]
 #------------------------------------------------------------------------------
-    def AddRares(self, other):
+    def Add_Rares(self, other):
         '''
         Add rare goods to a system. This will add duplicates if the same good is in self and other.
         '''
@@ -280,7 +280,7 @@ class DisplayLocation(object):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
-def TryFloat(val: str) -> bool:
+def Try_Float(val: str) -> bool:
     try:
         float(val)
         return True
