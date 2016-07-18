@@ -8,28 +8,6 @@ class EDSystem( object ):
     #          all rares have different variables for deciding sell val 
     #       Maybe change System_Distance to a dict, but this would require knowing all systems ahead of time when reading from the csv
 #------------------------------------------------------------------------------
-    #def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
-    #                   stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
-
-    #    if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
-    #        (stationName is None) or (systemName is None) or (systemIndex is None) or (distToOthers is None) or (permit is None) ):
-    #        raise Exception("Values cannot be None") 
-        
-    #    if not isinstance(distToOthers,list):
-    #        raise TypeError       
-
-    #    self.__Supply_Caps = [supplyCap] # Float
-    #    self.__Supply_Numbers = [avgSupply] # Float
-    #    self.__Costs = [itemCost] # Int
-    #    self.__Items = [itemName] # String
-    #    self.__Station_Distances = [distToStation] # Float
-    #    self.__Station_Names = [stationName] # String
-    #    self.__System_Name = systemName # String
-    #    self.__Index = systemIndex # Int
-    #    self.__System_Distances = distToOthers # List of Floats
-    #    self.__Permit_Req = permit 
-    #    self.__Location = dict(x=0, y=0, z=0)
-#------------------------------------------------------------------------------
     @classmethod
     def Create_From_Args(cls, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                               stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
@@ -49,20 +27,20 @@ class EDSystem( object ):
         newSystem.__Station_Names = [stationName] # String
         newSystem.__System_Name = systemName # String
         newSystem.__Index = systemIndex # Int
-        newSystem.__System_Distances = distToOthers # List of Floats
+        newSystem.__System_Distances = distToOthers # dict of floats, keys are system names
         newSystem.__Permit_Req = permit 
         newSystem.__Location = dict(x=0, y=0, z=0)  
         return newSystem  
 #------------------------------------------------------------------------------
     @classmethod
-    def Create_From_CSV(cls,tuple):
+    def Create_From_CSV(cls,tuple,idx):
         import re
         newSystem = EDSystem()
         supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName = tuple
         itemName        = itemName.strip().replace("\\'","\'")
         stationName     = stationName.strip().replace("\\'","\'")
-        systemName      = systemName.strip().replace("\\'","\'")
-        permit = False
+        systemName,permit = EDSystem.Clean_System_Name(systemName)
+        distToStation = float(re.sub("[^0-9.]", "", distToStation))
         
         if supplyCap == 'ND':
             supplyCap = 1
@@ -82,13 +60,14 @@ class EDSystem( object ):
 
         itemCost = int(re.sub("[^0-9]", "", itemCost))
 
-        if systemName.endswith('(permit)'):
-            permit = True
-            systemName = systemName.partition('(permit)')[0].strip()
+        #if systemName.endswith('(permit)'):
+        #    permit = True
+        #    systemName = systemName.partition('(permit)')[0].strip()
 
         if supplyCap == 1 or avgSupply == 1:
             supplyCap = max([supplyCap,avgSupply])
             avgSupply = supplyCap
+        
         newSystem.__Supply_Caps = [supplyCap] # Float
         newSystem.__Supply_Numbers = [avgSupply] # Float
         newSystem.__Costs = [itemCost] # Int
@@ -96,7 +75,7 @@ class EDSystem( object ):
         newSystem.__Station_Distances = [distToStation] # Float
         newSystem.__Station_Names = [stationName] # String
         newSystem.__System_Name = systemName # String
-        #newSystem.__Index = -1
+        newSystem.__Index = idx
         #newSystem.__System_Distances = distToOthers # List of Floats
         newSystem.__Permit_Req = permit 
         newSystem.__Location = dict(x=0, y=0, z=0)  
@@ -154,6 +133,14 @@ class EDSystem( object ):
         return [dist for dist in self.__Station_Distances]
 #------------------------------------------------------------------------------
     @property
+    def Distances_Dict(self) -> dict:
+        return dict(self.TestingDistances)
+#------------------------------------------------------------------------------
+    @Distances_Dict.setter
+    def Distances_Dict(self,distances:dict):
+        self.__Distances_Dict = dict(distances)
+#------------------------------------------------------------------------------
+    @property
     def Location(self) -> dict:
         return dict(self.__Location)
 #------------------------------------------------------------------------------
@@ -196,10 +183,12 @@ class EDSystem( object ):
         Get the distance from self to the other system. If the other system's index
         is not in the system distances list return -1
         '''
-        if other.__Index >= 0 and other.__Index < self.__System_Distances.__len__():
-            return self.__System_Distances[other.__Index]
-        else:
-            return -1.0
+        return self.__Distances_Dict[other.System_Name]
+        #else:
+        #    if other.__Index >= 0 and other.__Index < self.__System_Distances.__len__():
+        #        return self.__System_Distances[other.__Index]
+        #    else:
+        #        return -1.0
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         '''
@@ -242,6 +231,16 @@ class EDSystem( object ):
 
         return ''.join(strBuilder)
         
+#------------------------------------------------------------------------------
+    @classmethod
+    def Clean_System_Name(cls,sysName):
+        permit = False
+        normName = sysName.strip().replace("\\'","\'")
+        normName = normName.split('.')[0]
+        if normName.endswith('(permit)'):
+            permit = True
+            normName = normName.partition('(permit)')[0].strip()
+        return normName,permit
 #------------------------------------------------------------------------------
     def __key(self):
         '''

@@ -65,7 +65,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRares_Item_Names(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -80,7 +80,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRares_Item_Costs(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -95,7 +95,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRares_Station_Names(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -110,7 +110,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRares_Station_Distances(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -125,7 +125,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRares_Total_Cost(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -207,7 +207,7 @@ class Test_EDSystem(unittest.TestCase):
         reverseArgs = self.Test_Args[::-1]
         
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if systemsForward.count(newSystem) != 0:
                 for currentSystem in systemsForward:
                     if currentSystem == newSystem:
@@ -216,7 +216,7 @@ class Test_EDSystem(unittest.TestCase):
                 systemsForward.append(newSystem)
 
         for args in reverseArgs:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Create_From_Args(**args)
             if systemsReverse.count(newSystem) != 0:
                 for currentSystem in systemsReverse:
                     if currentSystem == newSystem:
@@ -240,7 +240,7 @@ class Test_EDSystem(unittest.TestCase):
         Make sure distance from a to b is the same as b to a
         '''
         import main
-        systemsToCheck  = main.ReadSystems("RareGoods.csv")
+        systemsToCheck  = main.Read_Systems_New("RareGoods.csv")
         for system in systemsToCheck:
             randSystem = random.choice(systemsToCheck)
             sysToRand = system.GetDistanceTo(randSystem)
@@ -255,12 +255,12 @@ class Test_EDSystem(unittest.TestCase):
             with self.subTest(sysName = system.System_Name):
                 badSystemArgs = CreateEDSystemArgsList(1)[0]
                 badSystemArgs["systemIndex"] = -1
-                badSystem = EDSystem(**badSystemArgs)
+                badSystem = EDSystem.Create_From_Args(**badSystemArgs)
                 distToBad = system.GetDistanceTo(badSystem)
                 self.assertEqual(-1,distToBad)     
                 
                 badSystemArgs["systemIndex"] = 99999999999999
-                badSystem = EDSystem(**badSystemArgs)
+                badSystem = EDSystem.Create_From_Args(**badSystemArgs)
                 distToBad = system.GetDistanceTo(badSystem)
                 self.assertEqual(-1,distToBad)                        
 #------------------------------------------------------------------------------
@@ -429,7 +429,7 @@ def CreateSystemsFromArgs(argsList: list) -> list:
     '''
     generatedSystems = []
     for args in argsList:
-        currentSystem = EDSystem(**args)
+        currentSystem = EDSystem.Create_From_Args(**args)
         if generatedSystems.count(currentSystem) != 0:
             for system in generatedSystems:
                 if system == currentSystem:

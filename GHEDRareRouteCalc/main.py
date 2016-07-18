@@ -11,7 +11,7 @@ from urllib import request
 from fuzzywuzzy import fuzz
 import pandas as pd
 #------------------------------------------------------------------------------
-def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
+def __Validate_Line(currentLine: list, lineNum: int) -> EDSystem:
     '''
     0 - Max Cap
     1 - Supply Rate
@@ -81,7 +81,7 @@ def __ValidateLine(currentLine: list, lineNum: int) -> EDSystem:
                     distToStation, stationName, systemName, index,
                     distToOthers, permit)
 #------------------------------------------------------------------------------
-def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
+def __Run_Genetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
     maxRuns = 5
@@ -102,90 +102,121 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
         print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
         bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
-def __TryFloat(val: str) -> bool:
+def __Try_Float(val: str) -> bool:
     try:
         float(val)
         return True
     except:
         return False
 #------------------------------------------------------------------------------
-def __TryInt(val: str) -> bool:
+def __Try_Int(val: str) -> bool:
     try:
         int(val)
         return True
     except:
         return False
 #------------------------------------------------------------------------------
-def ReadCSVPD(file:str = None) -> list:
-    mainCSV = pd.read_csv(file,skiprows=15,skipfooter=14,engine='python')
-    systems = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
-    for row in systems:
-        print(EDSystem.Create_From_CSV(row))      
-#------------------------------------------------------------------------------
-def ReadSystems(file:str = None) ->list:
-    cleanedCSV = []
+def Read_Systems_New(file:str = None) -> list:
+    if file is None:
+        file = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
     allSystems = []
-    coordLists = {}
-
-    if file is not None:
-        with open(file) as csvFile:
-            reader = csv.reader(csvFile)
-            breakout = False
-            for line in reader:
-                for section in line:
-                    if section == '':
-                        breakout = True
-                        continue
-                    if section == 'x' or section == 'y' or section == 'z':
-                        temp = [float(val) for val in line if __TryFloat(val)]
-                        coordLists[section] = temp
-                        breakout = True
-                        break
-                if not breakout:
-                    cleanedCSV.append(line)
-                breakout = False
-    else:
-        target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
-        with request.urlopen(target_url) as csvFile:
-            fileToText = csvFile.read()
-            usableCSV = str(fileToText).split('\\n')
-            reader = csv.reader(usableCSV)
-            breakout = False
-            for line in reader:
-                for section in line:
-                    if section == '':
-                        breakout = True
-                        continue
-                    if section == 'x' or section == 'y' or section == 'z':
-                        temp = [float(val) for val in line if __TryFloat(val)]
-                        coordLists[section] = temp
-                        breakout = True
-                        break
-                if not breakout:
-                    cleanedCSV.append(line)
-                breakout = False
-
-    headers = cleanedCSV[0]
-    for i in range(1,cleanedCSV.__len__()-1):
-        currentSystem = __ValidateLine(cleanedCSV[i],i)
-        location = {'x':coordLists['x'][currentSystem.Index],
-                    'y':coordLists['y'][currentSystem.Index],
-                    'z':coordLists['z'][currentSystem.Index]}
-        currentSystem.Location = location
-        '''
-        Putting all systems with multiple stations/rares/whatever into one EDSystem object
-        '''   
-        if allSystems.count(currentSystem) != 0:
+    colOffset = 7
+    mainCSV = pd.read_csv(file,header=15,skipfooter=14,engine='python')
+    distances = mainCSV.iloc[:,colOffset:-3]
+    locations = pd.read_csv(file,header=None,skiprows=10,chunksize=3)
+    #print(locations.iloc[:,7:-3])
+    for line in locations:
+        locations = line.iloc[:,colOffset:-3]
+        break
+    systemArgs = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
+    idx = 0
+    #print(locations[colOffset-idx][0],locations[colOffset-idx][1],locations[colOffset-idx][2])
+    for row in systemArgs:
+        currentSystem = EDSystem.Create_From_CSV(row,idx)
+        
+        distanceDict = {}
+        for key in distances.columns:
+            cleanedSystem,_ = EDSystem.Clean_System_Name(key)
+            distanceDict[cleanedSystem] = distances[key][idx]
+        currentSystem.Distances_Dict = distanceDict
+        
+        x,y,z = locations[colOffset+idx][0],locations[colOffset+idx][1],locations[colOffset+idx][2]
+        currentSystem.Location = {'x':x,'y':y,'z':z}
+        
+        if currentSystem in allSystems:
             for system in allSystems:
                 if system == currentSystem:
                     system.AddRares(currentSystem)
         else:
             allSystems.append(currentSystem)
+        idx += 1
 
     return allSystems
+#------------------------------------------------------------------------------
+#def Read_Systems(file:str = None) ->list:
+#    cleanedCSV = []
+#    allSystems = []
+#    coordLists = {}
+
+#    if file is not None:
+#        with open(file) as csvFile:
+#            reader = csv.reader(csvFile)
+#            breakout = False
+#            for line in reader:
+#                for section in line:
+#                    if section == '':
+#                        breakout = True
+#                        continue
+#                    if section == 'x' or section == 'y' or section == 'z':
+#                        temp = [float(val) for val in line if __TryFloat(val)]
+#                        coordLists[section] = temp
+#                        breakout = True
+#                        break
+#                if not breakout:
+#                    cleanedCSV.append(line)
+#                breakout = False
+#    else:
+#        target_url = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
+#        with request.urlopen(target_url) as csvFile:
+#            fileToText = csvFile.read()
+#            usableCSV = str(fileToText).split('\\n')
+#            reader = csv.reader(usableCSV)
+#            breakout = False
+#            for line in reader:
+#                for section in line:
+#                    if section == '':
+#                        breakout = True
+#                        continue
+#                    if section == 'x' or section == 'y' or section == 'z':
+#                        temp = [float(val) for val in line if __TryFloat(val)]
+#                        coordLists[section] = temp
+#                        breakout = True
+#                        break
+#                if not breakout:
+#                    cleanedCSV.append(line)
+#                breakout = False
+
+#    headers = cleanedCSV[0]
+#    for i in range(1,cleanedCSV.__len__()-1):
+#        currentSystem = __ValidateLine(cleanedCSV[i],i)
+#        location = {'x':coordLists['x'][currentSystem.Index],
+#                    'y':coordLists['y'][currentSystem.Index],
+#                    'z':coordLists['z'][currentSystem.Index]}
+#        currentSystem.Location = location
+#        '''
+#        Putting all systems with multiple stations/rares/whatever into one EDSystem object
+#        '''   
+#        if allSystems.count(currentSystem) != 0:
+#            for system in allSystems:
+#                if system == currentSystem:
+#                    system.AddRares(currentSystem)
+#        else:
+#            allSystems.append(currentSystem)
+
+#    return allSystems
 
 #------------------------------------------------------------------------------
-def __GetUserInput(systemsDict:dict) -> tuple:
+def __Get_User_Input(systemsDict:dict) -> tuple:
     '''
     Gets the user input for running the genetic. Tuple will have form (bool,int,list).
     bool will be true if the input gathered was valid.
@@ -202,19 +233,19 @@ def __GetUserInput(systemsDict:dict) -> tuple:
     print(''.join(sb))
     optionChoice = input("Your choice: ")
     numChoices = 3
-    while not( __TryInt(optionChoice) and not (int(optionChoice) < 1 or int(optionChoice) > numChoices) ):
+    while not( __Try_Int(optionChoice) and not (int(optionChoice) < 1 or int(optionChoice) > numChoices) ):
         print("Invalid entry")
         optionChoice = input("Your choice: ")
     
     if int(optionChoice) == 1:
         argsToUse = []      
         stationDist = input("Max distance to station (ly): ")
-        while not (__TryInt(stationDist) and int(stationDist) >= 1):
+        while not (__Try_Int(stationDist) and int(stationDist) >= 1):
             print("Please enter a number between 1 and whatever")
             stationDist = input("Max distance to station (ly): ")
         
         routeLen = input("Route length [6-35]: ")
-        while not (__TryInt(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 35)):
+        while not (__Try_Int(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 35)):
             print("Please enter a length from 6 up to and including 35.")
             routeLen = input("Route length [6-35]: ")
 
@@ -289,8 +320,8 @@ def __GetUserInput(systemsDict:dict) -> tuple:
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     csvFile = "RareGoods.csv"
-    allSystems = ReadSystems(csvFile);
-    ReadCSVPD(csvFile)
+    #allSystems = ReadSystems(csvFile);
+    allSystems = Read_Systems_New()
 
     systemsDict = {}
     for system in allSystems:
@@ -319,7 +350,7 @@ if __name__ == '__main__':
 
     prompt = False    
     if prompt:
-        ready,runType,userArgs = __GetUserInput(systemsDict)
+        ready,runType,userArgs = __Get_User_Input(systemsDict)
         if ready:
             if runType == 1:
                 maxStationDistance = userArgs[0]
@@ -330,20 +361,20 @@ if __name__ == '__main__':
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance]
                 else:
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-                __RunGenetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+                __Run_Genetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
             if runType == 2:
                 userSystems = userArgs
                 routeLen = userSystems.__len__()
-                __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
+                __Run_Genetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
         length = 8
         popSize = 150
-        fitType = FitnessType.Tester
+        fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = True
-        __RunGenetic(commonSystems,length,popSize,fitType,silenceOutput,stopShort)
+        __Run_Genetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
