@@ -38,7 +38,8 @@ class EDRareRoute(object):
     def __init__(self,systemList: list, fType: FitnessType):
         if(systemList.__len__() < 3):
             raise Exception("Routes must be 3 or more systems")
-        self.__Route = systemList
+        self.__Route = np.array(systemList)
+        self.__Route_Loop = np.array(systemList + systemList)
         self.__Seller_Min = 160
         self.__Total_Distance = 0
         self.__Total_Cargo = sum((system.Max_Supply for system in self.__Route))
@@ -246,48 +247,46 @@ class EDRareRoute(object):
         routeLength = self.__Route.__len__()
         self.__Total_Distance = 0
         self.__Route_Type = RouteType.FirstOver
-        sellerScale = 1
-        baseValue = 6
-        longJumpDistance = 135
-        maxJumpDistance = 200
-        longestJump = -1
-        overLongJump = False
-        for i in range(0,routeLength):
-            currentSystem = self.__Route[i]
-            nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
-            if jumpDistance > longestJump:
-                longestJump = jumpDistance
-            
-            if jumpDistance > longJumpDistance:
-                overLongJump = True
-                self.__Route_Type = RouteType.FirstOverLong
-            self.__Total_Distance += jumpDistance
 
-        self.__Longest_Jump = longestJump
+        overallScale = 1
+        baseValue = 6
+        longestGoodJump = 115
+        maxJumpDistance = 175
+        currentLongestJump = -1
+        overGoodJump = False
+
         systemsBySeller = {}
-        for seller in self.__Route:
-            systemsBySeller[seller] = []
+        for i in range(routeLength):
+            current = self.__Route[i]
+            next = self.__Route[(i+1)%routeLength]
+            distance = current.GetDistanceTo(next)
+            if distance > longestGoodJump:
+                overGoodJump = True
+                self.__Route_Type = RouteType.FirstOverLong
+            currentLongestJump = max(currentLongestJump,distance)
+            self.__Total_Distance += distance
+            systemsBySeller[current] = []
             for system in self.__Route:
-                if seller.GetDistanceTo(system) >= self.__Seller_Min:
-                    systemsBySeller[seller].append(system)
-        ableToSell = routeLength
-        for k,v in systemsBySeller.items():
-            if v.__len__() == 0:
-                ableToSell -= 1
-        sellersValue = ableToSell/routeLength * baseValue
+                if current.GetDistanceTo(system) >= self.__Seller_Min:
+                    systemsBySeller[current].append(system)
+        self.__Longest_Jump = currentLongestJump
+
+        numSellableSystems = routeLength
+        for system in systemsBySeller:
+            if systemsBySeller[system].__len__() == 0:
+                numSellableSystems -= 1
+        numSellableScale = numSellableSystems/routeLength * baseValue
         
         #Skip this part if we already know we can't sell all goods
-        maxCargo = 0
-        sellersDifference = None
-        mostSellers = -1
-        leastSellers = routeLength
-        if sellersValue >= baseValue:
+        self.__Max_Cargo = 0
+        systemsSoldDiff = -1
+        mostSystemsSold = -1
+        leastSystemsSold = routeLength + 1
+        if numSellableScale >= baseValue:
             sold = []
             unsold = []
             #Go through at most twice, since if a systems doesnt sell by then it won't sell
-            for currentSys in (self.__Route + self.__Route):
-                #currentSys = self.__Route[i%routeLength];
+            for currentSys in self.__Route_Loop:
                 unsold.append(currentSys)
                 toRemove = []
                 numUnsold = 0
@@ -299,7 +298,7 @@ class EDRareRoute(object):
                         sold.append(checkSys)
                     numUnsold += 1
                 if toRemove.__len__() != 0:
-                    maxCargo = max(maxCargo,sum((sys.Max_Supply for sys in unsold[:-1])))
+                    self.__Max_Cargo = max(self.__Max_Cargo,sum((sys.Max_Supply for sys in unsold[:-1])))
                     if self.__Sellers_Dict == None:
                         self.__Sellers_Dict = defaultdict(list)
                     self.__Sellers_Dict[currentSys].extend(toRemove)
@@ -307,16 +306,16 @@ class EDRareRoute(object):
                 for sys in toRemove:
                     unsold.remove(sys)
                     numSold = numSold + 1
-                mostSellers = max(mostSellers,numSold)
-                leastSellers = min(leastSellers,numSold)
+                mostSystemsSold = max(mostSystemsSold,numSold)
+                leastSystemsSold = min(leastSystemsSold,numSold)
                 if set(sold) == set(self.__Route):
-                    sellersDifference = mostSellers - leastSellers
+                    systemsSoldDiff = mostSystemsSold - leastSystemsSold
                     break
         else:
             #Scale overall value down
             sellerScale = 0.25
 
-        maxGoodDistance = routeLength * longJumpDistance
+        maxGoodDistance = routeLength * longestGoodJump
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
         minSupply = routeLength * 10
@@ -326,25 +325,22 @@ class EDRareRoute(object):
         #Base this on an average purchase price of 1x000cr per system   
         weightedCost = totalGoodsCost/(routeLength * 15000)
         
-        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
+        totalValue = (numSellableScale + weightedCost + weightedDistance + weightedSupply) * overallScale
         
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
-        if sellersValue < baseValue/2:
+        if numSellableScale < baseValue/2:
             totalValue = totalValue * 0.25
 
-        #Only lower value for maxwaiting and maxjump on shorter routes
-        #TODO: Change this to not be so lax on larger routes, too common to have 10+ stations sell at one place
-        if overLongJump and routeLength < 16:
+        if overGoodJump and routeLength < 16:
             totalValue = totalValue * 0.8
-        if longestJump > maxJumpDistance:
+        if self.__Longest_Jump > maxJumpDistance:
             totalValue = totalValue * 0.45
         
         #TODO: Scale here, larger allowance for sellersDifference on longer routes.... maybe like ceil(len/5) or something  with a min of 1? 
-        if sellersDifference is not None:
-            totalValue = (totalValue * 0.5 ) if (sellersDifference > 4) else totalValue
-        
-        self.__Max_Cargo = maxCargo
+        if systemsSoldDiff is not None:
+            totalValue = (totalValue * 0.5 ) if (systemsSoldDiff > 4) else totalValue
+
         return totalValue
 #------------------------------------------------------------------------------
     def __FitnessDistance(self):
@@ -694,7 +690,7 @@ class EDRareRoute(object):
         return (self.__Route,self.__Fitness_Value)
 #------------------------------------------------------------------------------
     def __eq__(self,other):
-        return self.__key() == other.__key()
+        return (self.__Fitness_Value == other.__Fitness_Value) and np.array_equal(self.__Route,other.__Route)
 #------------------------------------------------------------------------------
     def __FitnessTester(self):
         '''

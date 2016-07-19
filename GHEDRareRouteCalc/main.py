@@ -10,6 +10,7 @@ import time
 from urllib import request
 from fuzzywuzzy import fuzz
 import pandas as pd
+import numpy as np
 #------------------------------------------------------------------------------
 def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
@@ -229,15 +230,15 @@ if __name__ == '__main__':
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
         length = 8
         popSize = 300
-        fitType = FitnessType.Tester
+        fitType = FitnessType.FirstOver
         silenceOutput = False
-        stopShort = False
+        stopShort = True
         #__RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
         #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.FirstOver)
 
