@@ -21,7 +21,7 @@ class RouteCalc(object):
         return cls.__Selection_Mult
 #------------------------------------------------------------------------------
     @classmethod
-    def Start_Genetic_Solver(cls,popSize: int, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
+    def StartGeneticSolver(cls,popSize: int, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
@@ -47,10 +47,10 @@ class RouteCalc(object):
 
         population = [EDRareRoute(sysList, fitType) for sysList in GenerateSystemLists(popSize,routeLength,validSystems)]
 
-        return cls.__Genetic_Solver(population,silent)
+        return cls.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
     @classmethod
-    def __Genetic_Solver(cls,startingPopulation: list, silent: bool) -> tuple:
+    def __GeneticSolver(cls,startingPopulation: list, silent: bool) -> tuple:
         '''
         Actually does the solving. Goes through the population and, based on
         how close to the goal they are, picks 2 parents to merge/shuffle/mutate
@@ -121,7 +121,7 @@ class RouteCalc(object):
                 if not silent:
                     print("{0:>7} -> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
 
-            relativeFitnessVals = cls.__Calc_Relative_Fitness(currentPopulation)
+            relativeFitnessVals = cls.__CalcRelativeFitness(currentPopulation)
 
             while nextPopulation.__len__() != currentPopulation.__len__():
                 child1,child2 = cls.__Reproduce(currentPopulation,relativeFitnessVals)
@@ -138,7 +138,7 @@ class RouteCalc(object):
         return (bestRoute,currentGeneration)
 #------------------------------------------------------------------------------
     @classmethod
-    def __Calc_Relative_Fitness(cls, population: list) -> list:
+    def __CalcRelativeFitness(cls, population: list) -> list:
         '''
         We rank each route relative to the others in the population.
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is
@@ -235,12 +235,12 @@ class RouteCalc(object):
         return tempRoute
 #------------------------------------------------------------------------------
     @classmethod
-    def Set_Valid_Systems(cls,systems: list):
+    def SetValidSystems(cls,systems: list):
         cls.__Valid_Systems = systems
 #------------------------------------------------------------------------------
     @classmethod
-    def Wrap_Calc_Relative_Fitness(cls,population: list) -> list:
-        return cls.__Calc_Relative_Fitness(population);
+    def Wrap_CalcRelativeFitness(cls,population: list) -> list:
+        return cls.__CalcRelativeFitness(population);
 #------------------------------------------------------------------------------
     @classmethod
     def Wrap_Reproduce(cls,population: list, selectVals: list) -> tuple:

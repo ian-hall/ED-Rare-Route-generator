@@ -12,10 +12,10 @@ class Test_EDRareRoute(unittest.TestCase):
 #------------------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
-        cls.All_Systems = main.Read_Systems_New("RareGoods.csv")
+        cls.All_Systems = main.ReadSystems("RareGoods.csv")
         cls.System_Lists = routecalc.GenerateSystemLists(100,15,cls.All_Systems)
 #------------------------------------------------------------------------------
-    def test_Route_Not_Eq(self):
+    def test_Route_NotEq(self):
         '''
         Test that routes with the same systems, same order, different fitness types are not equal
                                   same systems, different order, same fitness types are not equal
@@ -63,14 +63,14 @@ class Test_EDRareRoute(unittest.TestCase):
         for i in range(routeLen):
             currSys = sysList[i%routeLen]
             nextSys = sysList[(i+1)%routeLen]
-            expectedDistance += currSys.Get_Distance_To(nextSys)
+            expectedDistance += currSys.GetDistanceTo(nextSys)
 
         for name,fType in FitnessType.__members__.items():
             with self.subTest(fType=fType):
                 testRoute = EDRareRoute(sysList,fType)
                 self.assertAlmostEqual(expectedDistance,testRoute.Total_Distance)          
 #------------------------------------------------------------------------------
-    def test_Route_Cargo_Totals(self):
+    def test_Route_CargoTotals(self):
         '''
         Test that the correct total cargo is being calculated
         '''
@@ -86,7 +86,7 @@ class Test_EDRareRoute(unittest.TestCase):
                 testRoute = EDRareRoute(sysList,fType)
                 self.assertAlmostEqual(expectedCargo,testRoute.Total_Cargo)    
 #------------------------------------------------------------------------------
-    def test_Route_Bad_Constructor(self):
+    def test_Route_BadConstructor(self):
         '''
         Make sure we are unable to create routes under length 3
         '''
@@ -99,7 +99,7 @@ class Test_EDRareRoute(unittest.TestCase):
                         with self.assertRaises(Exception):
                             testRoute = EDRareRoute(shortList,fType)   
 #------------------------------------------------------------------------------
-    def test_Route_RouteType_Split(self):
+    def test_Route_RouteTypeSplit(self):
         '''
         Test that we are getting only the expected RouteTypes back from certain FitnessTypes
         '''
@@ -109,7 +109,7 @@ class Test_EDRareRoute(unittest.TestCase):
             currRoute = EDRareRoute(sysList,fType)
             self.assertIn(currRoute.Route_Type,expectedRouteTypes)
 #------------------------------------------------------------------------------
-    def test_Route_RouteType_First(self):
+    def test_Route_RouteTypeFirst(self):
         '''
         Test that we are getting only the expected RouteTypes back from certain FitnessTypes
         '''
@@ -166,7 +166,7 @@ class Test_EDRareRoute(unittest.TestCase):
         with self.assertRaises(AttributeError):
             testRoute.Total_Distance = -1
 #------------------------------------------------------------------------------
-    def test_Route_Systems_Unchanged(self):
+    def test_Route_SystemsUnchanged(self):
         '''
         Test that getting the systems of a route and modifying the list does
         not change the systems of the route indirectly
@@ -179,7 +179,7 @@ class Test_EDRareRoute(unittest.TestCase):
                     random.shuffle(changedSystems)
                     self.assertNotEqual(testRoute.Systems,changedSystems,msg="EDRareRoute systems indirectly changed")
 #------------------------------------------------------------------------------
-    def test_Route_Fitness_SysOrderEqual(self):
+    def test_Route_FitnessCommutative(self):
         '''
         Routes should always have the same fitness value when given systems in the same order
         but with different positions in the system list.

@@ -11,77 +11,7 @@ from urllib import request
 from fuzzywuzzy import fuzz
 import pandas as pd
 #------------------------------------------------------------------------------
-def __Validate_Line(currentLine: list, lineNum: int) -> EDSystem:
-    '''
-    0 - Max Cap
-    1 - Supply Rate
-    2 - Cost
-    3 - Item
-    4 - Distance
-    5 - Station
-    6 - System
-    7 on - distance to other systems
-
-    first/last full lines: headings
-
-    Last 3 columns are garbage also
-
-    '''
-    supplyCap       = currentLine[0]
-    avgSupply       = currentLine[1]
-    itemCost        = currentLine[2]
-    itemName        = currentLine[3].strip().replace("\\'","\'")
-    distToStation   = currentLine[4]
-    stationName     = currentLine[5].strip().replace("\\'","\'")
-    systemName      = currentLine[6].strip().replace("\\'","\'")
-    index           = lineNum-1
-    distToOthers    = []
-    for j in range(7,currentLine.__len__()-3):
-        distToOthers.append(currentLine[j])
-    permit = False
-        
-    if supplyCap == 'ND':
-        supplyCap = 1
-    else:
-        tempMax = supplyCap.split('-')
-        for i in range(0,tempMax.__len__()):
-            tempMax[i] = int(re.sub("[^0-9]", "", tempMax[i]))
-        supplyCap = sum(tempMax)/len(tempMax)
-
-    if avgSupply == 'ND':
-        avgSupply = 1
-    else:
-        tempSupply = avgSupply.split('-')
-        for i in range(0,tempSupply.__len__()):
-            tempSupply[i] = float(re.sub("[^0-9]", "", tempSupply[i]))
-        avgSupply = sum(tempSupply)/len(tempSupply)
-
-    itemCost = int(re.sub("[^0-9]", "", itemCost))
-
-    #If it contains ly, convert to ls by 31,557,600 * x
-    multFactor = 1;
-    if 'ly' in distToStation:
-        multFactor = 31557600
-    distToStation = float(re.sub("[^0-9.]", "", distToStation)) * multFactor
-
-    for i in range(0,distToOthers.__len__()):
-        distToOthers[i] = float(distToOthers[i])
-
-    #Remove '(permit)' from systems and truncate ending spaces
-    if systemName.endswith('(permit)'):
-        permit = True
-        systemName = systemName.partition('(permit)')[0].strip()
-
-    if supplyCap == 1 or avgSupply == 1:
-        supplyCap = max([supplyCap,avgSupply])
-        avgSupply = supplyCap
-
-
-    return EDSystem.Create_From_Args(supplyCap, avgSupply, itemCost, itemName,
-                    distToStation, stationName, systemName, index,
-                    distToOthers, permit)
-#------------------------------------------------------------------------------
-def __Run_Genetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
+def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
     maxRuns = 5
@@ -90,33 +20,26 @@ def __Run_Genetic(systems: list, routeLength: int, popSize: int, fitType: Fitnes
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
         print("Run: {0}".format(runNum))
-        bestRoute,numGenerations = RouteCalc.Start_Genetic_Solver(popSize,systems,routeLength,silent,fitType)
+        bestRoute,numGenerations = RouteCalc.StartGeneticSolver(popSize,systems,routeLength,silent,fitType)
         geneticEnd = time.time()
         if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
             exitTestLoop = True
         if bestRoute.Fitness < RouteCalc.Route_Cutoff:
             print("No good route found")
         print(bestRoute)
-        bestRoute.Display_In_Console()
+        bestRoute.DisplayInConsole()
         print("Generations: {0}".format(numGenerations))
         print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
-        bestRoute.Draw_Route()
+        bestRoute.DrawRoute()
 #------------------------------------------------------------------------------
-def __Try_Float(val: str) -> bool:
-    try:
-        float(val)
-        return True
-    except:
-        return False
-#------------------------------------------------------------------------------
-def __Try_Int(val: str) -> bool:
+def __TryInt(val: str) -> bool:
     try:
         int(val)
         return True
     except:
         return False
 #------------------------------------------------------------------------------
-def Read_Systems_New(file:str = None) -> list:
+def ReadSystems(file:str = None) -> list:
     if file is None:
         file = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
     allSystems = []
@@ -130,11 +53,11 @@ def Read_Systems_New(file:str = None) -> list:
     systemArgs = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
     idx = 0
     for row in systemArgs:
-        currentSystem = EDSystem.Create_From_CSV(row,idx)
+        currentSystem = EDSystem.Initialize_FromCSVLine(row,idx)
         
         distanceDict = {}
         for key in distances.columns:
-            cleanedSystem,_ = EDSystem.Clean_System_Name(key)
+            cleanedSystem,_ = edsystem.CleanSystemName(key)
             distanceDict[cleanedSystem] = distances[key][idx]
         currentSystem.Distances_Dict = distanceDict
         
@@ -144,14 +67,14 @@ def Read_Systems_New(file:str = None) -> list:
         if currentSystem in allSystems:
             for system in allSystems:
                 if system == currentSystem:
-                    system.Add_Rares(currentSystem)
+                    system.AddRares(currentSystem)
         else:
             allSystems.append(currentSystem)
         idx += 1
 
     return allSystems
 #------------------------------------------------------------------------------
-def __Get_User_Input(systemsDict:dict) -> tuple:
+def __ReadUserInput(systemsDict:dict) -> tuple:
     '''
     Gets the user input for running the genetic. Tuple will have form (bool,int,list).
     bool will be true if the input gathered was valid.
@@ -168,19 +91,19 @@ def __Get_User_Input(systemsDict:dict) -> tuple:
     print(''.join(sb))
     optionChoice = input("Your choice: ")
     numChoices = 3
-    while not( __Try_Int(optionChoice) and not (int(optionChoice) < 1 or int(optionChoice) > numChoices) ):
+    while not( __TryInt(optionChoice) and not (int(optionChoice) < 1 or int(optionChoice) > numChoices) ):
         print("Invalid entry")
         optionChoice = input("Your choice: ")
     
     if int(optionChoice) == 1:
         argsToUse = []      
         stationDist = input("Max distance to station (ly): ")
-        while not (__Try_Int(stationDist) and int(stationDist) >= 1):
+        while not (__TryInt(stationDist) and int(stationDist) >= 1):
             print("Please enter a number between 1 and whatever")
             stationDist = input("Max distance to station (ly): ")
         
         routeLen = input("Route length [6-35]: ")
-        while not (__Try_Int(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 35)):
+        while not (__TryInt(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 35)):
             print("Please enter a length from 6 up to and including 35.")
             routeLen = input("Route length [6-35]: ")
 
@@ -256,7 +179,7 @@ def __Get_User_Input(systemsDict:dict) -> tuple:
 if __name__ == '__main__':
     csvFile = "RareGoods.csv"
     #allSystems = ReadSystems(csvFile);
-    allSystems = Read_Systems_New(csvFile)
+    allSystems = ReadSystems(csvFile)
 
     systemsDict = {}
     for system in allSystems:
@@ -285,7 +208,7 @@ if __name__ == '__main__':
 
     prompt = False    
     if prompt:
-        ready,runType,userArgs = __Get_User_Input(systemsDict)
+        ready,runType,userArgs = __ReadUserInput(systemsDict)
         if ready:
             if runType == 1:
                 maxStationDistance = userArgs[0]
@@ -296,29 +219,29 @@ if __name__ == '__main__':
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance]
                 else:
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-                __Run_Genetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+                __RunGenetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
             if runType == 2:
                 userSystems = userArgs
                 routeLen = userSystems.__len__()
-                __Run_Genetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
+                __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
         length = 8
         popSize = 150
-        fitType = FitnessType.FirstOver
+        fitType = FitnessType.Tester
         silenceOutput = False
-        stopShort = True
-        __Run_Genetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
+        stopShort = False
+        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
-        #PerformanceCalc.Check_Performance(systemsSubset,fitType=FitnessType.EvenSplit)
-        #PerformanceCalc.Check_Performance(systemsSubset,fitType=FitnessType.FirstOver)
-        #PerformanceCalc.Check_Performance(systemsSubset,fitType=FitnessType.Tester)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
 
-        #PerformanceCalc.Check_Test_Systems(systemsDict,FitnessType.FirstOver)
+        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.FirstOver)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
         #print(fullRoute)
-        #fullRoute.Display_In_Console()
-        #fullRoute.Draw_Route(showLines=False)
+        #fullRoute.DisplayInConsole()
+        #fullRoute.DrawRoute(showLines=False)
 #------------------------------------------------------------------------------

@@ -14,7 +14,7 @@ class EDSystem( object ):
         self.__Is_Initialized = False
 #------------------------------------------------------------------------------
     @classmethod
-    def Create_From_Args(cls, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
+    def Initialize_FromArgs(cls, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
                               stationName: str, systemName: str, systemIndex: int, permit: bool):
         
         if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
@@ -37,12 +37,18 @@ class EDSystem( object ):
         return newSystem  
 #------------------------------------------------------------------------------
     @classmethod
-    def Create_From_CSV(cls,tuple,idx):
+    def Initialize_FromCSVLine(cls,tuple,idx):
+        '''
+        Creates ad EDSystem object from the given tuple. The tuple should consist of: 
+        supply cap, average supply, item cost, item name, distance to station, station name, system name
+        in that order.
+        Also passing in an index for hashing purposes.
+        '''
         newSystem = EDSystem()
         supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName = tuple
         itemName        = itemName.strip().replace("\\'","\'")
         stationName     = stationName.strip().replace("\\'","\'")
-        systemName,permit = EDSystem.Clean_System_Name(systemName)
+        systemName,permit = CleanSystemName(systemName)
         distToStation = float(re.sub("[^0-9.]", "", distToStation))
         
         if supplyCap == 'ND':
@@ -160,7 +166,7 @@ class EDSystem( object ):
         if set(newLoc.keys()) != set(['x','y','z']):
             raise AttributeError
         for _,value in newLoc.items():
-            if not Try_Float(value):
+            if not TryFloat(value):
                 raise AttributeError            
         self.__Location = dict(newLoc)
 #------------------------------------------------------------------------------
@@ -182,7 +188,7 @@ class EDSystem( object ):
         strBuilder.append(")")
         return "".join(strBuilder)
 #------------------------------------------------------------------------------
-    def Get_Distance_To(self, other) -> float:
+    def GetDistanceTo(self, other) -> float:
         '''
         Get the distance from self to the other system. If the other system's index
         is not in the system distances list return -1
@@ -192,7 +198,7 @@ class EDSystem( object ):
         else:
             return self.__Distances_Dict[other.System_Name]
 #------------------------------------------------------------------------------
-    def Add_Rares(self, other):
+    def AddRares(self, other):
         '''
         Add rare goods to a system. This will add duplicates if the same good is in self and other.
         '''
@@ -234,16 +240,6 @@ class EDSystem( object ):
         return ''.join(strBuilder)
         
 #------------------------------------------------------------------------------
-    @classmethod
-    def Clean_System_Name(cls,sysName):
-        permit = False
-        normName = sysName.strip().replace("\\'","\'")
-        normName = normName.split('.')[0]
-        if normName.endswith('(permit)'):
-            permit = True
-            normName = normName.partition('(permit)')[0].strip()
-        return normName,permit
-#------------------------------------------------------------------------------
     def __key(self):
         '''
         All stations/rares in a system will count as one EDSystems
@@ -251,9 +247,6 @@ class EDSystem( object ):
         return self.__System_Name
 #------------------------------------------------------------------------------  
     def __hash__(self):
-        '''
-        Since Index refers to a system's index in the System_Distances list, this will be unique
-        '''
         return hash(self.__Index)
 #------------------------------------------------------------------------------
     def __eq__(self, other):
@@ -280,10 +273,23 @@ class DisplayLocation(object):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
-def Try_Float(val: str) -> bool:
+def TryFloat(val: str) -> bool:
     try:
         float(val)
         return True
     except:
         return False
+#------------------------------------------------------------------------------
+def CleanSystemName(sysName):
+    '''
+    cleans the system name and returns a tuple of
+    (cleaned name,permit requirement)
+    '''
+    permit = False
+    normName = sysName.strip().replace("\\'","\'")
+    normName = normName.split('.')[0]
+    if normName.endswith('(permit)'):
+        permit = True
+        normName = normName.partition('(permit)')[0].strip()
+    return normName,permit
 #------------------------------------------------------------------------------
