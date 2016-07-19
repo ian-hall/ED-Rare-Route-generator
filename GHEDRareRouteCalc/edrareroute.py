@@ -4,6 +4,7 @@ import itertools
 import math
 import tkinter
 import random
+import numpy as np
 from enum import Enum,unique
 #------------------------------------------------------------------------------
 ###############################################################################
@@ -282,12 +283,11 @@ class EDRareRoute(object):
         mostSellers = -1
         leastSellers = routeLength
         if sellersValue >= baseValue:
-            #sellersUsed = []
             sold = []
             unsold = []
             #Go through at most twice, since if a systems doesnt sell by then it won't sell
-            for i in range(routeLength*2):
-                currentSys = self.__Route[i%routeLength];
+            for currentSys in (self.__Route + self.__Route):
+                #currentSys = self.__Route[i%routeLength];
                 unsold.append(currentSys)
                 toRemove = []
                 numUnsold = 0
@@ -783,39 +783,6 @@ class EDRareRoute(object):
                 #continue if number of sellers per system isnt off by at most 1
                 if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
                     continue
-                #TODO: Actually need to do this to calculate maxCargo
-                sold = []
-                unsold = []
-                self.__Sellers_Dict = None
-                for i in range(routeLength*2):
-                    currentSys = self.__Route[i%routeLength];
-                    unsold.append(currentSys)
-                    toRemove = []
-                    numUnsold = 0
-                    if currentSys == seller1 or currentSys == seller2:
-                        for rareSys in unsold:
-                            #Means we can sell checkSys at currentSys
-                            sellableSystems = systemsBySeller[currentSys]
-                            if rareSys in sellableSystems:
-                                toRemove.append(rareSys)
-                                sold.append(rareSys)
-                            numUnsold += 1
-                    if toRemove.__len__() != 0:
-                        maxCargo = max(maxCargo,sum((sys.Max_Supply for sys in unsold[:-1])))
-                        if self.__Sellers_Dict == None:
-                            self.__Sellers_Dict = defaultdict(list)
-                        self.__Sellers_Dict[currentSys].extend(toRemove)
-                    numSold = 0
-                    for sys in toRemove:
-                        unsold.remove(sys)
-                        numSold = numSold + 1
-                    #We know that each pair represents two sellers that can represent the selling of all rares in the route
-                    #We can just check the length here instead of doing a check on members of sold and route
-                    if sold.__len__() >= self.__Route.__len__():
-                        #We have every system accounted for in sold, exit the for loop
-                        break
-                if self.__Sellers_Dict is not None:
-                    break
         if self.__Sellers_Dict is None:
             sellerScale = 0.25
 
