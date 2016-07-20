@@ -11,8 +11,8 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.5
-    __Selection_Mult = .25
+    Route_Cutoff = 11.25
+    __Selection_Mult = 1
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
 #------------------------------------------------------------------------------

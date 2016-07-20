@@ -38,8 +38,8 @@ class EDRareRoute(object):
     def __init__(self,systemList: list, fType: FitnessType):
         if(systemList.__len__() < 3):
             raise Exception("Routes must be 3 or more systems")
-        self.__Route = np.array(systemList)
-        self.__Route_Loop = np.array(systemList + systemList)
+        self.__Route = systemList
+        self.__Route_Loop = (systemList + systemList)
         self.__Seller_Min = 160
         self.__Total_Distance = 0
         self.__Total_Cargo = sum((system.Max_Supply for system in self.__Route))
@@ -251,7 +251,7 @@ class EDRareRoute(object):
         overallScale = 1
         baseValue = 6
         longestGoodJump = 115
-        maxJumpDistance = 175
+        maxJumpDistance = 180
         currentLongestJump = -1
         overGoodJump = False
 
@@ -289,14 +289,12 @@ class EDRareRoute(object):
             for currentSys in self.__Route_Loop:
                 unsold.append(currentSys)
                 toRemove = []
-                numUnsold = 0
                 for checkSys in unsold:
                     #Means we can sell checkSys at currentSys
                     sellableSystems = systemsBySeller[currentSys]
                     if systemsBySeller[currentSys].count(checkSys) != 0:
                         toRemove.append(checkSys)
                         sold.append(checkSys)
-                    numUnsold += 1
                 if toRemove.__len__() != 0:
                     self.__Max_Cargo = max(self.__Max_Cargo,sum((sys.Max_Supply for sys in unsold[:-1])))
                     if self.__Sellers_Dict == None:
@@ -308,12 +306,10 @@ class EDRareRoute(object):
                     numSold = numSold + 1
                 mostSystemsSold = max(mostSystemsSold,numSold)
                 leastSystemsSold = min(leastSystemsSold,numSold)
-                if set(sold) == set(self.__Route):
-                    systemsSoldDiff = mostSystemsSold - leastSystemsSold
-                    break
+                systemsSoldDiff = mostSystemsSold - leastSystemsSold
         else:
             #Scale overall value down
-            sellerScale = 0.25
+            overallScale = 0.5
 
         maxGoodDistance = routeLength * longestGoodJump
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
@@ -716,74 +712,102 @@ class EDRareRoute(object):
         #           8           {6,7,8}             {1,2,3,4,5}
         #           9           {6,7,8,1}           {1,2,3,4,5}
         #          10           {6,7,8,1,2}         {1,2,3,4,5}
-        #          11           {2,3}               {1,2,3,4,5,6,7,8,1} ##ALL SOLD
-        routeLength = self.Length
-        self.__Total_Distance = 0     
-        sellerScale = 1
-        clusterShortLY = 50
-        clusterLongLY = 145
-        spreadMaxLY = 110
-        maxJumpRangeLY = 200
-        clusterShort = 0
-        clusterLong = 0
-        spreadJumps = 0
-        longestJump = -999
+        #          11           {2,3}               {1,2,3,4,5,6,7,8,1} #ALL SOLD
+        routeLength = self.__Route.__len__()
+        self.__Total_Distance = 0
+        self.__Route_Type = RouteType.Other
+
+        overallScale = 1
         baseValue = 6
-
-        for i in range(0,routeLength):
-            currentSystem = self.__Route[i]
-            nextSystem = self.__Route[(i+1)%routeLength]
-            jumpDistance = currentSystem.GetDistanceTo(nextSystem)
-            self.__Total_Distance += jumpDistance
-            longestJump = jumpDistance if jumpDistance > longestJump else longestJump
-            if jumpDistance <= clusterShortLY:
-                clusterShort += 1
-            if jumpDistance >= clusterLongLY and jumpDistance <= maxJumpRangeLY:
-                clusterLong += 1 
-            if jumpDistance <= spreadMaxLY:
-                spreadJumps += 1 
-        self.__Longest_Jump = longestJump
-        #Route has 2 groups of systems separated by a long jump
-        if clusterLong == 2 and (clusterLong + clusterShort) == routeLength:
-           self.__Route_Type = RouteType.Cluster
-
-        #Route has fairly evenly spaced jumps
-        if spreadJumps == routeLength:
-            self.__Route_Type = RouteType.Spread
-        
+        maxJumpDistance = 200
+        clusterLoDistance = 50
+        clusterHiDistance = 145
+        spreadMaxDistance = 110
+        numClusterLoJumps = 0
+        numClusterHiJumps = 0
+        numSpreadJumps = 0
+        currentLongestJump = -1
+        overMaxJump = False
         systemsBySeller = {}
-        for seller in self.__Route:
-            systemsBySeller[seller] = []
+        for i in range(routeLength):
+            current = self.__Route[i]
+            next = self.__Route[(i+1)%routeLength]
+            distance = current.GetDistanceTo(next)
+            self.__Total_Distance += distance
+            currentLongestJump = max(currentLongestJump,distance)
+            if distance > maxJumpDistance:
+                overMaxJump = True
+            if distance <= clusterLoDistance:
+                numClusterLoJumps += 1
+            if distance >= clusterHiDistance:
+                numClusterHiJumps += 1
+            if distance <= spreadMaxDistance:
+                numSpreadJumps +=1
+
+            systemsBySeller[current] = []
             for system in self.__Route:
-                if seller.GetDistanceTo(system) >= self.__Seller_Min:
-                    systemsBySeller[seller].append(system)
-        ableToSell = 0
-        goodPairs = []
+                if current.GetDistanceTo(system) >= self.__Seller_Min:
+                    systemsBySeller[current].append(system)
+        self.__Longest_Jump = currentLongestJump
+
+        if numClusterHiJumps == 2 and (clusterHiDistance + clusterLoDistance) == routeLength:
+           self.__Route_Type = RouteType.Cluster
+        if numSpreadJumps == routeLength:
+            self.__Route_Type = RouteType.Spread
+
         #TODO: Do a stupid thing where I actually check that all systems are accounted for in systemsBySeller
+        #      Flag this somehow to break or sellers_dict may never be set, causing numbers to be scaled way down
+        numSellable = 0
+        numSellableScale = -1
         for seller1,seller2 in itertools.combinations(systemsBySeller,2):
             sellableSystems = set(systemsBySeller[seller1] + systemsBySeller[seller2])
-            ableToSell = max(ableToSell,sellableSystems.__len__())
-            if sellableSystems == set(self.__Route):
-                goodPairs.append((seller1,seller2))
-        sellersValue = min(ableToSell,routeLength)/routeLength * baseValue
-        maxCargo = 0
+            numSellable = max(numSellable,sellableSystems.__len__())
+            numSellableScale = max(numSellableScale,(numSellable/routeLength * baseValue))
+            seller1Idx = self.__Route.index(seller1)
+            seller2Idx = self.__Route.index(seller2)
+            systemJumpsApart = abs(seller1Idx-seller2Idx)
+            #continue if things aren't evenly spaced
+            if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
+                continue
+            #continue if number of sellers per system isnt off by at most 1
+            if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
+                continue
+            if sellableSystems == self.__Route:
+                #goodPairs.append((seller1,seller2))
+                self.__Sellers_Dict = None
+                self.__Max_Cargo = 0
+                systemsSoldDiff = -1
+                mostSystemsSold = -1
+                leastSystemsSold = routeLength + 1                
+                sold = []
+                unsold = []
+                for currentSys in self.__Route_Loop:
+                    unsold.append(currentSys)
+                    toRemove = []
+                    if currentSys == seller1 or currentSys == seller2:
+                        for checkSys in unsold:
+                            if checkSys in systemsBySeller[currentSys]:
+                                toRemove.append(checkSys)
+                                sold.append(checkSys)
+                    if toRemove.__len__() != 0:
+                        self.__Max_Cargo = max(self.__Max_Cargo,sum((sys.Max_Supply for sys in unsold[:-1])))
+                        if self.__Sellers_Dict == None:
+                            self.__Sellers_Dict = defaultdict(list)
+                        self.__Sellers_Dict[currentSys].extend(toRemove)
+                    numSold = 0
+                    for sys in toRemove:
+                        unsold.remove(sys)
+                        numSold = numSold + 1
+                    mostSystemsSold = max(mostSystemsSold,numSold)
+                    leastSystemsSold = min(leastSystemsSold,numSold)
 
-        if sellersValue >= baseValue:
-            for seller1,seller2 in goodPairs:
-                seller1Idx = self.__Route.index(seller1)
-                seller2Idx = self.__Route.index(seller2)
-                systemJumpsApart = abs(seller1Idx-seller2Idx)
-                #continue if things aren't evenly spaced
-                if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
-                    continue
-                #continue if number of sellers per system isnt off by at most 1
-                if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
-                    continue
         if self.__Sellers_Dict is None:
-            sellerScale = 0.25
+            overallScale = 0.25
 
         maxGoodDistance = routeLength * 100
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
+        if overMaxJump:
+            weightedDistance = weightedDistance * 0.5
         
         minSupply = routeLength * 10
         weightedSupply = math.log(self.__Total_Cargo,minSupply) * 2
@@ -792,14 +816,13 @@ class EDRareRoute(object):
         #Base this on an average purchase price of 1x000cr per system   
         weightedCost = totalGoodsCost/(routeLength * 15000)
         
-        totalValue = (sellersValue + weightedCost + weightedDistance + weightedSupply) * sellerScale
+        totalValue = (numSellableScale + weightedCost + weightedDistance + weightedSupply) * overallScale
         
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
-        if sellersValue < baseValue/2:
+        if numSellableScale < baseValue/2:
             totalValue = totalValue * 0.25
-        
-        self.__Max_Cargo = maxCargo
+
         return totalValue
 #------------------------------------------------------------------------------
 ###############################################################################

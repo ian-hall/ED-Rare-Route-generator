@@ -17,7 +17,7 @@ class PerformanceCalc(object):
         popSizeStep = 50
         popSizes = range(minPopSize,maxPopSize+1,popSizeStep)          
 
-        minLength = 6
+        minLength = 8
         maxLength = 8
         lengths = range(minLength,maxLength+1,1)
 
@@ -45,21 +45,10 @@ class PerformanceCalc(object):
     @classmethod
     def CheckTestSystems(cls,systemsDict: dict,fitType: FitnessType):
         
-        #brokenRoute4 = []
-        #brokenRoute4.append(systemsDict['Diso'])  
-        #brokenRoute4.append(systemsDict['Orrere'])
-        #brokenRoute4.append(systemsDict['Uszaa'])
-        #brokenRoute4.append(systemsDict['Leesti'])
-        #badRoute = EDRareRoute(brokenRoute4,fitType)
-        #print(badRoute)
-
-        #notBrokenRoute9 = EDRareRoute( [ systemsDict["Leesti"], systemsDict["Ngurii"], systemsDict["Jaroua"], systemsDict["Kamitra"], systemsDict["Momus Reach"],
-        #                              systemsDict["Witchhaul"], systemsDict["39 Tauri"], systemsDict["Zaonce"], systemsDict["Uszaa"] ], fitType )
-        #print(notBrokenRoute9)
-
-        #testingFarthest = EDRareRoute( [ systemsDict['Witchhaul'], systemsDict['George Pantazis'], systemsDict['Diso'], systemsDict['Utgaroar'], systemsDict['Momus Reach'],
-        #                                 systemsDict['Yaso Kondi'] ], fitType)
-        #print(testingFarthest)
+        #brokenRoute = EDRareRoute( [ systemsDict["Orrere"], systemsDict["Leesti"], systemsDict["Aganippe"], systemsDict["Bast"], systemsDict["39 Tauri"],
+        #                             systemsDict["Utgaroar"], systemsDict["Baltah'Sine"] ], fitType )
+        #print(brokenRoute)
+        #brokenRoute.DisplayInConsole()
         
         ykLoopList = []
         ykLoopList.append(systemsDict['Coquim'])  
@@ -77,20 +66,28 @@ class PerformanceCalc(object):
         ykLoop.DrawRoute()
         
 
-        good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
-        print(good5Route)
-        good5Route.DisplayInConsole()
+        #good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
+        #print(good5Route)
+        #good5Route.DisplayInConsole()
          
-        good8_1 = []
-        good8_1.append(systemsDict['Hecate'])
-        good8_1.append(systemsDict['Aganippe']) 
-        good8_1.append(systemsDict['Leesti'])
-        good8_1.append(systemsDict['Any Na'])
-        good8_1.append(systemsDict['Ngurii'])
-        good8_1.append(systemsDict["Baltah'Sine"])
-        good8_1.append(systemsDict['Chi Eridani'])
-        good8_1.append(systemsDict['Altair']) 
-        print(EDRareRoute(good8_1,fitType))
+        #good8_1 = []
+        #good8_1.append(systemsDict['Hecate'])
+        #good8_1.append(systemsDict['Aganippe']) 
+        #good8_1.append(systemsDict['Leesti'])
+        #good8_1.append(systemsDict['Any Na'])
+        #good8_1.append(systemsDict['Ngurii'])
+        #good8_1.append(systemsDict["Baltah'Sine"])
+        #good8_1.append(systemsDict['Chi Eridani'])
+        #good8_1.append(systemsDict['Altair']) 
+        #print(EDRareRoute(good8_1,fitType))
+
+        #brokenRoute4 = []
+        #brokenRoute4.append(systemsDict['Diso'])  
+        #brokenRoute4.append(systemsDict['Orrere'])
+        #brokenRoute4.append(systemsDict['Uszaa'])
+        #brokenRoute4.append(systemsDict['Leesti'])
+        #badRoute = EDRareRoute(brokenRoute4,fitType)
+        #print(badRoute)
         
         #bad6_1 = []
         #bad6_1.append(systemsDict['Karetii'])
