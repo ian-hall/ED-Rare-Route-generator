@@ -227,9 +227,9 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 20
-        popSize = 2500
-        fitType = FitnessType.Distance
+        length = 8
+        popSize = 350
+        fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
         __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)

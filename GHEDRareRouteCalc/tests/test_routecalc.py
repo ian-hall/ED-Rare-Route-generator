@@ -9,7 +9,6 @@ import operator
 from collections import Counter
 
 class Test_RouteCalc(unittest.TestCase):
-    #TODO: One assert per test
 #------------------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):

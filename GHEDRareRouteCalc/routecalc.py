@@ -182,7 +182,6 @@ class RouteCalc(object):
         child1 = []
         child2 = []
 
-        #TODO: Maybe combine these loops since they have the same bounds
         for i in range(0,pivot):
             child1.append(route1[i])
         i = pivot

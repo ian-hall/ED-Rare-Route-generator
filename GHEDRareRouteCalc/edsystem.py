@@ -5,10 +5,6 @@ import re
 ###############################################################################
 #------------------------------------------------------------------------------
 class EDSystem( object ):
-    #TODO: Maybe a better way to do this?
-    #      Maybe not enough data for est profit
-    #          all rares have different variables for deciding sell val 
-    #       Maybe change System_Distance to a dict, but this would require knowing all systems ahead of time when reading from the csv
 #------------------------------------------------------------------------------
     def __init__(self):
         self.__Is_Initialized = False
@@ -186,7 +182,7 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         '''
-        Add rare goods to a system. This will add duplicates if the same good is in self and other.
+        Add rare goods to a system. This will add duplicates if the same item is in self and other.
         '''
         if self.__System_Name != other.__System_Name:
             raise Exception("Can only add rares to the same system")

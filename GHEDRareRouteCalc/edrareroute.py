@@ -25,7 +25,6 @@ class FitnessType(Enum):
     EvenSplit = 0
     FirstOver = 1
     Distance = 2
-    #Tester = 3
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -123,16 +122,17 @@ class EDRareRoute(object):
                     systemsBySeller[current].append(system)
         self.__Longest_Jump = currentLongestJump
 
-        if numClusterHiJumps == 2 and (clusterHiDistance + clusterLoDistance) == routeLength:
+        if numClusterHiJumps == 2 and (numClusterHiJumps + numClusterLoJumps) == routeLength:
            self.__Route_Type = RouteType.Cluster
         if numSpreadJumps == routeLength:
             self.__Route_Type = RouteType.Spread
 
-        numSellable = 0
+        maxSellable = 0
         numSellableScale = -1
         for seller1,seller2 in itertools.combinations(systemsBySeller,2):
             sellableSystems = set(systemsBySeller[seller1] + systemsBySeller[seller2])
-            numSellable = max(numSellable,sellableSystems.__len__())
+            numSellable = sellableSystems.__len__()
+            maxSellable = max(maxSellable,numSellable)
             seller1Idx = self.__Route.index(seller1)
             seller2Idx = self.__Route.index(seller2)
             systemJumpsApart = abs(seller1Idx-seller2Idx)
@@ -143,8 +143,7 @@ class EDRareRoute(object):
             if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
                 continue
             #continue if not all systems are accounted for in the set of sellable systems
-            if sellableSystems.__len__() != routeLength:
-                numSellableScale = max(numSellableScale,sellableSystems.__len__()/20) 
+            if numSellable != routeLength:
                 continue
 
             #Doing one loop through the route starting from the systems chosen above.
@@ -162,15 +161,15 @@ class EDRareRoute(object):
                 systemToCheck_FromSeller2Idx = (i + seller2Idx) % routeLength
                 systemToCheck_FromSeller1 = self.__Route[systemToCheck_FromSeller1Idx]
                 systemToCheck_FromSeller2 = self.__Route[systemToCheck_FromSeller2Idx]
-                '''
-                Check if the current system to check can be sold at its associated seller
-                if it can be sold, a few things happen:
-                    if this is the first seller we have seen, add True to the associated SellableSystems list
-                    if this is not the first seller:
-                        if the last element of the SellableSystems list is true, add True to the list
-                        if the last element of the SellableSystems list is false, add False to the list
-                the idea is to get a contiguous block of Trues in the SellableSystems array equivalent to routelength/2
-                '''
+                
+                #Check if the current system to check can be sold at its associated seller
+                #if it can be sold, a few things happen:
+                #    if this is the first seller we have seen, add True to the associated SellableSystems list
+                #    if this is not the first seller:
+                #        if the last element of the SellableSystems list is true, add True to the list
+                #        if the last element of the SellableSystems list is false, add False to the list
+                #the idea is to get a contiguous block of Trues in the SellableSystems array equivalent to routelength/2
+                
                 if seller1.GetDistanceTo(systemToCheck_FromSeller1) >= self.__Seller_Min:
                     if not seller1_FirstSystemFound:
                         seller1_SellableSystems.append(True)
@@ -207,13 +206,13 @@ class EDRareRoute(object):
                     numSellableScale = baseValue
                     break
                 else:
-                    numSellableScale = max(numSellableScale,numSellable/5)
+                    numSellableScale = max(numSellableScale,maxSellable/5)
             else:
-                numSellableScale = max(numSellableScale,numSellable/15)                                                             
+                numSellableScale = max(numSellableScale,maxSellable/15)                                                             
             
         #If no combo of systems yields good seller spacing, or not all systems accounted for in the best pair(?), return here
         if self.__Sellers_Dict is None:
-            return 0.01
+            overallScale = 0.25
         
         #Special case for shorter routes
         maxGoodDistance = routeLength * 100
@@ -228,7 +227,7 @@ class EDRareRoute(object):
         totalGoodsCost = sum([system.Total_Cost for system in self.__Route])
         weightedCost = totalGoodsCost/(routeLength * 15000)
 
-        totalValue = (numSellableScale + weightedCost + weightedDistance + weightedSupply)
+        totalValue = (numSellableScale + weightedCost + weightedDistance + weightedSupply) * overallScale
         if weightedCost < 1 or weightedDistance < 2 or weightedSupply < 2:
             totalValue = totalValue * 0.5
         if currentLongestJump > maxJumpDistance:
@@ -354,8 +353,7 @@ class EDRareRoute(object):
         weightedDistance = (maxGoodDistance/self.__Total_Distance)
         return weightedDistance * 11
 #------------------------------------------------------------------------------
-    #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
-    #       Add a better way to represent large routes than first letter of system, too many duplicates
+    #TODO: Add a better way to represent large routes than first letter of system, too many duplicates
     def DisplayInConsole(self):
         '''
         prints the route with the power of the console
@@ -454,8 +452,7 @@ class EDRareRoute(object):
         '''
         Draws the route using tkinter
         '''
-        #TODO:  Find why zoom jumps all over the place
-        #       Add color to seller locations on mouseover
+        #TODO: Add color to seller locations on mouseover
         routeLength = self.__Route.__len__()
 
         cWidth = 900

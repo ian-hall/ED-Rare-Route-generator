@@ -8,7 +8,6 @@ import random
 ###############################################################################
 #------------------------------------------------------------------------------
 class Test_EDRareRoute(unittest.TestCase):
-    #TODO: one assert per test
 #------------------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
@@ -184,10 +183,6 @@ class Test_EDRareRoute(unittest.TestCase):
         Routes should always have the same fitness value when given systems in the same order
         but with different positions in the system list.
         '''
-        #TODO:  Regularly fails with EvenSplit fitness types
-        #           Most likely because of the use of itertools.combos to find sellers,
-        #           Different route order means different seller selection order and the first will be chosen
-        #           Maybe can't do anything about this
         import collections
         for systemList in self.System_Lists:
             for name,fType in FitnessType.__members__.items():

@@ -7,7 +7,6 @@ import itertools
 ###############################################################################
 #------------------------------------------------------------------------------
 class Test_EDSystem(unittest.TestCase):
-    #TODO: one assert per test(maybe)
 #------------------------------------------------------------------------------
     #@classmethod
     ##This is causing a lot of slowdown on these tests but it should only run once?
