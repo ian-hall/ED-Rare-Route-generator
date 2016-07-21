@@ -233,9 +233,9 @@ if __name__ == '__main__':
         fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
-        #__RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
