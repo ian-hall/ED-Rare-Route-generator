@@ -25,8 +25,7 @@ class FitnessType(Enum):
     EvenSplit = 0
     FirstOver = 1
     Distance = 2
-    Tester = 3
-
+    #Tester = 3
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -52,14 +51,10 @@ class EDRareRoute(object):
         self.__Fitness_Value = -1
         if fType == FitnessType.FirstOver:
             self.__Fitness_Value = self.__Fitness_FirstOver()
-        elif fType == FitnessType.Tester:
-            self.__Fitness_Value = self.__FitnessTester()
         elif fType == FitnessType.Distance:
             self.__Fitness_Value = self.__FitnessDistance()
         elif fType == FitnessType.EvenSplit:
             self.__Fitness_Value = self.__Fitness_EvenSplit()
-        else:
-            self.__Fitness_Value = self.__Fitness_FirstOver()
 #------------------------------------------------------------------------------
     @property
     def Fitness(self) -> float:
@@ -88,10 +83,9 @@ class EDRareRoute(object):
     def __Fitness_EvenSplit(self):
         '''
         Fitness value based on having a roughly even number of systems between sellers
+        only works with short ( < 16 ) routes
         '''
         #TODO:  Add tracking for max cargo used
-        #       Try again without itertools combos maybe and instead do only check values that are evenly spaced out like we want
-        #           Actually looks like I already do this because I continue if routes arent split???
         routeLength = self.__Route.__len__()
         self.__Total_Distance = 0
         self.__Route_Type = RouteType.Other
@@ -147,6 +141,10 @@ class EDRareRoute(object):
                 continue
             #continue if number of sellers per system isnt off by at most 1
             if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
+                continue
+            #continue if not all systems are accounted for in the set of sellable systems
+            if sellableSystems.__len__() != routeLength:
+                numSellableScale = max(numSellableScale,sellableSystems.__len__()/20) 
                 continue
 
             #Doing one loop through the route starting from the systems chosen above.
@@ -354,10 +352,7 @@ class EDRareRoute(object):
         
         maxGoodDistance = routeLength * 100
         weightedDistance = (maxGoodDistance/self.__Total_Distance)
-        if weightedDistance < 0.75:
-            return weightedDistance * 6
-        else:
-            return weightedDistance * 10
+        return weightedDistance * 11
 #------------------------------------------------------------------------------
     #TODO: Maybe do some kind of ratio between oldX/newX to squish xVals so the route doesn't look so wide
     #       Add a better way to represent large routes than first letter of system, too many duplicates

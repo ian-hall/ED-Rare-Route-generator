@@ -54,8 +54,7 @@ def ReadSystems(file:str = None) -> list:
     systemArgs = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
     idx = 0
     for row in systemArgs:
-        currentSystem = EDSystem.Initialize_FromCSVLine(row,idx)
-        
+        currentSystem = EDSystem.Initialize_FromCSVLine(row,idx)        
         distanceDict = {}
         for key in distances.columns:
             cleanedSystem,_ = edsystem.CleanSystemName(key)
@@ -228,17 +227,17 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 8
-        popSize = 300
-        fitType = FitnessType.EvenSplit
+        length = 20
+        popSize = 2500
+        fitType = FitnessType.Distance
         silenceOutput = False
         stopShort = True
         __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
 
         #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 

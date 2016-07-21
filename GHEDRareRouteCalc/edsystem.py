@@ -42,9 +42,8 @@ class EDSystem( object ):
         Creates ad EDSystem object from the given tuple. The tuple should consist of: 
         supply cap, average supply, item cost, item name, distance to station, station name, system name
         in that order.
-        Also passing in an index for hashing purposes.
+        Also passing in an index for ???
         '''
-        newSystem = EDSystem()
         supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName = tuple
         itemName        = itemName.strip().replace("\\'","\'")
         stationName     = stationName.strip().replace("\\'","\'")
@@ -72,20 +71,7 @@ class EDSystem( object ):
         if supplyCap == 1 or avgSupply == 1:
             supplyCap = max([supplyCap,avgSupply])
             avgSupply = supplyCap
-        
-        newSystem.__Supply_Caps = [supplyCap] # Float
-        newSystem.__Supply_Numbers = [avgSupply] # Float
-        newSystem.__Costs = [itemCost] # Int
-        newSystem.__Items = [itemName] # String
-        newSystem.__Station_Distances = [distToStation] # Float
-        newSystem.__Station_Names = [stationName] # String
-        newSystem.__System_Name = systemName # String
-        newSystem.__Index = idx
-        newSystem.__Distances_Dict = defaultdict(lambda: -1)
-        newSystem.__Permit_Req = permit 
-        newSystem.__Location = dict(x=0, y=0, z=0)
-        newSystem.__Is_Initialized = True
-        return newSystem
+        return EDSystem.Initialize_FromArgs(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,idx,permit)
 #------------------------------------------------------------------------------
     @property
     def Total_Cost(self) -> float:
@@ -247,7 +233,7 @@ class EDSystem( object ):
         return self.__System_Name
 #------------------------------------------------------------------------------  
     def __hash__(self):
-        return hash(self.__Index)
+        return hash(self.__key())
 #------------------------------------------------------------------------------
     def __eq__(self, other):
         return self.__key() == other.__key()
