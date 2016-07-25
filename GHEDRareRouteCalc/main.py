@@ -178,7 +178,6 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     csvFile = "RareGoods.csv"
-    #allSystems = ReadSystems(csvFile);
     allSystems = ReadSystems(csvFile)
 
     systemsDict = {}
@@ -237,11 +236,10 @@ if __name__ == '__main__':
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
-        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Tester)
 
         #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
-        #fullRoute = EDRareRoute(allSystems,FitnessType.FirstOver)
+        #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)
         #fullRoute.DisplayInConsole()
         #fullRoute.DrawRoute(showLines=False)
