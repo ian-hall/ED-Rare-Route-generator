@@ -245,7 +245,7 @@ class DisplayLocation(object):
         self.System_Name = name
 #------------------------------------------------------------------------------
     def __str__(self):
-        return "{0:>17}: ({1},{2})".format(self.System_Name,self.Col,self.Row)
+        return "{0:>17}: (c{1},r{2})".format(self.System_Name,self.Col,self.Row)
 #------------------------------------------------------------------------------
     def __eq__(self, other):
         return (self.Col == other.Col) and (self.Row == other.Row)

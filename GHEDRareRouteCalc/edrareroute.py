@@ -477,36 +477,50 @@ class EDRareRoute(object):
         for i in range(xValsNew.__len__()):
             points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
 
-
-        #TODO: Maybe have this shuffle based on ovalRad so we dont have overlapping ovals
-        #      Instead of doing counter(points), need to go through the point list and check which points are within
-        #      ovalRad of eachother
-        pointsCounter = Counter(points)
+        #TODO: Might still keep looping forever
+        overlapping = CheckOverlappingPoints(points,ovalRad)
         split = 10
         loops = 0
-        while sum([v for k,v in pointsCounter.items() if v == 1]) != points.__len__():
-            for k,v in pointsCounter.items():
-                if v > 1:
-                    toChange = points.index(k)
-                    if loops%split == split-1:
-                        if points[toChange].Row + ovalRad < maxRows:
-                            points[toChange].Row += ovalRad
-                        else:
-                            points[toChange].Row -= ovalRad
+        visited = []
+        while overlapping.__len__() != 0:
+            for p1,p2 in overlapping['row']:
+                if p1 not in visited and p2 not in visited:
+                    visited.append(p1)
+                    visited.append(p2)
+                    if p1.Row >= p2.Row:
+                        if p1.Row + ovalRad <= maxRows:
+                            p1.Row += ovalRad
+                        if p2.Row - ovalRad >= 0:
+                            p2.Row -= ovalRad
                     else:
-                        if points[toChange].Col + ovalRad < maxCols:
-                            points[toChange].Col += ovalRad
-                        else:
-                            points[toChange].Col -= ovalRad
+                        if p2.Col + ovalRad <= maxRows:
+                            p2.Col += ovalRad
+                        if p1.Col - ovalRad >= 0:
+                            p1.Col -= ovalRad
+            for p1,p2 in overlapping['col']:
+                if p1 not in visited and p2 not in visited:
+                    visited.append(p1)
+                    visited.append(p2)
+                    if p1.Col >= p2.Col:
+                        if p1.Col + ovalRad <= maxCols:
+                            p1.Col += ovalRad
+                        if p2.Col - ovalRad >= 0:
+                            p2.Col -= ovalRad
+                    else:
+                        if p2.Col + ovalRad <= maxCols:
+                            p2.Col += ovalRad
+                        if p1.Col - ovalRad >= 0:
+                            p1.Col -= ovalRad
+            visited = []
+            overlapping = CheckOverlappingPoints(points,ovalRad)
             loops += 1
-            pointsCounter = Counter(points)
 
-        for i in range(points.__len__()):
-            for j in range(points.__len__()):
-                if i != j:
-                    if points[i] == points[j]:
-                        print("Unable to draw route")
-                        return
+        #for i in range(points.__len__()):
+        #    for j in range(points.__len__()):
+        #        if i != j:
+        #            if points[i] == points[j]:
+        #                print("Unable to draw route")
+        #                return
 
         zValsNew = [z + abs(zMin) for z in zVals]
         zMax = max(zValsNew)
@@ -650,3 +664,17 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
+def CheckOverlappingPoints(points,ovalRad):
+    '''
+    Checks if there will be any overlapping ovals with the given points and oval radius
+    '''
+    overlapping = defaultdict(list)
+    for p1 in points:
+        for p2 in points:
+            if p1 == p2:
+                continue
+            if abs(p1.Col-p2.Col) <= ovalRad:
+                overlapping['col'].append((p1,p2))
+            elif abs(p1.Row-p2.Row) <= ovalRad:
+                overlapping['row'].append((p1,p2))
+    return overlapping

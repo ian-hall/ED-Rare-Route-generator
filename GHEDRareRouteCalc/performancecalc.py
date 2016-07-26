@@ -64,6 +64,20 @@ class PerformanceCalc(object):
         print(ykLoop)
         ykLoop.DisplayInConsole()
         ykLoop.DrawRoute()
+
+        leestiCluster = []
+        leestiCluster.append(systemsDict["Fujin"])
+        leestiCluster.append(systemsDict["Momus Reach"])
+        leestiCluster.append(systemsDict["39 Tauri"])
+        leestiCluster.append(systemsDict["Diso"])
+        leestiCluster.append(systemsDict["Leesti"])
+        leestiCluster.append(systemsDict["Uszaa"])
+        leestiCluster.append(systemsDict["Orrere"])
+        leestiCluster.append(systemsDict["Witchhaul"])
+        lcRoute = EDRareRoute(leestiCluster,fitType)
+        print(lcRoute)
+        lcRoute.DisplayInConsole()
+        lcRoute.DrawRoute()
         
 
         #good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )
