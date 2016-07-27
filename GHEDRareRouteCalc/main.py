@@ -47,9 +47,9 @@ def ReadSystems(file:str = None) -> list:
     colOffset = 7
     mainCSV = pd.read_csv(file,header=15,skipfooter=14,engine='python')
     distances = mainCSV.iloc[:,colOffset:-3]
-    locations = pd.read_csv(file,header=None,skiprows=10,chunksize=3)
-    for line in locations:
-        locations = line.iloc[:,colOffset:-3]
+    coordinates = pd.read_csv(file,header=None,skiprows=10,chunksize=3)
+    for line in coordinates:
+        coordinates = line.iloc[:,colOffset:-3]
         break
     systemArgs = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
     idx = 0
@@ -61,7 +61,7 @@ def ReadSystems(file:str = None) -> list:
             distanceDict[cleanedSystem] = distances[key][idx]
         currentSystem.Distances_Dict = distanceDict
         
-        x,y,z = locations[colOffset+idx][0],locations[colOffset+idx][1],locations[colOffset+idx][2]
+        x,y,z = coordinates[colOffset+idx][0],coordinates[colOffset+idx][1],coordinates[colOffset+idx][2]
         currentSystem.Location = {'x':x,'y':y,'z':z}
         
         if currentSystem in allSystems:
@@ -227,11 +227,11 @@ if __name__ == '__main__':
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
         length = 8
-        popSize = 300
-        fitType = FitnessType.EvenSplit
+        popSize = 1500
+        fitType = FitnessType.Distance
         silenceOutput = False
         stopShort = True
-        __RunGenetic(commonSystems,length,popSize,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)

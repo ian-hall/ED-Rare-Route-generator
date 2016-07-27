@@ -248,7 +248,7 @@ class DisplayLocation(object):
         return "{0:>17}: (c{1},r{2})".format(self.System_Name,self.Col,self.Row)
 #------------------------------------------------------------------------------
     def __eq__(self, other):
-        return (self.Col == other.Col) and (self.Row == other.Row)
+        return (self.Col == other.Col) and (self.Row == other.Row) and (self.Depth == other.Depth)
 #------------------------------------------------------------------------------
     def __hash__(self):
         return hash((self.Col,self.Row))

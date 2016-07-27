@@ -481,36 +481,22 @@ class EDRareRoute(object):
         overlapping = CheckOverlappingPoints(points,ovalRad)
         split = 10
         loops = 0
+        flip = False
         visited = []
-        while overlapping.__len__() != 0:
-            for p1,p2 in overlapping['row']:
-                if p1 not in visited and p2 not in visited:
-                    visited.append(p1)
-                    visited.append(p2)
-                    if p1.Row >= p2.Row:
-                        if p1.Row + ovalRad <= maxRows:
-                            p1.Row += ovalRad
-                        if p2.Row - ovalRad >= 0:
-                            p2.Row -= ovalRad
+        while overlapping.__len__() > 1:
+            for point,conflicts in overlapping.items():
+                for badPoint in conflicts:
+                    if loops % split == 0:                 
+                        if flip:
+                            badPoint.Row += 6
+                        else:
+                            badPoint.Row -= 6
                     else:
-                        if p2.Col + ovalRad <= maxRows:
-                            p2.Col += ovalRad
-                        if p1.Col - ovalRad >= 0:
-                            p1.Col -= ovalRad
-            for p1,p2 in overlapping['col']:
-                if p1 not in visited and p2 not in visited:
-                    visited.append(p1)
-                    visited.append(p2)
-                    if p1.Col >= p2.Col:
-                        if p1.Col + ovalRad <= maxCols:
-                            p1.Col += ovalRad
-                        if p2.Col - ovalRad >= 0:
-                            p2.Col -= ovalRad
-                    else:
-                        if p2.Col + ovalRad <= maxCols:
-                            p2.Col += ovalRad
-                        if p1.Col - ovalRad >= 0:
-                            p1.Col -= ovalRad
+                        if flip:
+                            badPoint.Col += 6
+                        else:
+                            badPoint.Col -= 6
+                    flip = not flip
             visited = []
             overlapping = CheckOverlappingPoints(points,ovalRad)
             loops += 1
@@ -668,13 +654,14 @@ def CheckOverlappingPoints(points,ovalRad):
     '''
     Checks if there will be any overlapping ovals with the given points and oval radius
     '''
+    #TODO: Change this to be by system instead of by pair
     overlapping = defaultdict(list)
     for p1 in points:
         for p2 in points:
             if p1 == p2:
                 continue
-            if abs(p1.Col-p2.Col) <= ovalRad:
-                overlapping['col'].append((p1,p2))
-            elif abs(p1.Row-p2.Row) <= ovalRad:
-                overlapping['row'].append((p1,p2))
+            if abs(p1.Col-p2.Col) <= ovalRad and abs(p1.Row-p2.Row) <= ovalRad:
+                overlapping[p1].append(p2)
+            #elif abs(p1.Row-p2.Row) <= ovalRad:
+            #    overlapping[p1]['col'].append(p2)
     return overlapping
