@@ -7,7 +7,6 @@ import itertools
 ###############################################################################
 #------------------------------------------------------------------------------
 class Test_EDSystem(unittest.TestCase):
-    #TODO: one assert per test(maybe)
 #------------------------------------------------------------------------------
     #@classmethod
     ##This is causing a lot of slowdown on these tests but it should only run once?
@@ -17,8 +16,8 @@ class Test_EDSystem(unittest.TestCase):
     #    cls.Test_Systems = CreateSystemsFromParams(cls.Test_Params)
 #------------------------------------------------------------------------------
     def setUp(self):
-        self.Test_Args = CreateEDSystemArgsList(500)
-        self.Test_Systems = CreateSystemsFromArgs(self.Test_Args)
+        self.Test_Args = CreateTestArgsList(500)
+        self.Test_Systems = CreateTestSystems(self.Test_Args)
 #------------------------------------------------------------------------------
     def test_System_Contructor(self):        
         systemName = "test system"
@@ -32,40 +31,38 @@ class Test_EDSystem(unittest.TestCase):
         permitReq = False
         distToOthers = [0]
 
-        with self.assertRaises(Exception,msg="no empty constructor"):
-            testSystem = EDSystem()
+        testSystem = EDSystem()
+        self.assertFalse(testSystem.Is_Initialized)
+
         with self.assertRaises(Exception,msg="missing args to constructor"):
-            testSystem = EDSystem(avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)           
-        
-        wrongDistToOthers = 0
-        with self.assertRaises(TypeError,msg="distToOthers needs to be a list"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,wrongDistToOthers,permitReq)
+            testSystem = EDSystem.Initialize_FromArgs(avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)           
+               
         
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(None,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(None,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,None,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,None,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,None,itemName,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,None,itemName,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,None,distToStation,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,None,distToStation,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,None,stationName,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,None,stationName,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,None,systemName,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,None,systemName,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,None,index,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,None,index,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,None,distToOthers,permitReq)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,None,permitReq)
         with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,None,permitReq)
-        with self.assertRaises(Exception,msg="no Nones allowed"):
-            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,distToOthers,None)
+            testSystem = EDSystem(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,None)
+
+        self.assertFalse(testSystem.Is_Initialized)
 #------------------------------------------------------------------------------
-    def test_System_AddRares_Item_Names(self):
+    def test_System_AddRaresItemNames(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -77,10 +74,10 @@ class Test_EDSystem(unittest.TestCase):
             else:
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
-    def test_System_AddRares_Item_Costs(self):
+    def test_System_AddRaresItemCosts(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -92,10 +89,10 @@ class Test_EDSystem(unittest.TestCase):
             else:
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
-    def test_System_AddRares_Station_Names(self):
+    def test_System_AddRaresStationNames(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -107,10 +104,10 @@ class Test_EDSystem(unittest.TestCase):
             else:
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
-    def test_System_AddRares_Station_Distances(self):
+    def test_System_AddRaresStationDistances(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -122,10 +119,10 @@ class Test_EDSystem(unittest.TestCase):
             else:
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
-    def test_System_AddRares_Total_Cost(self):
+    def test_System_AddRaresTotalCost(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -136,7 +133,7 @@ class Test_EDSystem(unittest.TestCase):
             else:
                 squishedSystems.append(newSystem)
 #------------------------------------------------------------------------------
-    def test_System_Total_Cost(self):
+    def test_System_TotalCost(self):
         '''
         Test that we are getting back the expected total cost of items sold in a system
         '''
@@ -150,7 +147,7 @@ class Test_EDSystem(unittest.TestCase):
                     expectedTotal += (cost * supply)
                 self.assertAlmostEqual(expectedTotal,system.Total_Cost)
 #------------------------------------------------------------------------------
-    def test_System_Item_Costs(self):
+    def test_System_ItemCosts(self):
         '''
         Test that we get back the expected list of costs for items sold in a system
         '''
@@ -159,7 +156,7 @@ class Test_EDSystem(unittest.TestCase):
                 expectedItemCosts = self.__PullValsForArg(self.Test_Args,"itemCost",system.System_Name)
                 self.assertListEqual(expectedItemCosts,system.Item_Costs)
 #------------------------------------------------------------------------------
-    def test_System_Item_Names(self):
+    def test_System_ItemNames(self):
         #TODO:  Test failed once with item lists of different length
         #           Same item appeared twice in system list but only once in args list
         for system in self.Test_Systems:
@@ -167,7 +164,7 @@ class Test_EDSystem(unittest.TestCase):
                 expectedItemNames = self.__PullValsForArg(self.Test_Args,"itemName",system.System_Name)
                 self.assertListEqual(expectedItemNames,system.Item_Names)
 #------------------------------------------------------------------------------
-    def test_System_Item_Counts(self):
+    def test_System_ItemCounts(self):
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
                 expectedItemCounts = self.__PullValsForArg(self.Test_Args,"avgSupply",system.System_Name)
@@ -185,7 +182,7 @@ class Test_EDSystem(unittest.TestCase):
                         itemInfo = (args["itemName"],args["itemCost"],args["avgSupply"],args["supplyCap"])
                         self.assertIn(itemInfo,system.Items_Info)
 #------------------------------------------------------------------------------
-    def test_System_Total_Supply(self):
+    def test_System_TotalSupply(self):
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
                 expectedTotal = sum(self.__PullValsForArg(self.Test_Args,"supplyCap",system.System_Name))
@@ -198,7 +195,7 @@ class Test_EDSystem(unittest.TestCase):
                 expectedPermitReq = self.__PullValsForArg(self.Test_Args,"permit",system.System_Name)[0]
                 self.assertTrue(system.Needs_Permit == expectedPermitReq)                
 #------------------------------------------------------------------------------
-    def test_System_Add_Commutative(self):
+    def test_System_AddRaresCommutative(self):
         '''
         Assert that we get the "same" systems regardless of the order we add rares to them
         '''
@@ -207,7 +204,7 @@ class Test_EDSystem(unittest.TestCase):
         reverseArgs = self.Test_Args[::-1]
         
         for args in self.Test_Args:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if systemsForward.count(newSystem) != 0:
                 for currentSystem in systemsForward:
                     if currentSystem == newSystem:
@@ -216,7 +213,7 @@ class Test_EDSystem(unittest.TestCase):
                 systemsForward.append(newSystem)
 
         for args in reverseArgs:
-            newSystem = EDSystem(**args)
+            newSystem = EDSystem.Initialize_FromArgs(**args)
             if systemsReverse.count(newSystem) != 0:
                 for currentSystem in systemsReverse:
                     if currentSystem == newSystem:
@@ -247,46 +244,41 @@ class Test_EDSystem(unittest.TestCase):
             randToSys = randSystem.GetDistanceTo(system)
             self.assertEqual(sysToRand,randToSys)
 #------------------------------------------------------------------------------
-    def test_System_Distances_Failure(self):
+    def test_System_DistancesFailure(self):
         '''
-        Attempting to get the distance to a system whose index is not in the list should return -1
+        Attempting to get the distance to a system whose name is not in the list should return -1
         '''
         for system in self.Test_Systems:
             with self.subTest(sysName = system.System_Name):
-                badSystemArgs = CreateEDSystemArgsList(1)[0]
-                badSystemArgs["systemIndex"] = -1
-                badSystem = EDSystem(**badSystemArgs)
+                badSystemArgs = CreateTestArgsList(1)[0]
+                badSystemArgs["systemName"] = "Bad system name"
+                badSystem = EDSystem.Initialize_FromArgs(**badSystemArgs)
                 distToBad = system.GetDistanceTo(badSystem)
-                self.assertEqual(-1,distToBad)     
-                
-                badSystemArgs["systemIndex"] = 99999999999999
-                badSystem = EDSystem(**badSystemArgs)
-                distToBad = system.GetDistanceTo(badSystem)
-                self.assertEqual(-1,distToBad)                        
+                self.assertEqual(-1,distToBad)                     
 #------------------------------------------------------------------------------
 #Test properties cannot be set
 #------------------------------------------------------------------------------
-    def test_System_Name_Setter(self):
+    def test_System_NameSetter(self):
         for system in self.Test_Systems:
             with self.assertRaises(AttributeError):
                 system.System_Name = "Another Name"
 #------------------------------------------------------------------------------
-    def test_System_Index_Setter(self):
+    def test_System_IndexSetter(self):
         for system in self.Test_Systems:
             with self.assertRaises(AttributeError):
                 system.Index = 99
 #------------------------------------------------------------------------------
-    def test_System_Total_Cost_Setter(self):
+    def test_System_TotalCostSetter(self):
         for system in self.Test_Systems:
             with self.assertRaises(AttributeError):
                 system.Total_Cost = 219
 #------------------------------------------------------------------------------
-    def test_System_Max_Suppy_Setter(self):
+    def test_System_MaxSuppySetter(self):
         for system in self.Test_Systems:
             with self.assertRaises(AttributeError):
                 system.Max_Supply = 219
 #------------------------------------------------------------------------------
-    def test_System_Item_Info_Setter(self):
+    def test_System_ItemInfoSetter(self):
         for system in self.Test_Systems:
             originalList = system.Items_Info
             with self.assertRaises(AttributeError):
@@ -297,7 +289,7 @@ class Test_EDSystem(unittest.TestCase):
             #Make sure we get the original list back with no elements actually changed
             self.assertListEqual(originalList,system.Items_Info)
 #------------------------------------------------------------------------------
-    def test_System_Item_Names_Setter(self):
+    def test_System_ItemNamesSetter(self):
         for system in self.Test_Systems:
             originalList = system.Item_Names
             with self.assertRaises(AttributeError):
@@ -308,7 +300,7 @@ class Test_EDSystem(unittest.TestCase):
             #Make sure we get the original list back with no elements actually changed
             self.assertListEqual(originalList,system.Item_Names)
 #------------------------------------------------------------------------------
-    def test_System_Location_Setter(self):
+    def test_System_LocationSetter(self):
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
                 originalLocation = system.Location
@@ -373,7 +365,7 @@ class Test_EDSystem(unittest.TestCase):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
-def CreateEDSystemArgsList(numToCreate: int) -> list:
+def CreateTestArgsList(numToCreate: int) -> list:
     '''
     Returns dicts of valid arguments for creating an EDSystem
     '''
@@ -398,11 +390,7 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
         distToStation = random.randrange(10000)
         permitReq = (random.randrange(100)%10 == 0)
 
-        #TODO: Maybe at some point have this actually have values instead of 0 all
-        #           Maybe keep track of i and create a random list of ints for the distances.
-        #           Since distance from i to i+n is that same as i+n to i we can go through and copy distances over
-        #               Exception being systems with the same name get distance of 0
-        distToOthers = [0 for _ in range(numToCreate)]
+        #TODO: distances to other systems is no longer in the constructor, should add it to the CreateTestSystems function
 
         #Check for and remove/come up with another station name if a given name is already in a system
         stationsForSystem = [args["stationName"] for args in argsDictList if args["systemName"] == systemName]
@@ -417,19 +405,18 @@ def CreateEDSystemArgsList(numToCreate: int) -> list:
                      "stationName":stationName,
                      "systemName":systemName,
                      "systemIndex":index,
-                     "distToOthers":distToOthers,
                      "permit":permitReq}
         argsDictList.append(argsDict)
     
     return argsDictList
 #------------------------------------------------------------------------------
-def CreateSystemsFromArgs(argsList: list) -> list:
+def CreateTestSystems(argsList: list) -> list:
     '''
     "Factory" whatever for making EDSystems to use in testing
     '''
     generatedSystems = []
     for args in argsList:
-        currentSystem = EDSystem(**args)
+        currentSystem = EDSystem.Initialize_FromArgs(**args)
         if generatedSystems.count(currentSystem) != 0:
             for system in generatedSystems:
                 if system == currentSystem:

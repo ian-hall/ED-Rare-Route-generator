@@ -11,8 +11,8 @@ class RouteCalc(object):
     '''
     Class for calculating rare trade routes
     '''
-    Route_Cutoff = 11.5
-    __Selection_Mult = .25
+    Route_Cutoff = 11.25
+    __Selection_Mult = 1
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
 #------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ class RouteCalc(object):
         return cls.__Selection_Mult
 #------------------------------------------------------------------------------
     @classmethod
-    def GeneticSolverStart(cls,popSize: int, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
+    def StartGeneticSolver(cls,popSize: int, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
@@ -121,7 +121,7 @@ class RouteCalc(object):
                 if not silent:
                     print("{0:>7} -> mutation chance: {1:.1f}%".format(currentGeneration,mutationChance*100))
 
-            relativeFitnessVals = cls.__CalculateRelativeFitness(currentPopulation)
+            relativeFitnessVals = cls.__CalcRelativeFitness(currentPopulation)
 
             while nextPopulation.__len__() != currentPopulation.__len__():
                 child1,child2 = cls.__Reproduce(currentPopulation,relativeFitnessVals)
@@ -138,7 +138,7 @@ class RouteCalc(object):
         return (bestRoute,currentGeneration)
 #------------------------------------------------------------------------------
     @classmethod
-    def __CalculateRelativeFitness(cls, population: list) -> list:
+    def __CalcRelativeFitness(cls, population: list) -> list:
         '''
         We rank each route relative to the others in the population.
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is
@@ -182,7 +182,6 @@ class RouteCalc(object):
         child1 = []
         child2 = []
 
-        #TODO: Maybe combine these loops since they have the same bounds
         for i in range(0,pivot):
             child1.append(route1[i])
         i = pivot
@@ -239,16 +238,15 @@ class RouteCalc(object):
         cls.__Valid_Systems = systems
 #------------------------------------------------------------------------------
     @classmethod
-    def WrapRelativeFitness(cls,population: list) -> list:
-        return cls.__CalculateRelativeFitness(population);
+    def Wrap_CalcRelativeFitness(cls,population: list) -> list:
+        return cls.__CalcRelativeFitness(population);
 #------------------------------------------------------------------------------
     @classmethod
-    def WrapReproduce(cls,population: list, selectVals: list) -> tuple:
-        #selectVals = cls.__CalculateRelativeFitness(population)
+    def Wrap_Reproduce(cls,population: list, selectVals: list) -> tuple:
         return cls.__Reproduce(population,selectVals)
 #------------------------------------------------------------------------------
     @classmethod
-    def WrapMutate(cls,route: list) -> list:
+    def Wrap_Mutate(cls,route: list) -> list:
         return cls.__Mutate(route)
 #------------------------------------------------------------------------------
 ###############################################################################

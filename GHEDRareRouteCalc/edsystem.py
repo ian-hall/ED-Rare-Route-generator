@@ -1,34 +1,73 @@
 ﻿__author__ = 'Ian'
+from collections import defaultdict
+import re
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
 class EDSystem( object ):
-    #TODO: Maybe a better way to do this?
-    #      Maybe not enough data for est profit
-    #          all rares have different variables for deciding sell val 
-    #       Maybe change System_Distance to a dict, but this would require knowing all systems ahead of time when reading from the csv
 #------------------------------------------------------------------------------
-    def __init__(self, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
-                       stationName: str, systemName: str, systemIndex: int, distToOthers: list, permit: bool):
-
-        if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
-            (stationName is None) or (systemName is None) or (systemIndex is None) or (distToOthers is None) or (permit is None) ):
-            raise Exception("Values cannot be None") 
+    def __init__(self):
+        self.__Is_Initialized = False
+#------------------------------------------------------------------------------
+    @classmethod
+    def Initialize_FromArgs(cls, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
+                              stationName: str, systemName: str, systemIndex: int, permit: bool):
         
-        if not isinstance(distToOthers,list):
-            raise TypeError       
+        if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
+            (stationName is None) or (systemName is None) or (systemIndex is None) or (permit is None) ):
+            raise Exception("Values cannot be None") 
+          
+        newSystem = EDSystem()
+        newSystem.__Supply_Caps = [supplyCap] # Float
+        newSystem.__Supply_Numbers = [avgSupply] # Float
+        newSystem.__Costs = [itemCost] # Int
+        newSystem.__Items = [itemName] # String
+        newSystem.__Station_Distances = [distToStation] # Float
+        newSystem.__Station_Names = [stationName] # String
+        newSystem.__System_Name = systemName # String
+        newSystem.__Index = systemIndex # Int
+        newSystem.__Distances_Dict = defaultdict(lambda: -1)
+        newSystem.__Permit_Req = permit 
+        newSystem.__Location = dict(x=0, y=0, z=0)  
+        newSystem.__Is_Initialized = True
+        return newSystem  
+#------------------------------------------------------------------------------
+    @classmethod
+    def Initialize_FromCSVLine(cls,tuple,idx):
+        '''
+        Creates ad EDSystem object from the given tuple. The tuple should consist of: 
+        supply cap, average supply, item cost, item name, distance to station, station name, system name
+        in that order.
+        Also passing in an index for ???
+        '''
+        supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName = tuple
+        itemName        = itemName.strip().replace("\\'","\'")
+        stationName     = stationName.strip().replace("\\'","\'")
+        systemName,permit = CleanSystemName(systemName)
+        distToStation = float(re.sub("[^0-9.]", "", distToStation))
+        
+        if supplyCap == 'ND':
+            supplyCap = 1
+        else:
+            tempMax = supplyCap.split('-')
+            for i in range(0,tempMax.__len__()):
+                tempMax[i] = int(re.sub("[^0-9]", "", tempMax[i]))
+            supplyCap = sum(tempMax)/len(tempMax)
 
-        self.__Supply_Caps = [supplyCap] # Float
-        self.__Supply_Numbers = [avgSupply] # Float
-        self.__Costs = [itemCost] # Int
-        self.__Items = [itemName] # String
-        self.__Station_Distances = [distToStation] # Float
-        self.__Station_Names = [stationName] # String
-        self.__System_Name = systemName # String
-        self.__Index = systemIndex # Int
-        self.__System_Distances = distToOthers # List of Floats
-        self.__Permit_Req = permit 
-        self.__Location = dict(x=0, y=0, z=0)    
+        if avgSupply == 'ND':
+            avgSupply = 1
+        else:
+            tempSupply = avgSupply.split('-')
+            for i in range(0,tempSupply.__len__()):
+                tempSupply[i] = float(re.sub("[^0-9]", "", tempSupply[i]))
+            avgSupply = sum(tempSupply)/len(tempSupply)
+
+        itemCost = int(re.sub("[^0-9]", "", itemCost))
+
+        if supplyCap == 1 or avgSupply == 1:
+            supplyCap = max([supplyCap,avgSupply])
+            avgSupply = supplyCap
+        return EDSystem.Initialize_FromArgs(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,idx,permit)
 #------------------------------------------------------------------------------
     @property
     def Total_Cost(self) -> float:
@@ -41,6 +80,10 @@ class EDSystem( object ):
             supply = self.__Supply_Caps[i]
             total += (cost * supply)
         return total
+#------------------------------------------------------------------------------
+    @property
+    def Is_Initialized(self) -> bool:
+        return self.__Is_Initialized
 #------------------------------------------------------------------------------
     @property
     def Max_Supply(self) -> float:
@@ -80,6 +123,14 @@ class EDSystem( object ):
     @property
     def Station_Distances(self) -> list:
         return [dist for dist in self.__Station_Distances]
+#------------------------------------------------------------------------------
+    @property
+    def Distances_Dict(self) -> dict:
+        return dict(self.TestingDistances)
+#------------------------------------------------------------------------------
+    @Distances_Dict.setter
+    def Distances_Dict(self,distances:dict):
+        self.__Distances_Dict = dict(distances)
 #------------------------------------------------------------------------------
     @property
     def Location(self) -> dict:
@@ -124,14 +175,14 @@ class EDSystem( object ):
         Get the distance from self to the other system. If the other system's index
         is not in the system distances list return -1
         '''
-        if other.__Index >= 0 and other.__Index < self.__System_Distances.__len__():
-            return self.__System_Distances[other.__Index]
+        if other.System_Name not in self.__Distances_Dict:
+            return -1
         else:
-            return -1.0
+            return self.__Distances_Dict[other.System_Name]
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         '''
-        Add rare goods to a system. This will add duplicates if the same good is in self and other.
+        Add rare goods to a system. This will add duplicates if the same item is in self and other.
         '''
         if self.__System_Name != other.__System_Name:
             raise Exception("Can only add rares to the same system")
@@ -168,8 +219,7 @@ class EDSystem( object ):
                 strBuilder.append(", ")
         strBuilder.append("}} ({0}T)".format(self.Max_Supply))
 
-        return ''.join(strBuilder)
-        
+        return ''.join(strBuilder)       
 #------------------------------------------------------------------------------
     def __key(self):
         '''
@@ -178,10 +228,7 @@ class EDSystem( object ):
         return self.__System_Name
 #------------------------------------------------------------------------------  
     def __hash__(self):
-        '''
-        Since Index refers to a system's index in the System_Distances list, this will be unique
-        '''
-        return hash(self.__Index)
+        return hash(self.__key())
 #------------------------------------------------------------------------------
     def __eq__(self, other):
         return self.__key() == other.__key()
@@ -197,10 +244,10 @@ class DisplayLocation(object):
         self.System_Name = name
 #------------------------------------------------------------------------------
     def __str__(self):
-        return "{0:>17}: ({1},{2})".format(self.System_Name,self.Col,self.Row)
+        return "{0:>17}: (c{1},r{2})".format(self.System_Name,self.Col,self.Row)
 #------------------------------------------------------------------------------
     def __eq__(self, other):
-        return (self.Col == other.Col) and (self.Row == other.Row)
+        return (self.Col == other.Col) and (self.Row == other.Row) and (self.Depth == other.Depth)
 #------------------------------------------------------------------------------
     def __hash__(self):
         return hash((self.Col,self.Row))
@@ -213,4 +260,17 @@ def TryFloat(val: str) -> bool:
         return True
     except:
         return False
+#------------------------------------------------------------------------------
+def CleanSystemName(sysName):
+    '''
+    cleans the system name and returns a tuple of
+    (cleaned name,permit requirement)
+    '''
+    permit = False
+    normName = sysName.strip().replace("\\'","\'")
+    normName = normName.split('.')[0]
+    if normName.endswith('(permit)'):
+        permit = True
+        normName = normName.partition('(permit)')[0].strip()
+    return normName,permit
 #------------------------------------------------------------------------------
