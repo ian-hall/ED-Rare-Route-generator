@@ -219,8 +219,7 @@ class EDSystem( object ):
                 strBuilder.append(", ")
         strBuilder.append("}} ({0}T)".format(self.Max_Supply))
 
-        return ''.join(strBuilder)
-        
+        return ''.join(strBuilder)       
 #------------------------------------------------------------------------------
     def __key(self):
         '''

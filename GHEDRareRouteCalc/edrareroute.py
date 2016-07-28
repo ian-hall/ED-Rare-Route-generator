@@ -28,7 +28,7 @@ class FitnessType(Enum):
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
-#TODO:  Add tracking for max_cargo to all fitness calculations
+#TODO:  
 #       Need to finish adjusting the weightedCost values in the fitness functions
 #           to better support routes of short lengths.
 class EDRareRoute(object):
@@ -477,7 +477,7 @@ class EDRareRoute(object):
         for i in range(xValsNew.__len__()):
             points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
 
-        #TODO: Might still keep looping forever
+        #TODO: maybe this still loops forever sometimes
         overlapping = CheckOverlappingPoints(points,ovalRad)
         split = 10
         loops = 0
@@ -500,13 +500,6 @@ class EDRareRoute(object):
             visited = []
             overlapping = CheckOverlappingPoints(points,ovalRad)
             loops += 1
-
-        #for i in range(points.__len__()):
-        #    for j in range(points.__len__()):
-        #        if i != j:
-        #            if points[i] == points[j]:
-        #                print("Unable to draw route")
-        #                return
 
         zValsNew = [z + abs(zMin) for z in zVals]
         zMax = max(zValsNew)
@@ -662,6 +655,4 @@ def CheckOverlappingPoints(points,ovalRad):
                 continue
             if abs(p1.Col-p2.Col) <= ovalRad and abs(p1.Row-p2.Row) <= ovalRad:
                 overlapping[p1].append(p2)
-            #elif abs(p1.Row-p2.Row) <= ovalRad:
-            #    overlapping[p1]['col'].append(p2)
     return overlapping
