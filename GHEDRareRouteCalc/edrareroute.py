@@ -46,6 +46,7 @@ class EDRareRoute(object):
         self.__Max_Cargo = 0
         self.__Route_Type = RouteType.Other
         self.__Longest_Jump = 0
+        self.__Fit_Type = fType
         
         self.__Fitness_Value = -1
         if fType == FitnessType.FirstOver:
@@ -54,6 +55,10 @@ class EDRareRoute(object):
             self.__Fitness_Value = self.__FitnessDistance()
         elif fType == FitnessType.EvenSplit:
             self.__Fitness_Value = self.__Fitness_EvenSplit()
+#------------------------------------------------------------------------------
+    @property
+    def Fitness_Type(self) -> FitnessType:
+        return self.__Fit_Type
 #------------------------------------------------------------------------------
     @property
     def Fitness(self) -> float:

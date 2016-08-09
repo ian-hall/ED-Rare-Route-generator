@@ -51,22 +51,18 @@ class PerformanceCalc(object):
         print(good14)
         good14.DrawRoute()
 
-        from scipy.spatial import ConvexHull
-        import matplotlib.pyplot as plt
-        import numpy as np
-        allPoints = np.array([(system.Location['x'],system.Location['y']) for system in good14.Systems])
-        testHull = ConvexHull(allPoints)       
-        print(allPoints[:,0])
-        plt.plot(allPoints[:,0], allPoints[:,1], 'o')
-        for simplex in testHull.simplices:
-            plt.plot(allPoints[simplex, 0], allPoints[simplex, 1], 'k-')
-        plt.show()
-
         reordered14 = EDRareRoute([ systemsDict['Ngurii'], systemsDict["Baltah'Sine"], systemsDict['HR 7221'], systemsDict['Phiagre'], systemsDict['Coquim'],  systemsDict['Tarach Tor'], 
                                     systemsDict['Hecate'], systemsDict['Rusani'], systemsDict['Kongga'], systemsDict['Ethgreze'], systemsDict['George Pantazis'], systemsDict['CD-75 661'],
                                     systemsDict['Arouca'], systemsDict['Any Na'] ], fitType) 
         print(reordered14)
         reordered14.DrawRoute()
+
+        # 1 2 3 4 12 11 5 13 6 7 8 9 10 14
+        anotherReorder = EDRareRoute([ systemsDict['Delta Phoenicis'], systemsDict['Rapa Bao'], systemsDict['Karsuki Ti'], systemsDict['Irukama'], systemsDict["Baltah'Sine"],
+                                       systemsDict['HR 7221'], systemsDict['Phiagre'], systemsDict['Chi Eridani'], systemsDict['Altair'], systemsDict['Aganippe'], systemsDict['Helvetitj'],
+                                       systemsDict['Bast'], systemsDict['Xihe'], systemsDict['Utgaroar'] ], fitType)
+        print(anotherReorder)
+        anotherReorder.DrawRoute()
 
         #brokenRoute = EDRareRoute( [ systemsDict["Orrere"], systemsDict["Leesti"], systemsDict["Aganippe"], systemsDict["Bast"], systemsDict["39 Tauri"],
         #                             systemsDict["Utgaroar"], systemsDict["Baltah'Sine"] ], fitType )

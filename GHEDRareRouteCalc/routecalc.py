@@ -136,6 +136,7 @@ class RouteCalc(object):
             currentPopulation = nextPopulation
 
         #TODO: Add some kind of finalization optimization here to shuffle routes. Many routes found have a lot of overlaps that could probably be straightened out.
+        bestRoute = cls.__TryOptimize(bestRoute,silent)
         return (bestRoute,currentGeneration)
 #------------------------------------------------------------------------------
     @classmethod
@@ -206,7 +207,7 @@ class RouteCalc(object):
             i += 1
 
         return (child1,child2)
-#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------
     @classmethod
     def __Mutate(cls,route: list) -> list:
         tempRoute = [system for system in route]
@@ -233,6 +234,43 @@ class RouteCalc(object):
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
+#------------------------------------------------------------------------------
+    @classmethod
+    def __TryOptimize(cls,route: EDRareRoute, silent: bool) -> EDRareRoute:
+        '''
+        Attempts to optimize the given route by rearranging the systems
+        '''
+        if not silent:
+            print("Attempting to optimize route...")
+        #First do a greedy shortest path around the systems
+        origSystems = route.Systems
+        newOrder = [origSystems[0]]
+        while newOrder.__len__() != origSystems.__len__():
+            currentSystem = newOrder[-1]
+            distances = {}
+            for system in origSystems:
+                if system not in newOrder:
+                    distances[system] = currentSystem.GetDistanceTo(system)
+            closest = min(distances,key=distances.get)
+            newOrder.append(closest)
+        shorterRoute = EDRareRoute(newOrder,route.Fitness_Type)
+        if shorterRoute.Fitness > route.Fitness:
+            if not silent:
+                print("Optimization found")
+            return newRoute     
+        #if that isnt better then just shuffle or something
+        numShuffles = 1000
+        systemsCopy = route.Systems
+        for i in range(numShuffles):
+            random.shuffle(systemsCopy)
+            newRoute = EDRareRoute(systemsCopy,route.Fitness_Type)
+            if newRoute.Fitness > route.Fitness:
+                if not silent:
+                    print("Optimization found")
+                return newRoute            
+        if not silent:
+            print("No optimization found")
+        return route
 #------------------------------------------------------------------------------
     @classmethod
     def SetValidSystems(cls,systems: list):
