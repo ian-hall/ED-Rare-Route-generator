@@ -45,6 +45,29 @@ class PerformanceCalc(object):
     @classmethod
     def CheckTestSystems(cls,systemsDict: dict,fitType: FitnessType):
         
+        good14 = EDRareRoute([ systemsDict['HR 7221'], systemsDict['Ngurii'], systemsDict["Baltah'Sine"], systemsDict['Tarach Tor'], systemsDict['Hecate'], systemsDict['Rusani'],
+                               systemsDict['Kongga'], systemsDict['Ethgreze'], systemsDict['George Pantazis'], systemsDict['Arouca'], systemsDict['Any Na'], systemsDict['CD-75 661'],
+                               systemsDict['Coquim'], systemsDict['Phiagre'] ], fitType) 
+        print(good14)
+        good14.DrawRoute()
+
+        from scipy.spatial import ConvexHull
+        import matplotlib.pyplot as plt
+        import numpy as np
+        allPoints = np.array([(system.Location['x'],system.Location['y']) for system in good14.Systems])
+        testHull = ConvexHull(allPoints)       
+        print(allPoints[:,0])
+        plt.plot(allPoints[:,0], allPoints[:,1], 'o')
+        for simplex in testHull.simplices:
+            plt.plot(allPoints[simplex, 0], allPoints[simplex, 1], 'k-')
+        plt.show()
+
+        reordered14 = EDRareRoute([ systemsDict['Ngurii'], systemsDict["Baltah'Sine"], systemsDict['HR 7221'], systemsDict['Phiagre'], systemsDict['Coquim'],  systemsDict['Tarach Tor'], 
+                                    systemsDict['Hecate'], systemsDict['Rusani'], systemsDict['Kongga'], systemsDict['Ethgreze'], systemsDict['George Pantazis'], systemsDict['CD-75 661'],
+                                    systemsDict['Arouca'], systemsDict['Any Na'] ], fitType) 
+        print(reordered14)
+        reordered14.DrawRoute()
+
         #brokenRoute = EDRareRoute( [ systemsDict["Orrere"], systemsDict["Leesti"], systemsDict["Aganippe"], systemsDict["Bast"], systemsDict["39 Tauri"],
         #                             systemsDict["Utgaroar"], systemsDict["Baltah'Sine"] ], fitType )
         #print(brokenRoute)
@@ -65,19 +88,19 @@ class PerformanceCalc(object):
         #ykLoop.DisplayInConsole()
         #ykLoop.DrawRoute()
 
-        leestiCluster = []
-        leestiCluster.append(systemsDict["Fujin"])
-        leestiCluster.append(systemsDict["Momus Reach"])
-        leestiCluster.append(systemsDict["39 Tauri"])
-        leestiCluster.append(systemsDict["Diso"])
-        leestiCluster.append(systemsDict["Leesti"])
-        leestiCluster.append(systemsDict["Uszaa"])
-        leestiCluster.append(systemsDict["Orrere"])
-        leestiCluster.append(systemsDict["Witchhaul"])
-        lcRoute = EDRareRoute(leestiCluster,fitType)
-        print(lcRoute)
-        lcRoute.DisplayInConsole()
-        lcRoute.DrawRoute()
+        #leestiCluster = []
+        #leestiCluster.append(systemsDict["Fujin"])
+        #leestiCluster.append(systemsDict["Momus Reach"])
+        #leestiCluster.append(systemsDict["39 Tauri"])
+        #leestiCluster.append(systemsDict["Diso"])
+        #leestiCluster.append(systemsDict["Leesti"])
+        #leestiCluster.append(systemsDict["Uszaa"])
+        #leestiCluster.append(systemsDict["Orrere"])
+        #leestiCluster.append(systemsDict["Witchhaul"])
+        #lcRoute = EDRareRoute(leestiCluster,fitType)
+        #print(lcRoute)
+        #lcRoute.DisplayInConsole()
+        #lcRoute.DrawRoute()
         
 
         #good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )

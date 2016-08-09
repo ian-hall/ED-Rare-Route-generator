@@ -214,8 +214,8 @@ class EDRareRoute(object):
 
         overallScale = 1
         baseValue = 6
-        longestGoodJump = 115
-        maxJumpDistance = 180
+        longestGoodJump = 120
+        maxJumpDistance = 195
         currentLongestJump = -1
         overGoodJump = False
 

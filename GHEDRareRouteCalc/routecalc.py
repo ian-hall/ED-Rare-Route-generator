@@ -135,6 +135,7 @@ class RouteCalc(object):
 
             currentPopulation = nextPopulation
 
+        #TODO: Add some kind of finalization optimization here to shuffle routes. Many routes found have a lot of overlaps that could probably be straightened out.
         return (bestRoute,currentGeneration)
 #------------------------------------------------------------------------------
     @classmethod
