@@ -241,7 +241,7 @@ class RouteCalc(object):
         Attempts to optimize the given route by rearranging the systems
         '''
         if not silent:
-            print("Attempting to optimize route...")
+            print("Attempting to optimize route...")        
         #First do a greedy shortest path around the systems
         origSystems = route.Systems
         newOrder = [origSystems[0]]
@@ -257,9 +257,9 @@ class RouteCalc(object):
         if shorterRoute.Fitness > route.Fitness:
             if not silent:
                 print("Optimization found")
-            return newRoute     
+            return shorterRoute     
         #if that isnt better then just shuffle or something
-        numShuffles = 1000
+        numShuffles = 1500
         systemsCopy = route.Systems
         for i in range(numShuffles):
             random.shuffle(systemsCopy)
