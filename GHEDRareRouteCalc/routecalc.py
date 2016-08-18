@@ -136,7 +136,7 @@ class RouteCalc(object):
             currentPopulation = nextPopulation
 
         #TODO: Add some kind of finalization optimization here to shuffle routes. Many routes found have a lot of overlaps that could probably be straightened out.
-        bestRoute = cls.__TryOptimize(bestRoute,silent)
+        bestRoute = cls.__Optimize(bestRoute,silent)
         return (bestRoute,currentGeneration)
 #------------------------------------------------------------------------------
     @classmethod
@@ -236,7 +236,7 @@ class RouteCalc(object):
         return tempRoute
 #------------------------------------------------------------------------------
     @classmethod
-    def __TryOptimize(cls,route: EDRareRoute, silent: bool) -> EDRareRoute:
+    def __Optimize(cls,route: EDRareRoute, silent: bool) -> EDRareRoute:
         '''
         Attempts to optimize the given route by rearranging the systems
         '''
@@ -259,7 +259,7 @@ class RouteCalc(object):
                 print("Optimization found")
             return shorterRoute     
         #if that isnt better then just shuffle or something
-        numShuffles = 1500
+        numShuffles = 3000
         systemsCopy = route.Systems
         for i in range(numShuffles):
             random.shuffle(systemsCopy)
