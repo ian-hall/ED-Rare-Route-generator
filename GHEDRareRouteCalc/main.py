@@ -178,7 +178,7 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     csvFile = "RareGoods.csv"
-    allSystems = ReadSystems(csvFile)
+    allSystems = ReadSystems()
 
     systemsDict = {}
     for system in allSystems:
@@ -226,8 +226,8 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 21
-        popSize = 1450
+        length = 16
+        popSize = 800
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = True

@@ -259,7 +259,7 @@ class RouteCalc(object):
                 print("Optimization found")
             return shorterRoute     
         #if that isnt better then just shuffle or something
-        numShuffles = 3000
+        numShuffles = 5000
         systemsCopy = route.Systems
         for i in range(numShuffles):
             random.shuffle(systemsCopy)
