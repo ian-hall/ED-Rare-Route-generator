@@ -174,12 +174,13 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
     return (readyToRun,int(optionChoice),argsOrSystems)
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-# Main starts here
-#------------------------------------------------------------------------------
-if __name__ == '__main__':
-    csvFile = "RareGoods.csv"
-    allSystems = ReadSystems()
-
+def main(csvFile:str = None,prompt:bool = False):
+    '''
+    Main whatever. Takes a string linked to a csv file and a bool to flag if user
+    should be prompted for input. Default value for csvFile is an online spreadsheet.
+    Default value for prompt is to not prompt.
+    '''
+    allSystems = ReadSystems(csvFile)
     systemsDict = {}
     for system in allSystems:
         systemsDict[system.System_Name] = system
@@ -205,7 +206,6 @@ if __name__ == '__main__':
     commonSystems.append(systemsDict['Yaso Kondi']) 
     commonSystems.append(systemsDict['Quechua'])
 
-    prompt = False    
     if prompt:
         ready,runType,userArgs = __ReadUserInput(systemsDict)
         if ready:
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 16
+        length = 11
         popSize = 800
         fitType = FitnessType.FirstOver
         silenceOutput = False
@@ -243,4 +243,10 @@ if __name__ == '__main__':
         #print(fullRoute)
         #fullRoute.DisplayInConsole()
         #fullRoute.DrawRoute(showLines=False)           
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+if __name__ == '__main__':
+    csvFile = "RareGoods.csv"
+    prompt = True
+    main(csvFile,prompt)
 #------------------------------------------------------------------------------
