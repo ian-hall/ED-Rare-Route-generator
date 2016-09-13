@@ -12,7 +12,7 @@ from fuzzywuzzy import fuzz
 import pandas as pd
 import numpy as np
 #------------------------------------------------------------------------------
-def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: FitnessType, silent: bool, stopShort: bool):
+def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
     maxRuns = 5
@@ -21,7 +21,7 @@ def __RunGenetic(systems: list, routeLength: int, popSize: int, fitType: Fitness
     while not exitTestLoop and runNum < maxRuns:
         runNum += 1
         print("Run: {0}".format(runNum))
-        bestRoute,numGenerations = RouteCalc.StartGeneticSolver(popSize,systems,routeLength,silent,fitType)
+        bestRoute,numGenerations = RouteCalc.StartGeneticSolver(systems,routeLength,silent,fitType)
         geneticEnd = time.time()
         if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
             exitTestLoop = True
@@ -102,19 +102,19 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
             print("Please enter a number between 1 and whatever")
             stationDist = input("Max distance to station (ly): ")
         
-        routeLen = input("Route length [6-35]: ")
-        while not (__TryInt(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 35)):
-            print("Please enter a length from 6 up to and including 35.")
-            routeLen = input("Route length [6-35]: ")
+        routeLen = input("Route length [6-30]: ")
+        while not (__TryInt(routeLen) and not (int(routeLen) < 6 or int(routeLen) > 30)):
+            print("Please enter a length from 6 up to and including 30.")
+            routeLen = input("Route length [6-30]: ")
 
         validPermitEntry = False
         permitsStr = input("Allow permit systems [Y/N]? ")
-        if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'Y'):
+        if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'n' or permitsStr == 'Y' or permitsStr == 'y'):
             validPermitEntry = True
         while not validPermitEntry:
             print("Please enter just Y or N")
             permitsStr = input("Allow permit systems [Y/N]? ")
-            if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'Y'):
+            if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'n' or permitsStr == 'Y' or permitsStr == 'y'):
                 validPermitEntry = True
         
         permitVal = (permitsStr == "Y")
@@ -218,20 +218,19 @@ def main(csvFile:str = None,prompt:bool = False):
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance]
                 else:
                     systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-                __RunGenetic(systemsSubset,length,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
+                __RunGenetic(systemsSubset,length,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
             if runType == 2:
                 userSystems = userArgs
                 routeLen = userSystems.__len__()
-                __RunGenetic(userSystems,routeLen,500,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
+                __RunGenetic(userSystems,routeLen,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 11
-        popSize = 800
-        fitType = FitnessType.FirstOver
+        length = 22
+        fitType = FitnessType.Distance
         silenceOutput = False
         stopShort = True
-        __RunGenetic(systemsSubset,length,popSize,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
@@ -247,6 +246,6 @@ def main(csvFile:str = None,prompt:bool = False):
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
     csvFile = "RareGoods.csv"
-    prompt = True
+    prompt = False
     main(csvFile,prompt)
 #------------------------------------------------------------------------------

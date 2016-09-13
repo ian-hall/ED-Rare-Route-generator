@@ -15,38 +15,49 @@ class RouteCalc(object):
     __Selection_Mult = 1
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
+    __Population_Sizes = [50,300,450,800,1250,1500,1950,2500,3000]
 #------------------------------------------------------------------------------
     @classmethod
     def GetSelectionMult(cls) -> float:
         return cls.__Selection_Mult
 #------------------------------------------------------------------------------
     @classmethod
-    def StartGeneticSolver(cls,popSize: int, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
+    def StartGeneticSolver(cls, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
         '''
         Creates the initial population for the genetic algorithm and starts it running.
         Population is a list of EDRareRoutes
         '''
-        #TODO:  Eventually add something here that calculates popSize based on route length
+        errMin = "Minimum route length required: {0}"
+        errMax = "Maximum route length: {0}"
+        if fitType == FitnessType.EvenSplit:
+            if routeLength < 3:
+                raise Exception(errMin.format("3"))
+            if routeLength > 15:
+                raise Exception(errMax.format("15"))
+        elif fitType == FitnessType.FirstOver:
+            if routeLength < 6:
+                raise Exception(errMin.format("6"))
+            if routeLength > 30:
+                raise Exception(errMax.format("30"))
         RouteCalc.__Fit_Type = fitType
-        if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
-            if routeLength < 3 or routeLength > 15:
-                raise Exception("Split routes must have lengths [3-15]")
-        elif RouteCalc.__Fit_Type == FitnessType.Distance:
-            pass
-        else:
-            if routeLength < 6 or routeLength > 35:
-                raise Exception("Alternate type routes must have lengths [6-35]")
 
-        if popSize < 3:
-            raise Exception("Must have a population size of at least 3")
-            
-        RouteCalc.__Valid_Systems = validSystems
-        
+        #if RouteCalc.__Fit_Type == FitnessType.EvenSplit:
+        #    if routeLength < 3 or routeLength > 15:
+        #        raise Exception("Split routes must have lengths [3-15]")
+        #elif RouteCalc.__Fit_Type == FitnessType.Distance:
+        #    pass
+        #else:
+        #    if routeLength < 6 or routeLength > 35:
+        #        raise Exception("Alternate type routes must have lengths [6-35]")
+           
+        RouteCalc.__Valid_Systems = validSystems        
         if RouteCalc.__Valid_Systems.__len__() < routeLength:
             raise Exception("Not enough systems for a route...")
 
-        population = [EDRareRoute(sysList, fitType) for sysList in GenerateSystemLists(popSize,routeLength,validSystems)]
+        popSize = cls.__Population_Sizes[min(math.floor(routeLength/4),len(cls.__Population_Sizes)-1)]
+        #print(popSize)
 
+        population = [EDRareRoute(sysList, fitType) for sysList in GenerateSystemLists(popSize,routeLength,validSystems)]
         return cls.__GeneticSolver(population,silent)
 #------------------------------------------------------------------------------
     @classmethod
