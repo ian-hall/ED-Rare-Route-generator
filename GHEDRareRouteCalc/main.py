@@ -226,11 +226,11 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 5000
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 22
-        fitType = FitnessType.Distance
+        length = 4
+        fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
-        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        __RunGenetic(commonSystems,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)

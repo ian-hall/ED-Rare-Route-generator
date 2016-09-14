@@ -41,7 +41,6 @@ class EDRareRoute(object):
         self.__Seller_Min = 160
         self.__Total_Distance = 0
         self.__Total_Cargo = sum((system.Max_Supply for system in self.__Route))
-        self.__Sellers_List = None
         self.__Sellers_Dict = None
         self.__Max_Cargo = 0
         self.__Route_Type = RouteType.Other
@@ -530,8 +529,7 @@ class EDRareRoute(object):
                 jumpDistance = currSys.GetDistanceTo(nextSys)
                 #gross
                 #also doesnt look as good as I thought
-                if( (self.__Sellers_Dict is not None and nextSys in self.__Sellers_Dict) or 
-                    (self.__Sellers_List is not None and nextSys in self.__Sellers_List) ):
+                if self.__Sellers_Dict is not None and nextSys in self.__Sellers_Dict:
                     currLine = canvas.create_line(points[i%routeLength].Col,points[i%routeLength].Row,
                                                   points[(i+1)%routeLength].Col,points[(i+1)%routeLength].Row,
                                                   arrow="last",arrowshape=(20,30,20),width=4)
@@ -575,35 +573,8 @@ class EDRareRoute(object):
         count = 0
 
         #For printing split fitness values
-        #TODO:  Flag systems that can be sold at either seller
-        #       Add helper function to change sellers_list to sellers_dict so we can get rid of this
-        if self.__Sellers_List is not None:
-            sellersPerSystem = {}
-            for system in self.__Route:
-                tempSellers = []
-                for distToCheck in self.__Route:
-                    if system.GetDistanceTo(distToCheck) >= self.__Seller_Min:
-                        tempSellers.append(distToCheck)
-                sellersPerSystem[system] = tempSellers
-            strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
-            for system in self.__Route:
-                if system in self.__Sellers_List:
-                    strList.append("{0}: <{1}>".format(count+1,system.Short_Str))
-                else:
-                    strList.append("{0}: {1}".format(count+1,system.Short_Str))
-                strList.append("\n")
-                count += 1
-            
-            for station in self.__Sellers_List:
-                strList.append("\nAt <{0}> sell:\n\t".format(station.System_Name))
-                for seller in sellersPerSystem[station]:
-                    if seller in self.__Sellers_List:
-                        strList.append(" <{0}> ".format(seller.System_Name))
-                    else:
-                        strList.append(" {0} ".format(seller.System_Name))
-        
-        #For printing alt fitness values
-        elif self.__Sellers_Dict is not None:
+        #TODO:  Flag systems that can be sold at either seller     
+        if self.__Sellers_Dict is not None:
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
                 if system in self.__Sellers_Dict:
