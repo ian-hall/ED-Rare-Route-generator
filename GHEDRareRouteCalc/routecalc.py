@@ -31,15 +31,15 @@ class RouteCalc(object):
         errMin = "Minimum route length required: {0}"
         errMax = "Maximum route length: {0}"
         if fitType == FitnessType.EvenSplit:
-            if routeLength < 3:
-                raise Exception(errMin.format("3"))
-            if routeLength > 15:
-                raise Exception(errMax.format("15"))
+            if routeLength < EDRareRoute.MinLen_Split:
+                raise Exception(errMin.format(EDRareRoute.MinLen_Split))
+            if routeLength > EDRareRoute.MaxLen_Split:
+                raise Exception(errMax.format(EDRareRoute.MaxLen_Split))
         elif fitType == FitnessType.FirstOver:
-            if routeLength < 6:
-                raise Exception(errMin.format("6"))
-            if routeLength > 30:
-                raise Exception(errMax.format("30"))
+            if routeLength < EDRareRoute.MinLen_Alt:
+                raise Exception(errMin.format(EDRareRoute.MinLen_Alt))
+            if routeLength > EDRareRoute.MaxLen_Alt:
+                raise Exception(errMax.format(EDRareRoute.MaxLen_Alt))
         RouteCalc.__Fit_Type = fitType
                    
         RouteCalc.__Valid_Systems = validSystems        

@@ -32,6 +32,10 @@ class FitnessType(Enum):
 #       Need to finish adjusting the weightedCost values in the fitness functions
 #           to better support routes of short lengths.
 class EDRareRoute(object):
+    MinLen_Split = 3
+    MaxLen_Split = 15
+    MinLen_Alt = 6
+    MaxLen_Alt = 30
 #------------------------------------------------------------------------------
     def __init__(self,systemList: list, fType: FitnessType):
         if(systemList.__len__() < 3):
