@@ -224,13 +224,13 @@ def main(csvFile:str = None,prompt:bool = False):
                 routeLen = userSystems.__len__()
                 __RunGenetic(userSystems,routeLen,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
-        maxStationDistance = 5000
+        maxStationDistance = 999999999
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 8
+        length = 11
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = True
-        __RunGenetic(commonSystems,length,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
