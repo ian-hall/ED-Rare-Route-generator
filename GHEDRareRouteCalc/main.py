@@ -226,8 +226,8 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 999999999
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 11
-        fitType = FitnessType.FirstOver
+        length = 7
+        fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
         __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)

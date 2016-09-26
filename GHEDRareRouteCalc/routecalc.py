@@ -242,51 +242,33 @@ class RouteCalc(object):
         '''
         Attempts to optimize the given route by rearranging the systems
         '''
-        RouteCalc.__Fit_Type = FitnessType.Distance
+        if not silent:
+            print("Attempting to optimize route...")     
+        
         RouteCalc.__Valid_Systems = route.Systems       
         popSize = cls.__Population_Sizes[min(math.floor(route.Length/4),len(cls.__Population_Sizes)-1)]
-        population = [EDRareRoute(sysList, FitnessType.Distance) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]
-        if not silent:
-            print("Attempting to optimize route...")        
+        
+        #See if we can get a better value by just using the systems in the route as the total population of systems
+        population = [EDRareRoute(sysList, route.Fitness_Type) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]   
         potentialRoute,_ = cls.__GeneticSolver(population,silent=True,optimize=False)
-        potentialRoute = EDRareRoute(potentialRoute.Systems,route.Fitness_Type)
-        if route.Fitness > potentialRoute.Fitness:
-            if not silent:
-                print("No optimization found")
-            return route
-        else:
+        if potentialRoute.Fitness > route.Fitness:
             if not silent:
                 print("Optimization found!")
             return potentialRoute
-        ##First do a greedy shortest path around the systems
-        #origSystems = route.Systems
-        #newOrder = [origSystems[0]]
-        #while newOrder.__len__() != origSystems.__len__():
-        #    currentSystem = newOrder[-1]
-        #    distances = {}
-        #    for system in origSystems:
-        #        if system not in newOrder:
-        #            distances[system] = currentSystem.GetDistanceTo(system)
-        #    closest = min(distances,key=distances.get)
-        #    newOrder.append(closest)
-        #shorterRoute = EDRareRoute(newOrder,route.Fitness_Type)
-        #if shorterRoute.Fitness > route.Fitness:
-        #    if not silent:
-        #        print("Optimization found")
-        #    return shorterRoute     
-        ##if that isnt better then just shuffle or something
-        #numShuffles = 5000
-        #systemsCopy = route.Systems
-        #for i in range(numShuffles):
-        #    random.shuffle(systemsCopy)
-        #    newRoute = EDRareRoute(systemsCopy,route.Fitness_Type)
-        #    if newRoute.Fitness > route.Fitness:
-        #        if not silent:
-        #            print("Optimization found")
-        #        return newRoute            
-        #if not silent:
-        #    print("No optimization found")
-        #return route
+        
+        #See if we get a better route by changing the fitness type to Distance and then recalculating the value of the route with the shortest distance
+        RouteCalc.__Fit_Type = FitnessType.Distance
+        population = [EDRareRoute(sysList, FitnessType.Distance) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]     
+        potentialRoute,_ = cls.__GeneticSolver(population,silent=True,optimize=False)
+        potentialRoute = EDRareRoute(potentialRoute.Systems,route.Fitness_Type)
+        if potentialRoute.Fitness > route.Fitness:
+            if not silent:
+                print("Optimization found!")
+            return potentialRoute
+        
+        if not silent:
+            print("No optimization found")
+        return route
 #------------------------------------------------------------------------------
     @classmethod
     def SetValidSystems(cls,systems: list):
