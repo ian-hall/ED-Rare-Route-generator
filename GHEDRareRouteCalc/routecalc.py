@@ -76,7 +76,7 @@ class RouteCalc(object):
         lastIncrease = currentGeneration
         numIncreases = 0
         maxIncreases = 2
-
+        print("Current Fit Type: {0}\nCurrent Num Systems: {1}".format(RouteCalc.__Fit_Type, RouteCalc.__Valid_Systems.__len__()))
         #Force an exit if X generations pass with no improvement
         maxGensSinceLast = (maxIncreases+1)*timeBetweenIncrease
 
@@ -248,19 +248,20 @@ class RouteCalc(object):
         RouteCalc.__Valid_Systems = route.Systems       
         popSize = cls.__Population_Sizes[min(math.floor(route.Length/4),len(cls.__Population_Sizes)-1)]
         
-        #See if we can get a better value by just using the systems in the route as the total population of systems
-        population = [EDRareRoute(sysList, route.Fitness_Type) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]   
-        potentialRoute,_ = cls.__GeneticSolver(population,silent=True,optimize=False)
-        if potentialRoute.Fitness > route.Fitness:
-            if not silent:
-                print("Optimization found!")
-            return potentialRoute
-        
-        #See if we get a better route by changing the fitness type to Distance and then recalculating the value of the route with the shortest distance
+        #First check if we get a better value by finding the (maybe) shortest distance between systems
         RouteCalc.__Fit_Type = FitnessType.Distance
         population = [EDRareRoute(sysList, FitnessType.Distance) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]     
         potentialRoute,_ = cls.__GeneticSolver(population,silent=True,optimize=False)
         potentialRoute = EDRareRoute(potentialRoute.Systems,route.Fitness_Type)
+        if potentialRoute.Fitness > route.Fitness:
+            if not silent:
+                print("Optimization found!")
+            return potentialRoute
+
+        #Then check if we get a better value by running the route finder again with only the current systems as the valid systems
+        RouteCalc.__Fit_Type = route.Fitness_Type
+        population = [EDRareRoute(sysList, route.Fitness_Type) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]   
+        potentialRoute,_ = cls.__GeneticSolver(population,silent=True,optimize=False)
         if potentialRoute.Fitness > route.Fitness:
             if not silent:
                 print("Optimization found!")
