@@ -226,7 +226,7 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 8
+        length = 10
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = True

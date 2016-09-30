@@ -12,7 +12,7 @@ class RouteCalc(object):
     Class for calculating rare trade routes
     '''
     Route_Cutoff = 11.25
-    __Selection_Mult = 1
+    __Selection_Mult = .55
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
     __Population_Sizes = [50,300,450,800,1250,1500,1950,2500,3000]
@@ -165,16 +165,20 @@ class RouteCalc(object):
         Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
         Upper end of rand.uni is X times the population size, set by __Selection_Mult
-        '''      
+        '''
+        #TODO: Potential infinite loop here since route equality is based only on fitness value.
+        #       Need to add a break if it loops for too long or something      
         #Get the parents
         parents = []
+        numLoops = 0
         while parents.__len__() != 2:
-            value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
-            parent = population[bisect.bisect(selectionValues,value)]
-            while parents.count(parent) != 0:
+            value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)        
+            tempParent = population[bisect.bisect(selectionValues,value)]
+            while tempParent in parents and numLoops < 500:
                 value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
-                parent = population[bisect.bisect(selectionValues,value)]
-            parents.append(parent)
+                tempParent = population[bisect.bisect(selectionValues,value)]
+                numLoops += 1
+            parents.append(tempParent)
         
         #Create the new children
         route1 = parents[0].Systems
@@ -242,6 +246,7 @@ class RouteCalc(object):
         '''
         Attempts to optimize the given route by rearranging the systems
         '''
+        #TODO: Can potentially take a very long time if the route is really really bad. Maybe only run the distance type if its that bad or something.
         if not silent:
             print("Attempting to optimize route...")     
         
