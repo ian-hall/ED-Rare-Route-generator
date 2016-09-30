@@ -88,6 +88,7 @@ class EDRareRoute(object):
         return self.__Route.__len__() 
 #------------------------------------------------------------------------------
     def __Fitness_EvenSplit(self):
+        #TODO: This has slowed down a lot for some reason and i dont know what i changed
         '''
         Fitness value based on having a roughly even number of systems between sellers
         only works with short ( < 16 ) routes

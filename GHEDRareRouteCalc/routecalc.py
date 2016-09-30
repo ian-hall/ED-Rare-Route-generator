@@ -76,7 +76,7 @@ class RouteCalc(object):
         lastIncrease = currentGeneration
         numIncreases = 0
         maxIncreases = 2
-        print("Current Fit Type: {0}\nCurrent Num Systems: {1}".format(RouteCalc.__Fit_Type, RouteCalc.__Valid_Systems.__len__()))
+        #print("Current Fit Type: {0}\nCurrent Num Systems: {1}".format(RouteCalc.__Fit_Type, RouteCalc.__Valid_Systems.__len__()))
         #Force an exit if X generations pass with no improvement
         maxGensSinceLast = (maxIncreases+1)*timeBetweenIncrease
 
