@@ -165,19 +165,18 @@ class RouteCalc(object):
         Chooses 2 parent nodes based on relative goodness of the population.
         A child node is created by combining the parent nodes
         Upper end of rand.uni is X times the population size, set by __Selection_Mult
-        '''
-        #TODO: Potential infinite loop here since route equality is based only on fitness value.
-        #       Need to add a break if it loops for too long or something      
+        ''' 
         #Get the parents
         parents = []
         numLoops = 0
         while parents.__len__() != 2:
             value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)        
             tempParent = population[bisect.bisect(selectionValues,value)]
-            while tempParent in parents and numLoops < 500:
-                value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
-                tempParent = population[bisect.bisect(selectionValues,value)]
-                numLoops += 1
+            ##numLoops is the cutoff if for some reason we are looping forever, just add the same parent to the list and forget it
+            #while tempParent in parents and numLoops < 500:
+            #    value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
+            #    tempParent = population[bisect.bisect(selectionValues,value)]
+            #    numLoops += 1
             parents.append(tempParent)
         
         #Create the new children
@@ -246,12 +245,11 @@ class RouteCalc(object):
         '''
         Attempts to optimize the given route by rearranging the systems
         '''
-        #TODO: Can potentially take a very long time if the route is really really bad. Maybe only run the distance type if its that bad or something.
         if not silent:
             print("Attempting to optimize route...")     
         
         RouteCalc.__Valid_Systems = route.Systems       
-        popSize = cls.__Population_Sizes[min(math.floor(route.Length/4),len(cls.__Population_Sizes)-1)]
+        popSize = cls.__Population_Sizes[min(math.floor(route.Length/4),len(cls.__Population_Sizes)-1)]//2
         
         #First check if we get a better value by finding the (maybe) shortest distance between systems
         RouteCalc.__Fit_Type = FitnessType.Distance
@@ -263,6 +261,13 @@ class RouteCalc(object):
                 print("Optimization found!")
             return potentialRoute
 
+        #Cutoff here on bad routes to skip the next part which could run for a while if the route is really bad
+        #TODO: Maybe remove this since the whole point of this is to see if a "bad" route isn't that bad
+        if route.Fitness < RouteCalc.Route_Cutoff * 0.7:
+            if not silent:
+                print("No optimization found")
+            return route
+        
         #Then check if we get a better value by running the route finder again with only the current systems as the valid systems
         RouteCalc.__Fit_Type = route.Fitness_Type
         population = [EDRareRoute(sysList, route.Fitness_Type) for sysList in GenerateSystemLists(popSize,route.Length,route.Systems)]   
