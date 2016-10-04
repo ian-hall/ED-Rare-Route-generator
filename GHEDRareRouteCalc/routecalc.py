@@ -12,7 +12,7 @@ class RouteCalc(object):
     Class for calculating rare trade routes
     '''
     Route_Cutoff = 11.25
-    __Selection_Mult = .55
+    __Selection_Mult = .25
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
     __Population_Sizes = [50,300,450,800,1250,1500,1950,2500,3000]
@@ -61,7 +61,7 @@ class RouteCalc(object):
         currentGeneration = 1
         currentPopulation = startingPopulation
         lastRouteFoundOn = currentGeneration
-        baseMutation = 0.05
+        baseMutation = 0.15
         mutationChance = baseMutation
         
         #Just keep track of the single best route
@@ -70,9 +70,9 @@ class RouteCalc(object):
         #Want the program to keep running until it finds something, which it will eventually (maybe).
         #Going to increase the mutation chance for every x00 generations it goes without increasing
         #the value of the best route.
-        mutationIncrease = 0.35
-        timeBetweenIncrease = 350
-        cutoffAfterRouteFound = 100
+        mutationIncrease = 0.30
+        timeBetweenIncrease = 300
+        cutoffAfterRouteFound = 150
         lastIncrease = currentGeneration
         numIncreases = 0
         maxIncreases = 2

@@ -89,6 +89,7 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     def __Fitness_EvenSplit(self):
         #TODO: This has slowed down a lot for some reason and i dont know what i changed
+        #seriously this is hardly working now
         '''
         Fitness value based on having a roughly even number of systems between sellers
         only works with short ( < 16 ) routes
@@ -425,7 +426,6 @@ class EDRareRoute(object):
         '''
         Draws the route using tkinter
         '''
-        #TODO: Add color to seller locations on mouseover
         routeLength = self.__Route.__len__()
 
         cWidth = 900
@@ -576,9 +576,7 @@ class EDRareRoute(object):
         totalCost = sum([system.Total_Cost for system in self.__Route])
         strList = []
         count = 0
-
-        #For printing split fitness values
-        #TODO:  Flag systems that can be sold at either seller     
+ 
         if self.__Sellers_Dict is not None:
             strList.append("\t\tRoute Value:{0:.5f}\n".format(self.__Fitness_Value))
             for system in self.__Route:
@@ -598,7 +596,7 @@ class EDRareRoute(object):
                         else:
                             strList.append(" {0} ".format(seller.System_Name))
 
-        #For just displaying the systems if we dont have a sellers list/dict
+        #For just displaying the systems if we dont have a sellers dict
         else:
             strList.append("\nRoute value:{0}\n".format(self.__Fitness_Value))
             for system in self.__Route:
