@@ -251,17 +251,23 @@ class EDRareRoute(object):
                 numSellableSystems -= 1
         numSellableScale = numSellableSystems/routeLength * baseValue
         
-        #Skip this part if we already know we can't sell all goods
         self.__Max_Cargo = 0
-        systemsSoldDiff = -1
-        mostSystemsSold = -1
+        systemsSoldDiff = None
+        mostSystemsSold = 0
         leastSystemsSold = routeLength + 1
+        timeInHold = defaultdict(int)
+        maxTimeInHold = -1
+        #Skip this part if we already know we can't sell all goods
         if numSellableScale >= baseValue:
             sold = []
             unsold = []
             #Go through at most twice, since if a systems doesnt sell by then it won't sell
             for currentSys in self.__Route_Loop:
+                for sys in timeInHold:
+                    timeInHold[sys] += 1
                 unsold.append(currentSys)
+                if timeInHold[currentSys]:
+                    pass
                 toRemove = []
                 for checkSys in unsold:
                     #Means we can sell checkSys at currentSys
@@ -278,6 +284,8 @@ class EDRareRoute(object):
                 for sys in toRemove:
                     unsold.remove(sys)
                     numSold = numSold + 1
+                    maxTimeInHold = max(maxTimeInHold,timeInHold[sys])
+                    del timeInHold[sys]
                 mostSystemsSold = max(mostSystemsSold,numSold)
                 leastSystemsSold = min(leastSystemsSold,numSold)
                 systemsSoldDiff = mostSystemsSold - leastSystemsSold
@@ -308,9 +316,11 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.45
         
         #TODO: Scale here, larger allowance for sellersDifference on longer routes.... maybe like ceil(len/5) or something  with a min of 1? 
+        #       Add scaling based on the maxTimeInHold var, assuming it is calculated right
         if systemsSoldDiff is not None:
             totalValue = (totalValue * 0.5 ) if (systemsSoldDiff > 4) else totalValue
 
+        #print(maxTimeInHold)
         return totalValue
 #------------------------------------------------------------------------------
     def __FitnessDistance(self):

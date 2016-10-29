@@ -28,7 +28,7 @@ class PerformanceCalc(object):
                 for testNum in range(maxTests):
                     solved = False
                     startTime = time.time()
-                    bestRoute,numGenerations = RouteCalc.StartGeneticSolver(popSize,systemsList,routeLength, True,fitType)
+                    bestRoute,numGenerations = RouteCalc.StartGeneticSolver(systemsList,routeLength, True,fitType)
                     endTime = time.time()
                     elapsed = endTime - startTime
                     if bestRoute.Fitness >= RouteCalc.Route_Cutoff:
@@ -64,25 +64,25 @@ class PerformanceCalc(object):
         print(anotherReorder)
         anotherReorder.DrawRoute()
 
-        #brokenRoute = EDRareRoute( [ systemsDict["Orrere"], systemsDict["Leesti"], systemsDict["Aganippe"], systemsDict["Bast"], systemsDict["39 Tauri"],
-        #                             systemsDict["Utgaroar"], systemsDict["Baltah'Sine"] ], fitType )
-        #print(brokenRoute)
-        #brokenRoute.DisplayInConsole()
+        brokenRoute = EDRareRoute( [ systemsDict["Orrere"], systemsDict["Leesti"], systemsDict["Aganippe"], systemsDict["Bast"], systemsDict["39 Tauri"],
+                                     systemsDict["Utgaroar"], systemsDict["Baltah'Sine"] ], fitType )
+        print(brokenRoute)
+        brokenRoute.DisplayInConsole()
         
-        #ykLoopList = []
-        #ykLoopList.append(systemsDict['Coquim'])  
-        #ykLoopList.append(systemsDict['Altair'])   
-        #ykLoopList.append(systemsDict['Ethgreze'])  
-        #ykLoopList.append(systemsDict['AZ Cancri'])  
-        #ykLoopList.append(systemsDict['George Pantazis'])  
-        #ykLoopList.append(systemsDict['Utgaroar'])  
-        #ykLoopList.append(systemsDict['Yaso Kondi']) 
-        #ykLoopList.append(systemsDict['Quechua'])  
-        #print("\n\nYK Loop")
-        #ykLoop = EDRareRoute(ykLoopList,fitType)
-        #print(ykLoop)
-        #ykLoop.DisplayInConsole()
-        #ykLoop.DrawRoute()
+        ykLoopList = []
+        ykLoopList.append(systemsDict['Coquim'])  
+        ykLoopList.append(systemsDict['Altair'])   
+        ykLoopList.append(systemsDict['Ethgreze'])  
+        ykLoopList.append(systemsDict['AZ Cancri'])  
+        ykLoopList.append(systemsDict['George Pantazis'])  
+        ykLoopList.append(systemsDict['Utgaroar'])  
+        ykLoopList.append(systemsDict['Yaso Kondi']) 
+        ykLoopList.append(systemsDict['Quechua'])  
+        print("\n\nYK Loop")
+        ykLoop = EDRareRoute(ykLoopList,fitType)
+        print(ykLoop)
+        ykLoop.DisplayInConsole()
+        ykLoop.DrawRoute()
 
         #leestiCluster = []
         #leestiCluster.append(systemsDict["Fujin"])
