@@ -216,8 +216,6 @@ class EDRareRoute(object):
         Based on selling to the first system next on the route over the __Seller_Min distance
         Also a lot faster than the original __CalcFitness.
         '''
-        #TODO: 
-        #       Add a check for the amount of jumps a system stays in before it is sold and scale if over some value
         routeLength = self.__Route.__len__()
         self.__Total_Distance = 0
         self.__Route_Type = RouteType.FirstOver
@@ -252,7 +250,7 @@ class EDRareRoute(object):
         numSellableScale = numSellableSystems/routeLength * baseValue
         
         self.__Max_Cargo = 0
-        systemsSoldDiff = None
+        #systemsSoldDiff = None
         mostSystemsSold = 0
         leastSystemsSold = routeLength + 1
         timeInHold = defaultdict(int)
@@ -266,6 +264,7 @@ class EDRareRoute(object):
                 for sys in timeInHold:
                     timeInHold[sys] += 1
                 unsold.append(currentSys)
+                #This adds currentSys as a key if it isn't in the dict, otherwise it does nothing i guess?
                 if timeInHold[currentSys]:
                     pass
                 toRemove = []
@@ -286,9 +285,9 @@ class EDRareRoute(object):
                     numSold = numSold + 1
                     maxTimeInHold = max(maxTimeInHold,timeInHold[sys])
                     del timeInHold[sys]
-                mostSystemsSold = max(mostSystemsSold,numSold)
-                leastSystemsSold = min(leastSystemsSold,numSold)
-                systemsSoldDiff = mostSystemsSold - leastSystemsSold
+                #mostSystemsSold = max(mostSystemsSold,numSold)
+                #leastSystemsSold = min(leastSystemsSold,numSold)
+                #systemsSoldDiff = mostSystemsSold - leastSystemsSold
         else:
             #Scale overall value down
             overallScale = 0.5
@@ -315,10 +314,10 @@ class EDRareRoute(object):
         if self.__Longest_Jump > maxJumpDistance:
             totalValue = totalValue * 0.45
         
-        #TODO: Scale here, larger allowance for sellersDifference on longer routes.... maybe like ceil(len/5) or something  with a min of 1? 
-        #       Add scaling based on the maxTimeInHold var, assuming it is calculated right
-        if systemsSoldDiff is not None:
-            totalValue = (totalValue * 0.5 ) if (systemsSoldDiff > 4) else totalValue
+        #TODO: Confirm this isn't too rough
+        # Scaling down if routes are in the hold for more than half the route
+        if maxTimeInHold != -1:
+            totalValue = (totalValue * 0.8 ) if (maxTimeInHold > math.ceil(self.Length/2) + 2) else totalValue
 
         #print(maxTimeInHold)
         return totalValue
