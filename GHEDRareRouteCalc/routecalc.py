@@ -169,16 +169,22 @@ class RouteCalc(object):
         #Get the parents
         parents = []
         numLoops = 0
+        #Picks the 2 parents, both parents can be the same system
         while parents.__len__() != 2:
             value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)        
             tempParent = population[bisect.bisect(selectionValues,value)]
-            ##numLoops is the cutoff if for some reason we are looping forever, just add the same parent to the list and forget it
-            #while tempParent in parents and numLoops < 500:
-            #    value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)
-            #    tempParent = population[bisect.bisect(selectionValues,value)]
-            #    numLoops += 1
             parents.append(tempParent)
         
+        # If the 2 parents are the same, just shuffle them and return
+        # This can still cause children to be the same sometimes but better than just returning the
+        # parent systems
+        if parents[0] == parents[1]:
+            child1 = [sys for sys in parents[0].Systems]
+            child2 = [sys for sys in parents[0].Systems]
+            random.shuffle(child1)
+            random.shuffle(child2)
+            return (child1,child2)
+
         #Create the new children
         route1 = parents[0].Systems
         route2 = parents[1].Systems
