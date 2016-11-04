@@ -164,6 +164,9 @@ class Test_EDRareRoute(unittest.TestCase):
         
         with self.assertRaises(AttributeError):
             testRoute.Total_Distance = -1
+
+        with self.assertRaises(AttributeError):
+            testRoute.Hold_Times = {'wrong':420}
 #------------------------------------------------------------------------------
     def test_Route_SystemsUnchanged(self):
         '''
@@ -194,6 +197,20 @@ class Test_EDRareRoute(unittest.TestCase):
                     route = EDRareRoute(systemList,fType)
                     rotatedRoute = EDRareRoute(rotatedList,fType)
                     self.assertAlmostEqual(route.Fitness,rotatedRoute.Fitness)
+#------------------------------------------------------------------------------
+    def test_Route_HoldTime(self):
+        '''
+        Test that all systems in a route are accounted for in the Hold_Times dict
+        also test that values are either -1 (system cannot be sold) or > 0 (system can be sold)
+        '''
+        for systemList in self.System_Lists:
+            for name,fType in FitnessType.__members__.items():
+                testRoute = EDRareRoute(systemList,fType)
+                holdDict = testRoute.Hold_Times
+                for system in testRoute.Systems:
+                    with self.subTest(system=system):
+                        self.assertIn(system,holdDict)
+                        self.assertTrue(holdDict[system] == -1 or holdDict[system] > 0)
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------

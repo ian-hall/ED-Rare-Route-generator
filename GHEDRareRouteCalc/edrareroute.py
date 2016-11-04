@@ -50,6 +50,9 @@ class EDRareRoute(object):
         self.__Route_Type = RouteType.Other
         self.__Longest_Jump = 0
         self.__Fit_Type = fType
+        self.__MaxHoldTime = {}
+        for system in systemList:
+            self.__MaxHoldTime[system] = -1
         
         self.__Fitness_Value = -1
         if fType == FitnessType.FirstOver:
@@ -86,6 +89,10 @@ class EDRareRoute(object):
     @property
     def Length(self) -> int:
         return self.__Route.__len__() 
+#------------------------------------------------------------------------------
+    @property
+    def Hold_Times(self) -> dict:
+        return dict(self.__MaxHoldTime)
 #------------------------------------------------------------------------------
     def __Fitness_EvenSplit(self):
         #TODO: This has slowed down a lot for some reason and i dont know what i changed
@@ -264,9 +271,10 @@ class EDRareRoute(object):
                 for sys in timeInHold:
                     timeInHold[sys] += 1
                 unsold.append(currentSys)
-                #This adds currentSys as a key if it isn't in the dict, otherwise it does nothing i guess?
-                if timeInHold[currentSys]:
-                    pass
+                #Actually I think i can just set this at 0 since if a system cannot be sold we wont hit this point, and if 
+                #we get to the same system twice we will have already deleted it from the timeInHold dict
+                timeInHold[currentSys] = 0
+                #print(timeInHold)
                 toRemove = []
                 for checkSys in unsold:
                     #Means we can sell checkSys at currentSys
@@ -284,6 +292,7 @@ class EDRareRoute(object):
                     unsold.remove(sys)
                     numSold = numSold + 1
                     maxTimeInHold = max(maxTimeInHold,timeInHold[sys])
+                    self.__MaxHoldTime[sys] = max(self.__MaxHoldTime[sys],timeInHold[sys])
                     del timeInHold[sys]
                 #mostSystemsSold = max(mostSystemsSold,numSold)
                 #leastSystemsSold = min(leastSystemsSold,numSold)
@@ -292,6 +301,7 @@ class EDRareRoute(object):
             #Scale overall value down
             overallScale = 0.5
 
+        #TODO: Need to readjust scaling maybe
         maxGoodDistance = routeLength * longestGoodJump
         weightedDistance = (maxGoodDistance/self.__Total_Distance) * 2
         
@@ -315,9 +325,10 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.45
         
         #TODO: Confirm this isn't too rough
-        # Scaling down if routes are in the hold for more than half the route
-        if maxTimeInHold != -1:
-            totalValue = (totalValue * 0.8 ) if (maxTimeInHold > math.ceil(self.Length/2) + 2) else totalValue
+        # Scaling down if items are in the hold for XXX time
+        if maxTimeInHold > self.Length // 2 + 1:
+            totalValue *= 0.8
+            
 
         #print(maxTimeInHold)
         return totalValue

@@ -32,6 +32,8 @@ def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: 
         print("Generations: {0}".format(numGenerations))
         print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
         bestRoute.DrawRoute()
+        for k,v in bestRoute.Hold_Times.items():
+            print(k.System_Name, " -> ", v)
 #------------------------------------------------------------------------------
 def __TryInt(val: str) -> bool:
     try:
