@@ -32,6 +32,7 @@ def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: 
         print("Generations: {0}".format(numGenerations))
         print("Time since start: {0:.5f}s".format((geneticEnd-geneticStart)))
         bestRoute.DrawRoute()
+        #Eventually take this out once im satisfied with hold times
         for k,v in bestRoute.Hold_Times.items():
             print(k.System_Name, " -> ", v)
 #------------------------------------------------------------------------------
@@ -226,10 +227,10 @@ def main(csvFile:str = None,prompt:bool = False):
                 routeLen = userSystems.__len__()
                 __RunGenetic(userSystems,routeLen,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
-        maxStationDistance = 4500
+        maxStationDistance = 999999999
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
         length = 8
-        fitType = FitnessType.FirstOver
+        fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
         __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)

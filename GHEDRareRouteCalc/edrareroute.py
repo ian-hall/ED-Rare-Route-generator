@@ -31,6 +31,7 @@ class FitnessType(Enum):
 #TODO:  
 #       Need to finish adjusting the weightedCost values in the fitness functions
 #           to better support routes of short lengths.
+#       Add support for MaxHoldTime in the EvenSplit fitness type
 class EDRareRoute(object):
     MinLen_Split = 3
     MaxLen_Split = 15
