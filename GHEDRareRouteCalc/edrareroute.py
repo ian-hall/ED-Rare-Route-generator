@@ -156,6 +156,7 @@ class EDRareRoute(object):
         validIndices = [(i,(i+math.floor(self.Length/2))) for i in range(math.floor(self.Length/2))]
         if self.Length%2 == 1:
             validIndices.extend([(i,(i+math.ceil(self.Length/2))%self.Length) for i in range(math.ceil(self.Length/2))])
+        #print(validIndices)
 
         #for seller1,seller2 in itertools.combinations(systemsBySeller,2):
         #    seller1Idx = indexBySystem[seller1]
@@ -164,6 +165,8 @@ class EDRareRoute(object):
         #    #continue if things aren't evenly spaced
         #    if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
         #        continue
+        #FIXIT: Commutative property failing because maybe we are setting sellers_dict when we shouldn't
+        #TODO: Use the duplicates set to remove duplicate systems based on which seller has more ... sellers
         for i,j in validIndices:
             seller1 = self.__Route[i]
             seller2 = self.__Route[j]            
@@ -175,7 +178,8 @@ class EDRareRoute(object):
             if abs(len(systemsBySeller[seller1]) - len(systemsBySeller[seller2])) > 1:
                 continue
 
-            if (sellableSystems == set(self.__Route)):
+            #if (sellableSystems == set(self.__Route)):
+            if len(sellableSystems) == self.Length:
                 self.__Sellers_Dict = None
                 sold = []
                 unsold = []
@@ -333,7 +337,7 @@ class EDRareRoute(object):
         
         #TODO: Confirm this isn't too rough
         # Scaling down if items are in the hold for XXX time
-        if maxTimeInHold > self.Length // 2 + 1:
+        if maxTimeInHold > self.Length // 2 + 1 or maxTimeInHold == -1:
             totalValue *= 0.8
             
         #print(maxTimeInHold)

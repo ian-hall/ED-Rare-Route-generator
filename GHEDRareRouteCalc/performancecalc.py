@@ -45,6 +45,20 @@ class PerformanceCalc(object):
     @classmethod
     def CheckTestSystems(cls,systemsDict: dict,fitType: FitnessType):
         
+        systemsToRotate = [ systemsDict['Ngurii'], systemsDict['Ethgreze'], systemsDict['HIP 80364'], systemsDict['Altair'], systemsDict['Eleu'],
+                            systemsDict['Wuthielo Ku'], systemsDict['Korro Kung'], systemsDict['Coquim'], systemsDict['Wulpa'] ]
+        #testRotation = EDRareRoute(systemsToRotate, fitType)
+        #print(testRotation)
+        #testRotation.DrawRoute()
+
+        for i in range(9):
+            rotated = systemsToRotate[i:] + systemsToRotate[:i]
+            testrotation = EDRareRoute(rotated,fitType)
+            print(testrotation)
+
+
+
+
         #good14 = EDRareRoute([ systemsDict['HR 7221'], systemsDict['Ngurii'], systemsDict["Baltah'Sine"], systemsDict['Tarach Tor'], systemsDict['Hecate'], systemsDict['Rusani'],
         #                       systemsDict['Kongga'], systemsDict['Ethgreze'], systemsDict['George Pantazis'], systemsDict['Arouca'], systemsDict['Any Na'], systemsDict['CD-75 661'],
         #                       systemsDict['Coquim'], systemsDict['Phiagre'] ], fitType) 
@@ -69,22 +83,22 @@ class PerformanceCalc(object):
         #print(brokenRoute)
         #brokenRoute.DisplayInConsole()
         
-        ykLoopList = []
-        ykLoopList.append(systemsDict['Coquim'])  
-        ykLoopList.append(systemsDict['Altair'])   
-        ykLoopList.append(systemsDict['Ethgreze'])  
-        ykLoopList.append(systemsDict['AZ Cancri'])  
-        ykLoopList.append(systemsDict['George Pantazis'])  
-        ykLoopList.append(systemsDict['Utgaroar'])  
-        ykLoopList.append(systemsDict['Yaso Kondi']) 
-        ykLoopList.append(systemsDict['Quechua'])  
-        print("\n\nYK Loop")
-        ykLoop = EDRareRoute(ykLoopList,fitType)
-        print(ykLoop)
-        ykLoop.DisplayInConsole()
-        ykLoop.DrawRoute()
-        for k,v in ykLoop.Hold_Times.items():
-            print(k.System_Name,v)
+        #ykLoopList = []
+        #ykLoopList.append(systemsDict['Coquim'])  
+        #ykLoopList.append(systemsDict['Altair'])   
+        #ykLoopList.append(systemsDict['Ethgreze'])  
+        #ykLoopList.append(systemsDict['AZ Cancri'])  
+        #ykLoopList.append(systemsDict['George Pantazis'])  
+        #ykLoopList.append(systemsDict['Utgaroar'])  
+        #ykLoopList.append(systemsDict['Yaso Kondi']) 
+        #ykLoopList.append(systemsDict['Quechua'])  
+        #print("\n\nYK Loop")
+        #ykLoop = EDRareRoute(ykLoopList,fitType)
+        #print(ykLoop)
+        #ykLoop.DisplayInConsole()
+        #ykLoop.DrawRoute()
+        #for k,v in ykLoop.Hold_Times.items():
+        #    print(k.System_Name,v)
 
         #leestiCluster = []
         #leestiCluster.append(systemsDict["Fujin"])

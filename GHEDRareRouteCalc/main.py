@@ -23,7 +23,7 @@ def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: 
         print("Run: {0}".format(runNum))
         bestRoute,numGenerations = RouteCalc.StartGeneticSolver(systems,routeLength,silent,fitType)
         geneticEnd = time.time()
-        if bestRoute.Fitness >= RouteCalc.Route_Cutoff and stopShort:
+        if bestRoute.Fitness >= RouteCalc.Route_Cutoff or stopShort:
             exitTestLoop = True
         if bestRoute.Fitness < RouteCalc.Route_Cutoff:
             print("No good route found")
@@ -229,17 +229,17 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 9
+        length = 6
         fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
-        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        #__RunGenetic(commonSystems,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)

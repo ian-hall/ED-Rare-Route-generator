@@ -12,7 +12,7 @@ class Test_EDRareRoute(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.All_Systems = main.ReadSystems("RareGoods.csv")
-        cls.System_Lists = routecalc.GenerateSystemLists(100,15,cls.All_Systems)
+        cls.System_Lists = routecalc.GenerateSystemLists(35,9,cls.All_Systems)
 #------------------------------------------------------------------------------
     def test_Route_NotEq(self):
         '''
