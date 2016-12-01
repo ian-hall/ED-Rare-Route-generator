@@ -43,7 +43,7 @@ class RouteCalc(object):
         RouteCalc.__Fit_Type = fitType
                    
         RouteCalc.__Valid_Systems = validSystems        
-        if RouteCalc.__Valid_Systems.__len__() < routeLength:
+        if len(RouteCalc.__Valid_Systems) < routeLength:
             raise Exception("Not enough systems for a route...")
 
         popSize = cls.__Population_Sizes[min(math.floor(routeLength/4),len(cls.__Population_Sizes)-1)]
@@ -115,7 +115,7 @@ class RouteCalc(object):
                 lastIncrease = currentGeneration
                 currentPopulation = sorted(currentPopulation,key=operator.attrgetter('Fitness'))
                 #Replace a percentage of the routes with lowest values, maybe make this smart to not include adding systems already commonly in the top routes
-                numReplace = math.ceil(currentPopulation.__len__() * .75)
+                numReplace = math.ceil(len(currentPopulation) * .75)
                 tempPop = GenerateSystemLists(numReplace,bestRoute.Length,RouteCalc.__Valid_Systems)
                 for i in range(numReplace):
                     currentPopulation[i] = EDRareRoute(tempPop[i],RouteCalc.__Fit_Type)
@@ -125,14 +125,14 @@ class RouteCalc(object):
 
             relativeFitnessVals = cls.__CalcRelativeFitness(currentPopulation)
 
-            while nextPopulation.__len__() != currentPopulation.__len__():
+            while len(nextPopulation) != len(currentPopulation):
                 child1,child2 = cls.__Reproduce(currentPopulation,relativeFitnessVals)
                 if random.random() <= mutationChance:
                     child1 = cls.__Mutate(child1)
                 if random.random() <= mutationChance:
                     child2 = cls.__Mutate(child2)
                 nextPopulation.append(EDRareRoute(child1,RouteCalc.__Fit_Type))
-                if nextPopulation.__len__() < currentPopulation.__len__():
+                if len(nextPopulation) < len(currentPopulation):
                     nextPopulation.append(EDRareRoute(child2,RouteCalc.__Fit_Type))
 
             currentPopulation = nextPopulation
@@ -148,11 +148,11 @@ class RouteCalc(object):
         We then assign them a value such that values[0] is percent[0] and values[pop-1] is
         X times the population size, set by __Selection_Mult
         '''
-        upperVal = population.__len__() * RouteCalc.__Selection_Mult
+        upperVal = len(population) * RouteCalc.__Selection_Mult
         total = sum([route.Fitness for route in population])     
 
         selectionValues = [population[0].Fitness/total * upperVal]
-        for i in range(1,population.__len__()):
+        for i in range(1,len(population)):
             percentTotal = population[i].Fitness/total * upperVal
             selectionValues.append(percentTotal + selectionValues[i-1])
 
@@ -170,8 +170,8 @@ class RouteCalc(object):
         parents = []
         numLoops = 0
         #Picks the 2 parents, both parents can be the same system
-        while parents.__len__() != 2:
-            value = random.uniform(0,population.__len__() * RouteCalc.__Selection_Mult)        
+        while len(parents) != 2:
+            value = random.uniform(0,len(population) * RouteCalc.__Selection_Mult)        
             tempParent = population[bisect.bisect(selectionValues,value)]
             parents.append(tempParent)
         
@@ -188,9 +188,9 @@ class RouteCalc(object):
         #Create the new children
         route1 = parents[0].Systems
         route2 = parents[1].Systems
-        if route1.__len__() != route2.__len__():
+        if len(route1) != len(route2):
             raise Exception("Routes of uneven length")
-        routeLength = route1.__len__()
+        routeLength = len(route1)
         pivot = random.randrange(1,routeLength-1)
         child1 = []
         child2 = []
@@ -198,7 +198,7 @@ class RouteCalc(object):
         for i in range(0,pivot):
             child1.append(route1[i])
         i = pivot
-        while child1.__len__() != routeLength:
+        while len(child1) != routeLength:
             toAdd = route2[i%routeLength]
             if child1.count(toAdd) != 0:
                 i += 1
@@ -209,7 +209,7 @@ class RouteCalc(object):
         for i in range(0,pivot):
             child2.append(route2[i])
         i = pivot
-        while child2.__len__() != routeLength:
+        while len(child2) != routeLength:
             toAdd = route1[i%routeLength]
             if child2.count(toAdd) != 0:
                 i += 1
@@ -225,18 +225,18 @@ class RouteCalc(object):
         
         #Have a chance to either shuffle the route or introduce new systems in the route
         mutateType = random.random()
-        if mutateType < 0.2 or route.__len__() == RouteCalc.__Valid_Systems.__len__():
+        if mutateType < 0.2 or len(route) == len(RouteCalc.__Valid_Systems):
             #shuffle route
             random.shuffle(tempRoute)
         else:
             #change up to half the systems in a route
-            numSystemsToChange = random.randrange(1,math.ceil(tempRoute.__len__()/2))
+            numSystemsToChange = random.randrange(1,math.ceil(len(tempRoute)/2))
             changedSystems = []
             for i in range(0, numSystemsToChange):
                 
-                systemToChange = random.randrange(tempRoute.__len__())
+                systemToChange = random.randrange(len(tempRoute))
                 while changedSystems.count(systemToChange) != 0 :
-                    systemToChange = random.randrange(tempRoute.__len__())
+                    systemToChange = random.randrange(len(tempRoute))
                 changedSystems.append(systemToChange)
                 
                 newSystem = random.choice(RouteCalc.__Valid_Systems)            
@@ -309,7 +309,7 @@ def GenerateSystemLists(numToCreate: int, routeLength: int, validSystems: list) 
     '''
     Generates lists of length routeLength made up of the systems in the validSystems list
     '''
-    if validSystems.__len__() < routeLength:
+    if len(validSystems) < routeLength:
         raise Exception("Not enough systems for a route")
 
     generatedLists = []

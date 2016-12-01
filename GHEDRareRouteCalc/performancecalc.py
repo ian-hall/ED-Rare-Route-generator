@@ -260,9 +260,9 @@ class PerformanceMetrics(object):
         totalGensSolved = 0
         totalGensUnsolved = 0
 
-        numEntries = self.Solved.__len__()
+        numEntries = len(self.Solved)
 
-        for i in range(0,self.Solved.__len__()):
+        for i in range(len(self.Solved)):
             if self.Solved[i]:
                 numSolved += 1
                 totalTimeSolved += self.Times[i]
@@ -271,7 +271,7 @@ class PerformanceMetrics(object):
                 totalTimeUnsolved += self.Times[i]
                 totalGensUnsolved += self.Gens[i]
 
-        avgSolvedValue = sum(self.Values)/self.Values.__len__() if numSolved > 0 else 0
+        avgSolvedValue = sum(self.Values)/len(self.Values) if numSolved > 0 else 0
         avgTimeSolved = totalTimeSolved/numSolved if numSolved > 0 else 0
         avgTimeUnsolved = totalTimeUnsolved/(numEntries - numSolved) if (numEntries-numSolved) > 0 else 0
         avgGensSolved = totalGensSolved/numSolved if numSolved > 0 else 0 
@@ -287,7 +287,7 @@ class PerformanceMetrics(object):
             typesCount = Counter(self.Types)
             for type,count in typesCount.most_common():
                 strList.append("\n\t\t{0}: {1}".format(type.name,count))
-        if numSolved != self.Solved.__len__():
+        if numSolved != len(self.Solved):
             strList.append("\n\tAvg time(fail): {0:.5f}".format(avgTimeUnsolved))
             strList.append("\n\tAvg generations(fail): {0:.5f}".format(avgGensUnsolved))
 

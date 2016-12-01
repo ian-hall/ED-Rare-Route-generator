@@ -141,7 +141,7 @@ class Test_EDSystem(unittest.TestCase):
             with self.subTest(sysName=system.System_Name):
                 expectedCosts = self.__PullValsForArg(self.Test_Args,"itemCost",system.System_Name)
                 expectedSupplyNums = self.__PullValsForArg(self.Test_Args,"supplyCap",system.System_Name)
-                self.assertEqual(expectedCosts.__len__(),expectedSupplyNums.__len__())
+                self.assertEqual(len(expectedCosts),len(expectedSupplyNums))
                 expectedTotal = 0
                 for cost,supply in zip(expectedCosts,expectedSupplyNums):
                     expectedTotal += (cost * supply)
@@ -222,7 +222,7 @@ class Test_EDSystem(unittest.TestCase):
                 systemsReverse.append(newSystem)
         #Yeah I said one assert per test but bleh
         #First make sure equal number of systems are created
-        self.assertEqual(systemsForward.__len__(),systemsReverse.__len__(),msg="Should create equal number of systems")
+        self.assertEqual(len(systemsForward),len(systemsReverse),msg="Should create equal number of systems")
 
         #Next assert that systems with the same System_Name are essentially the same
         for system in systemsForward:
@@ -283,7 +283,7 @@ class Test_EDSystem(unittest.TestCase):
             originalList = system.Items_Info
             with self.assertRaises(AttributeError):
                 system.Items_Info = ["a bad list that shouldn't work"]
-            for i in range(originalList.__len__()):
+            for i in range(len(originalList)):
                 system.Items_Info[i] = "A different value"
             
             #Make sure we get the original list back with no elements actually changed
@@ -294,7 +294,7 @@ class Test_EDSystem(unittest.TestCase):
             originalList = system.Item_Names
             with self.assertRaises(AttributeError):
                 system.Item_Names = ["a bad list that shouldn't work"]
-            for i in range(originalList.__len__()):
+            for i in range(len(originalList)):
                 system.Item_Names[i] = "A different value"
             
             #Make sure we get the original list back with no elements actually changed

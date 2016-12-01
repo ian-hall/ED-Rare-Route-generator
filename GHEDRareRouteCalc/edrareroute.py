@@ -31,7 +31,6 @@ class FitnessType(Enum):
 #TODO:  
 #       Need to finish adjusting the weightedCost values in the fitness functions
 #           to better support routes of short lengths.
-#       Add support for MaxHoldTime in the EvenSplit fitness type
 class EDRareRoute(object):
     MinLen_Split = 3
     MaxLen_Split = 15
@@ -39,7 +38,7 @@ class EDRareRoute(object):
     MaxLen_Alt = 30
 #------------------------------------------------------------------------------
     def __init__(self,systemList: list, fType: FitnessType):
-        if(systemList.__len__() < 3):
+        if(len(systemList) < 3):
             raise Exception("Routes must be 3 or more systems")
         self.__Route = systemList
         self.__Route_Loop = (systemList + systemList)
@@ -89,7 +88,7 @@ class EDRareRoute(object):
 #------------------------------------------------------------------------------
     @property
     def Length(self) -> int:
-        return self.__Route.__len__() 
+        return len(self.__Route)
 #------------------------------------------------------------------------------
     @property
     def Hold_Times(self) -> dict:
@@ -100,11 +99,14 @@ class EDRareRoute(object):
         #   First check if the route can be split, meaning there are at least 2 sellers which handle all systems
         #   then check if the route is any good by doing something similar to the alt fitness function
         #   then maybe dont worry so much about aplit ?? or check how everything worked out maybe
+        #   Also should adjust scaling to use the new __MaxHoldTime thing
+        #   Probably change this to generating a list of valid indices for the 2 sellers rather then going through
+        #       itertools.combos and check if the 2 chosen are ok
         '''
         Fitness value based on having a roughly even number of systems between sellers
         only works with short ( < 16 ) routes
         '''
-        routeLength = self.__Route.__len__()
+        routeLength = len(self.__Route)
         self.__Total_Distance = 0
         self.__Route_Type = RouteType.Other
 
@@ -151,23 +153,28 @@ class EDRareRoute(object):
         numSellable = 0
         numSellableScale = -1
 
-        for seller1,seller2 in itertools.combinations(systemsBySeller,2):
-            seller1Idx = indexBySystem[seller1]
-            seller2Idx = indexBySystem[seller2]
-            systemJumpsApart = abs(seller1Idx-seller2Idx)
-            #continue if things aren't evenly spaced
-            if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
-                continue
-            
+        validIndices = [(i,(i+math.floor(self.Length/2))) for i in range(math.floor(self.Length/2))]
+        if self.Length%2 == 1:
+            validIndices.extend([(i,(i+math.ceil(self.Length/2))%self.Length) for i in range(math.ceil(self.Length/2))])
+
+        #for seller1,seller2 in itertools.combinations(systemsBySeller,2):
+        #    seller1Idx = indexBySystem[seller1]
+        #    seller2Idx = indexBySystem[seller2]
+        #    systemJumpsApart = abs(seller1Idx-seller2Idx)
+        #    #continue if things aren't evenly spaced
+        #    if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
+        #        continue
+        for i,j in validIndices:
+            seller1 = self.__Route[i]
+            seller2 = self.__Route[j]            
             sellableSystems = systemsBySeller[seller1] | systemsBySeller[seller2]
             duplicates = systemsBySeller[seller1] & systemsBySeller[seller2]
-            numSellable = max(numSellable,sellableSystems.__len__())
+            numSellable = max(numSellable,len(sellableSystems))
             numSellableScale = max(numSellableScale,(numSellable/routeLength * baseValue))
-            #continue if number of sellers per system is off by at most 1
-            if abs(systemsBySeller[seller1].__len__() - systemsBySeller[seller2].__len__()) > 1:
+            #continue if number of sellers per system is off by more than 1
+            if abs(len(systemsBySeller[seller1]) - len(systemsBySeller[seller2])) > 1:
                 continue
 
-            #TODO: Add more scaling here
             if (sellableSystems == set(self.__Route)):
                 self.__Sellers_Dict = None
                 sold = []
@@ -186,7 +193,7 @@ class EDRareRoute(object):
                             if checkSys in systemsBySeller[currentSys]:
                                 toRemove.append(checkSys)
                                 sold.append(checkSys)
-                    if toRemove.__len__() != 0:
+                    if len(toRemove) != 0:
                         self.__Max_Cargo = max(self.__Max_Cargo,sum((sys.Max_Supply for sys in unsold[:-1])))
                         if self.__Sellers_Dict == None:
                             self.__Sellers_Dict = defaultdict(list)
@@ -230,7 +237,7 @@ class EDRareRoute(object):
         Based on selling to the first system next on the route over the __Seller_Min distance
         Also a lot faster than the original __CalcFitness.
         '''
-        routeLength = self.__Route.__len__()
+        routeLength = len(self.__Route)
         self.__Total_Distance = 0
         self.__Route_Type = RouteType.FirstOver
 
@@ -259,7 +266,7 @@ class EDRareRoute(object):
 
         numSellableSystems = routeLength
         for system in systemsBySeller:
-            if systemsBySeller[system].__len__() == 0:
+            if len(systemsBySeller[system]) == 0:
                 numSellableSystems -= 1
         numSellableScale = numSellableSystems/routeLength * baseValue
         
@@ -285,7 +292,7 @@ class EDRareRoute(object):
                     if checkSys in systemsBySeller[currentSys]:
                         toRemove.append(checkSys)
                         sold.append(checkSys)
-                if toRemove.__len__() != 0:
+                if len(toRemove) != 0:
                     self.__Max_Cargo = max(self.__Max_Cargo,sum((sys.Max_Supply for sys in unsold[:-1])))
                     if self.__Sellers_Dict == None:
                         self.__Sellers_Dict = defaultdict(list)
@@ -379,7 +386,7 @@ class EDRareRoute(object):
             print("Unable to draw route")
             return
 
-        for i in range(xValsNew.__len__()):
+        for i in range(len(xValsNew)):
             if xValsNew[i] != 0:
                 if xValsNew[i] == xMax:
                     xValsNew[i] = maxCols
@@ -397,7 +404,7 @@ class EDRareRoute(object):
         pointsCounter = Counter(points)
         split = 10
         loops = 0
-        while sum([v for k,v in pointsCounter.items() if v == 1]) != points.__len__():
+        while sum([v for k,v in pointsCounter.items() if v == 1]) != len(points):
             for k,v in pointsCounter.items():
                 if v > 1:
                     toChange = points.index(k)
@@ -415,8 +422,8 @@ class EDRareRoute(object):
             loops += 1
             pointsCounter = Counter(points)
 
-        for i in range(points.__len__()):
-            for j in range(points.__len__()):
+        for i in range(len(points)):
+            for j in range(len(points)):
                 if i != j:
                     if points[i] == points[j]:
                         print("Unable to draw route")
@@ -432,7 +439,7 @@ class EDRareRoute(object):
                 pointToCheck = DisplayLocation(row,col)
                 if pointToCheck in points:
                     pIndex = points.index(pointToCheck)
-                    if self.__Route.__len__() < 10:
+                    if len(self.__Route) < 10:
                         strList.append('{0}'.format(pIndex + 1))
                     else:
                         strList.append('{0}'.format(points[pIndex].System_Name[0]))
@@ -445,7 +452,7 @@ class EDRareRoute(object):
         '''
         Draws the route using tkinter
         '''
-        routeLength = self.__Route.__len__()
+        routeLength = len(self.__Route)
 
         cWidth = 900
         cHeight = 600
@@ -481,7 +488,7 @@ class EDRareRoute(object):
             print("Unable to draw route")
             return
 
-        for i in range(xValsNew.__len__()):
+        for i in range(len(xValsNew)):
             if xValsNew[i] != 0:
                 if xValsNew[i] == xMax:
                     xValsNew[i] = maxCols
@@ -502,7 +509,7 @@ class EDRareRoute(object):
         #flip yvals around and add border size to all
         yValsNew = [(yMax - y) + border for y in yValsNew]
 
-        for i in range(xValsNew.__len__()):
+        for i in range(len(xValsNew)):
             points.append(DisplayLocation(row=yValsNew[i],col=xValsNew[i],depth=zVals[i],name=self.__Route[i].System_Name))
 
         #TODO: maybe this still loops forever sometimes
@@ -511,7 +518,7 @@ class EDRareRoute(object):
         loops = 0
         flip = False
         visited = []
-        while overlapping.__len__() > 1:
+        while len(overlapping) > 1:
             for point,conflicts in overlapping.items():
                 for badPoint in conflicts:
                     if loops % split == 0:                 
@@ -533,7 +540,7 @@ class EDRareRoute(object):
         zMax = max(zValsNew)
         #Red -> low, Green -> high
         fillColors = ["#FF0000", "#FF6000", "#FFBF00", "#DFFF00", "#80FF00", "#20FF00", "#00FF40"]
-        colorStep = (zMax / (fillColors.__len__())) + 0.1
+        colorStep = (zMax / (len(fillColors))) + 0.1
 
         root = tkinter.Tk()
         bgColor = "#666666"

@@ -27,7 +27,7 @@ class Test_RouteCalc(unittest.TestCase):
         Testing that all the values are as expected, a percentage of their value vs the total value, and that they are in increasing order
         '''
         selectVals = RouteCalc.Wrap_CalcRelativeFitness(self.Population)
-        self.assertEqual(self.Pop_Size,selectVals.__len__())
+        self.assertEqual(self.Pop_Size,len(selectVals))
 
         selectMult = RouteCalc.GetSelectionMult()
         lastVal = selectMult * self.Pop_Size
@@ -57,7 +57,7 @@ class Test_RouteCalc(unittest.TestCase):
         for reproNum in range(self.Pop_Size):
             with self.subTest(reproNum=reproNum):
                 children = RouteCalc.Wrap_Reproduce(self.Population,selectVals)
-                self.assertEqual(children.__len__(),2,"RouteCalc.Repro must create 2 children")
+                self.assertEqual(len(children),2,"RouteCalc.Repro must create 2 children")
                 self.failIfEqual(children[0],children[1],"Generated children must be different")
 
         #Assert removed because small route + small num valid systems + large pop = a lot of duplicates and that should not be a fail state
@@ -104,8 +104,8 @@ class Test_RouteCalc(unittest.TestCase):
                         for currList in systemLists:
                             for sys,count in Counter(currList).most_common():
                                 self.assertEqual(count,1,"Multiple of a system found in route")
-                        self.assertEqual(systemLists.__len__(),popSize,"Did not generate correct number of system lists")
-                        self.assertEqual(systemLists[0].__len__(),routeLen,"Did not generate lists of the correct length")
+                        self.assertEqual(len(systemLists),popSize,"Did not generate correct number of system lists")
+                        self.assertEqual(len(systemLists[0]),routeLen,"Did not generate lists of the correct length")
 #------------------------------------------------------------------------------
     @unittest.expectedFailure
     def test_Genetic_StartNoArgs(self):

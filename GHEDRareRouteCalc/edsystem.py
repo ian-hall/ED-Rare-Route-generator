@@ -50,7 +50,7 @@ class EDSystem( object ):
             supplyCap = 1
         else:
             tempMax = supplyCap.split('-')
-            for i in range(0,tempMax.__len__()):
+            for i in range(len(tempMax)):
                 tempMax[i] = int(re.sub("[^0-9]", "", tempMax[i]))
             supplyCap = sum(tempMax)/len(tempMax)
 
@@ -58,7 +58,7 @@ class EDSystem( object ):
             avgSupply = 1
         else:
             tempSupply = avgSupply.split('-')
-            for i in range(0,tempSupply.__len__()):
+            for i in range(len(tempSupply)):
                 tempSupply[i] = float(re.sub("[^0-9]", "", tempSupply[i]))
             avgSupply = sum(tempSupply)/len(tempSupply)
 
@@ -75,7 +75,7 @@ class EDSystem( object ):
         A number that represents the total cost of buying the max number of rare goods in a system.
         '''
         total = 0
-        for i in range(self.__Items.__len__()):
+        for i in range(len(self.__Items)):
             cost = self.__Costs[i]
             supply = self.__Supply_Caps[i]
             total += (cost * supply)
@@ -143,7 +143,7 @@ class EDSystem( object ):
         Only accepts dicts with keys of x, y, and z and values of
         floats.
         '''
-        if newLoc.__len__() != 3:
+        if len(newLoc) != 3:
             raise AttributeError
         if set(newLoc.keys()) != set(['x','y','z']):
             raise AttributeError
@@ -187,14 +187,14 @@ class EDSystem( object ):
         if self.__System_Name != other.__System_Name:
             raise Exception("Can only add rares to the same system")
 
-        for i in range(other.__Items.__len__()):
+        for i in range(len(other.__Items)):
             if other.__Items[i] not in self.__Items:
                 self.__Items.append(other.__Items[i])
                 self.__Costs.append(other.__Costs[i])
                 self.__Supply_Numbers.append(other.__Supply_Numbers[i])
                 self.__Supply_Caps.append(other.__Supply_Caps[i])
                         
-        for i in range(other.__Station_Names.__len__()):
+        for i in range(len(other.__Station_Names)):
             if other.__Station_Names[i] not in self.__Station_Names:
                 self.__Station_Names.append(other.__Station_Names[i])
                 self.__Station_Distances.append(other.__Station_Distances[i])
@@ -213,9 +213,9 @@ class EDSystem( object ):
             if station != self.__Station_Names[-1]:
                 strBuilder.append(", ")
         strBuilder.append("): {")
-        for i in range(self.__Items.__len__()):
+        for i in range(len(self.__Items)):
             strBuilder.append("{0} - {1}cr".format(self.__Items[i],self.__Costs[i]))
-            if i != self.__Items.__len__() - 1:
+            if i != len(self.__Items) - 1:
                 strBuilder.append(", ")
         strBuilder.append("}} ({0}T)".format(self.Max_Supply))
 

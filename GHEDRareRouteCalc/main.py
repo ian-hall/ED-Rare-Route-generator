@@ -112,12 +112,12 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
 
         validPermitEntry = False
         permitsStr = input("Allow permit systems [Y/N]? ")
-        if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'n' or permitsStr == 'Y' or permitsStr == 'y'):
+        if len(permitsStr) == 1 and (permitsStr == 'N' or permitsStr == 'n' or permitsStr == 'Y' or permitsStr == 'y'):
             validPermitEntry = True
         while not validPermitEntry:
             print("Please enter just Y or N")
             permitsStr = input("Allow permit systems [Y/N]? ")
-            if permitsStr.__len__() == 1 and (permitsStr == 'N' or permitsStr == 'n' or permitsStr == 'Y' or permitsStr == 'y'):
+            if len(permitsStr) == 1 and (permitsStr == 'N' or permitsStr == 'n' or permitsStr == 'Y' or permitsStr == 'y'):
                 validPermitEntry = True
         
         permitVal = (permitsStr == "Y")
@@ -156,16 +156,16 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
                 for k,v in systemsDict.items():
                     if fuzz.ratio(checkSystem,k) >= 60:
                         possibleSysNames.append(k)
-                if possibleSysNames.__len__() == 0:
+                if len(possibleSysNames) == 0:
                     print("No system with that name found. Please try another")
-                elif possibleSysNames.__len__() == 1:
+                elif len(possibleSysNames) == 1:
                     print("Did you mean \"{0}\"?".format(possibleSysNames[0]))
                 else:
                     print("Did you mean one of these?")
                     print("\t{0}".format(' '.join(possibleSysNames)))
                 count -= 1
         
-        if systemsToUse.__len__() < minSystems:
+        if len(systemsToUse) < minSystems:
             print("Not enough systems entered. Exiting.")
         else:
             readyToRun = True
@@ -224,20 +224,20 @@ def main(csvFile:str = None,prompt:bool = False):
                 __RunGenetic(systemsSubset,length,fitType=FitnessType.FirstOver,silent=False,stopShort=True)
             if runType == 2:
                 userSystems = userArgs
-                routeLen = userSystems.__len__()
+                routeLen = len(userSystems)
                 __RunGenetic(userSystems,routeLen,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 6
-        fitType = FitnessType.FirstOver
+        length = 9
+        fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
-        #__RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
-        PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
+        #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
         #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 

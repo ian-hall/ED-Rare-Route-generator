@@ -57,7 +57,7 @@ class Test_EDRareRoute(unittest.TestCase):
         Make sure all fitvals are calculating the expected total distance of a route
         '''
         sysList = random.choice(self.System_Lists)
-        routeLen = sysList.__len__()   
+        routeLen = len(sysList)   
         expectedDistance = 0
         for i in range(routeLen):
             currSys = sysList[i%routeLen]
@@ -74,7 +74,7 @@ class Test_EDRareRoute(unittest.TestCase):
         Test that the correct total cargo is being calculated
         '''
         sysList = random.choice(self.System_Lists)
-        routeLen = sysList.__len__()
+        routeLen = len(sysList)
         expectedCargo = 0
         for i in range(routeLen):
             currSys = sysList[i]
@@ -186,12 +186,14 @@ class Test_EDRareRoute(unittest.TestCase):
         Routes should always have the same fitness value when given systems in the same order
         but with different positions in the system list.
         '''
+        #FIXIT: test failing with new split fitness type
+        #   Probably short circuiting somewhere 
         import collections
         for systemList in self.System_Lists:
             for name,fType in FitnessType.__members__.items():
                 with self.subTest(fType=fType):
                     sysDQ = collections.deque(systemList)
-                    numToRotate = random.randrange(systemList.__len__())
+                    numToRotate = random.randrange(len(systemList))
                     sysDQ.rotate(numToRotate)
                     rotatedList = list(sysDQ)
                     route = EDRareRoute(systemList,fType)
