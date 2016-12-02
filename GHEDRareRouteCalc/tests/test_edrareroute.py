@@ -11,8 +11,10 @@ class Test_EDRareRoute(unittest.TestCase):
 #------------------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
+        cls.Pop_Size = 500
+        cls.Route_Length = 15
         cls.All_Systems = main.ReadSystems("RareGoods.csv")
-        cls.System_Lists = routecalc.GenerateSystemLists(35,9,cls.All_Systems)
+        cls.System_Lists = routecalc.GenerateSystemLists(cls.Pop_Size,cls.Route_Length,cls.All_Systems)
 #------------------------------------------------------------------------------
     def test_Route_NotEq(self):
         '''
@@ -133,7 +135,7 @@ class Test_EDRareRoute(unittest.TestCase):
         Test that we get the expected length back from a route
         '''
         for systemList in self.System_Lists:
-            expectedLength = random.randint(3,15)
+            expectedLength = random.randint(3,self.Route_Length)
             tempList = systemList[:expectedLength]
             with self.subTest(expectedLength=expectedLength):
                 for name,fType in FitnessType.__members__.items():

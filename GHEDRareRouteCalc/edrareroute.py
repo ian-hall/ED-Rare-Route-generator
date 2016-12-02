@@ -153,29 +153,31 @@ class EDRareRoute(object):
         numSellable = 0
         numSellableScale = -1
 
-        validIndices = [(i,(i+math.floor(self.Length/2))) for i in range(math.floor(self.Length/2))]
-        if self.Length%2 == 1:
-            validIndices.extend([(i,(i+math.ceil(self.Length/2))%self.Length) for i in range(math.ceil(self.Length/2))])
-        #print(validIndices)
-
-        #for seller1,seller2 in itertools.combinations(systemsBySeller,2):
-        #    seller1Idx = indexBySystem[seller1]
-        #    seller2Idx = indexBySystem[seller2]
-        #    systemJumpsApart = abs(seller1Idx-seller2Idx)
-        #    #continue if things aren't evenly spaced
-        #    if (systemJumpsApart != math.floor(routeLength/2) and systemJumpsApart != math.ceil(routeLength/2)):
-        #        continue
         #FIXIT: Commutative property failing because maybe we are setting sellers_dict when we shouldn't
+        #       Looks like it has to do with the last system in the route not being hit
+        #       CONFIRMED: validIndices list is off by one
         #TODO: Use the duplicates set to remove duplicate systems based on which seller has more ... sellers
-        for i,j in validIndices:
+        useFloor = True
+        i = 0
+        j = math.floor(self.Length/2)
+        while j < self.Length:
             seller1 = self.__Route[i]
-            seller2 = self.__Route[j]            
+            seller2 = self.__Route[j]    
+            #print(seller1.Short_Str,seller2.Short_Str)        
             sellableSystems = systemsBySeller[seller1] | systemsBySeller[seller2]
             duplicates = systemsBySeller[seller1] & systemsBySeller[seller2]
             numSellable = max(numSellable,len(sellableSystems))
             numSellableScale = max(numSellableScale,(numSellable/routeLength * baseValue))
             #continue if number of sellers per system is off by more than 1
+            #TODO: Actually should change this to use the duplicates and sellablesystems sets to determine if we should continue or not
             if abs(len(systemsBySeller[seller1]) - len(systemsBySeller[seller2])) > 1:
+                i += 1
+                j += 1
+                if j >= self.Length and useFloor:
+                    if math.floor(self.Length/2) != math.ceil(self.Length/2):
+                        i = 0
+                        j = math.ceil(self.Length/2)
+                        useFloor = False
                 continue
 
             #if (sellableSystems == set(self.__Route)):
@@ -209,6 +211,13 @@ class EDRareRoute(object):
                         #maxTimeInHold = max(maxTimeInHold,timeInHold[sys])
                         self.__MaxHoldTime[sys] = max(self.__MaxHoldTime[sys],timeInHold[sys])
                         del timeInHold[sys]
+            i += 1
+            j += 1
+            if j >= self.Length and useFloor:
+                if math.floor(self.Length/2) != math.ceil(self.Length/2):
+                    i = 0
+                    j = math.ceil(self.Length/2)
+                    useFloor = False
 
         if self.__Sellers_Dict is None:
             overallScale = 0.25

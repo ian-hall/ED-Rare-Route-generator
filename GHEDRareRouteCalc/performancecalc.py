@@ -47,11 +47,7 @@ class PerformanceCalc(object):
         
         systemsToRotate = [ systemsDict['Ngurii'], systemsDict['Ethgreze'], systemsDict['HIP 80364'], systemsDict['Altair'], systemsDict['Eleu'],
                             systemsDict['Wuthielo Ku'], systemsDict['Korro Kung'], systemsDict['Coquim'], systemsDict['Wulpa'] ]
-        #testRotation = EDRareRoute(systemsToRotate, fitType)
-        #print(testRotation)
-        #testRotation.DrawRoute()
-
-        for i in range(9):
+        for i in range(len(systemsToRotate)):
             rotated = systemsToRotate[i:] + systemsToRotate[:i]
             testrotation = EDRareRoute(rotated,fitType)
             print(testrotation)
