@@ -95,10 +95,7 @@ class EDRareRoute(object):
         return dict(self.__MaxHoldTime)
 #------------------------------------------------------------------------------
     def __Fitness_EvenSplit(self):
-        #TODO: ok new idea
-        #   First check if the route can be split, meaning there are at least 2 sellers which handle all systems
-        #   then check if the route is any good by doing something similar to the alt fitness function
-        #   then maybe dont worry so much about aplit ?? or check how everything worked out maybe
+        #TODO: still broken (?)
         #   Also should adjust scaling to use the new __MaxHoldTime thing
         '''
         Fitness value based on having a roughly even number of systems between sellers
