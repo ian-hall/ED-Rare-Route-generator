@@ -227,19 +227,19 @@ def main(csvFile:str = None,prompt:bool = False):
                 routeLen = len(userSystems)
                 __RunGenetic(userSystems,routeLen,fitType=FitnessType.FirstOver,silent=False,stopShort=True)       
     else:
-        maxStationDistance = 4500
+        maxStationDistance = 999999999
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 6
+        length = 8
         fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = True
-        #__RunGenetic(commonSystems,length,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)

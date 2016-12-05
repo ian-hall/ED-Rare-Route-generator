@@ -100,8 +100,6 @@ class EDRareRoute(object):
         #   then check if the route is any good by doing something similar to the alt fitness function
         #   then maybe dont worry so much about aplit ?? or check how everything worked out maybe
         #   Also should adjust scaling to use the new __MaxHoldTime thing
-        #   Probably change this to generating a list of valid indices for the 2 sellers rather then going through
-        #       itertools.combos and check if the 2 chosen are ok
         '''
         Fitness value based on having a roughly even number of systems between sellers
         only works with short ( < 16 ) routes
@@ -153,9 +151,6 @@ class EDRareRoute(object):
         numSellable = 0
         numSellableScale = -1
 
-        #FIXIT: Commutative property failing because maybe we are setting sellers_dict when we shouldn't
-        #       Looks like it has to do with the last system in the route not being hit
-        #       CONFIRMED: validIndices list is off by one
         #TODO: Use the duplicates set to remove duplicate systems based on which seller has more ... sellers
         useFloor = True
         i = 0
@@ -214,6 +209,7 @@ class EDRareRoute(object):
             i += 1
             j += 1
             if j >= self.Length and useFloor:
+                #if route is of odd length then do splits of ceil also
                 if math.floor(self.Length/2) != math.ceil(self.Length/2):
                     i = 0
                     j = math.ceil(self.Length/2)
