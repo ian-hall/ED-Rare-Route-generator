@@ -45,15 +45,12 @@ class PerformanceCalc(object):
     @classmethod
     def CheckTestSystems(cls,systemsDict: dict,fitType: FitnessType):
         
-        systemsToRotate = [ systemsDict['Ngurii'], systemsDict['Ethgreze'], systemsDict['HIP 80364'], systemsDict['Altair'], systemsDict['Eleu'],
-                            systemsDict['Wuthielo Ku'], systemsDict['Korro Kung'], systemsDict['Coquim'], systemsDict['Wulpa'] ]
-        for i in range(len(systemsToRotate)):
-            rotated = systemsToRotate[i:] + systemsToRotate[:i]
-            testrotation = EDRareRoute(rotated,fitType)
-            print(testrotation)
-
-
-
+        #systemsToRotate = [ systemsDict['Ngurii'], systemsDict['Ethgreze'], systemsDict['HIP 80364'], systemsDict['Altair'], systemsDict['Eleu'],
+        #                    systemsDict['Wuthielo Ku'], systemsDict['Korro Kung'], systemsDict['Coquim'], systemsDict['Wulpa'] ]
+        #for i in range(len(systemsToRotate)):
+        #    rotated = systemsToRotate[i:] + systemsToRotate[:i]
+        #    testrotation = EDRareRoute(rotated,fitType)
+        #    print(testrotation)
 
         #good14 = EDRareRoute([ systemsDict['HR 7221'], systemsDict['Ngurii'], systemsDict["Baltah'Sine"], systemsDict['Tarach Tor'], systemsDict['Hecate'], systemsDict['Rusani'],
         #                       systemsDict['Kongga'], systemsDict['Ethgreze'], systemsDict['George Pantazis'], systemsDict['Arouca'], systemsDict['Any Na'], systemsDict['CD-75 661'],
@@ -79,36 +76,36 @@ class PerformanceCalc(object):
         #print(brokenRoute)
         #brokenRoute.DisplayInConsole()
         
-        #ykLoopList = []
-        #ykLoopList.append(systemsDict['Coquim'])  
-        #ykLoopList.append(systemsDict['Altair'])   
-        #ykLoopList.append(systemsDict['Ethgreze'])  
-        #ykLoopList.append(systemsDict['AZ Cancri'])  
-        #ykLoopList.append(systemsDict['George Pantazis'])  
-        #ykLoopList.append(systemsDict['Utgaroar'])  
-        #ykLoopList.append(systemsDict['Yaso Kondi']) 
-        #ykLoopList.append(systemsDict['Quechua'])  
-        #print("\n\nYK Loop")
-        #ykLoop = EDRareRoute(ykLoopList,fitType)
-        #print(ykLoop)
-        #ykLoop.DisplayInConsole()
-        #ykLoop.DrawRoute()
-        #for k,v in ykLoop.Hold_Times.items():
-        #    print(k.System_Name,v)
+        ykLoopList = []
+        ykLoopList.append(systemsDict['Coquim'])  
+        ykLoopList.append(systemsDict['Altair'])   
+        ykLoopList.append(systemsDict['Ethgreze'])  
+        ykLoopList.append(systemsDict['AZ Cancri'])  
+        ykLoopList.append(systemsDict['George Pantazis'])  
+        ykLoopList.append(systemsDict['Utgaroar'])  
+        ykLoopList.append(systemsDict['Yaso Kondi']) 
+        ykLoopList.append(systemsDict['Quechua'])  
+        print("\n\nYK Loop")
+        ykLoop = EDRareRoute(ykLoopList,fitType)
+        print(ykLoop)
+        ykLoop.DisplayInConsole()
+        ykLoop.DrawRoute()
+        for k,v in ykLoop.Hold_Times.items():
+            print(k.System_Name,v)
 
-        #leestiCluster = []
-        #leestiCluster.append(systemsDict["Fujin"])
-        #leestiCluster.append(systemsDict["Momus Reach"])
-        #leestiCluster.append(systemsDict["39 Tauri"])
-        #leestiCluster.append(systemsDict["Diso"])
-        #leestiCluster.append(systemsDict["Leesti"])
-        #leestiCluster.append(systemsDict["Uszaa"])
-        #leestiCluster.append(systemsDict["Orrere"])
-        #leestiCluster.append(systemsDict["Witchhaul"])
-        #lcRoute = EDRareRoute(leestiCluster,fitType)
-        #print(lcRoute)
-        #lcRoute.DisplayInConsole()
-        #lcRoute.DrawRoute()
+        leestiCluster = []
+        leestiCluster.append(systemsDict["Fujin"])
+        leestiCluster.append(systemsDict["Momus Reach"])
+        leestiCluster.append(systemsDict["39 Tauri"])
+        leestiCluster.append(systemsDict["Diso"])
+        leestiCluster.append(systemsDict["Leesti"])
+        leestiCluster.append(systemsDict["Uszaa"])
+        leestiCluster.append(systemsDict["Orrere"])
+        leestiCluster.append(systemsDict["Witchhaul"])
+        lcRoute = EDRareRoute(leestiCluster,fitType)
+        print(lcRoute)
+        lcRoute.DisplayInConsole()
+        lcRoute.DrawRoute()
         
 
         #good5Route = EDRareRoute( [ systemsDict['Uszaa'], systemsDict['Orrere'], systemsDict['Leesti'], systemsDict['Tanmark'], systemsDict['Witchhaul'] ],fitType )

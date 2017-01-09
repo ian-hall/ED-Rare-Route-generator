@@ -147,6 +147,7 @@ class EDRareRoute(object):
         
         numSellable = 0
         numSellableScale = -1
+        maxTimeInHold = -1
 
         #TODO: Use the duplicates set to remove duplicate systems based on which seller has more ... sellers
         useFloor = True
@@ -172,8 +173,8 @@ class EDRareRoute(object):
                         useFloor = False
                 continue
 
-            #if (sellableSystems == set(self.__Route)):
             if len(sellableSystems) == self.Length:
+                maxTimeInHold = -1
                 self.__Sellers_Dict = None
                 sold = []
                 unsold = []
@@ -200,7 +201,7 @@ class EDRareRoute(object):
                     for sys in toRemove:
                         unsold.remove(sys)
                         numSold = numSold + 1
-                        #maxTimeInHold = max(maxTimeInHold,timeInHold[sys])
+                        maxTimeInHold = max(maxTimeInHold,timeInHold[sys])
                         self.__MaxHoldTime[sys] = max(self.__MaxHoldTime[sys],timeInHold[sys])
                         del timeInHold[sys]
             i += 1
@@ -233,6 +234,10 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.5
         if numSellableScale < baseValue/2:
             totalValue = totalValue * 0.25
+
+        #TODO: Looks like this broke commutative again 
+        if maxTimeInHold > self.Length // 2 + 2 or maxTimeInHold == -1:
+            totalValue *= 0.8
 
         return totalValue
 #------------------------------------------------------------------------------
