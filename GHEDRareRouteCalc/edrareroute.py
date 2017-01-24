@@ -236,7 +236,7 @@ class EDRareRoute(object):
             totalValue = totalValue * 0.25
 
         #TODO: Looks like this broke commutative again 
-        if maxTimeInHold > self.Length // 2 + 2 or maxTimeInHold == -1:
+        if maxTimeInHold > self.Length // 2 + 1 or maxTimeInHold == -1:
             totalValue *= 0.8
 
         return totalValue

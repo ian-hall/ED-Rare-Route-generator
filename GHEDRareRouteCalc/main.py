@@ -233,13 +233,13 @@ def main(csvFile:str = None,prompt:bool = False):
         fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = False
-        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        #__RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)
