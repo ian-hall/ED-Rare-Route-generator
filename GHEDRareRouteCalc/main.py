@@ -44,6 +44,9 @@ def __TryInt(val: str) -> bool:
         return False
 #------------------------------------------------------------------------------
 def ReadSystems(file:str = None) -> list:
+    #TODO: This spreadsheet is way out of date and I should look in to updating it to use a different source.
+    #      Of course none of the other rares lists give ly distance between systems so lol@me
+    #      Probably use http://edtools.ddns.net/rares.php
     if file is None:
         file = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
     allSystems = []
@@ -229,17 +232,17 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 8
+        length = 9
         fitType = FitnessType.EvenSplit
         silenceOutput = False
         stopShort = False
-        #__RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)

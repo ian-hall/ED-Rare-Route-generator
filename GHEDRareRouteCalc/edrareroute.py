@@ -235,8 +235,8 @@ class EDRareRoute(object):
         if numSellableScale < baseValue/2:
             totalValue = totalValue * 0.25
 
-        #TODO: Looks like this broke commutative again 
-        if maxTimeInHold > self.Length // 2 + 1 or maxTimeInHold == -1:
+        #FIXIT: Looks like this broke commutative again 
+        if maxTimeInHold > (self.Length // 2) + 2 or maxTimeInHold < 0:
             totalValue *= 0.8
 
         return totalValue
@@ -344,7 +344,7 @@ class EDRareRoute(object):
         
         #TODO: Confirm this isn't too rough
         # Scaling down if items are in the hold for XXX time
-        if maxTimeInHold > self.Length // 2 + 1 or maxTimeInHold == -1:
+        if maxTimeInHold > (self.Length // 2) + 2 or maxTimeInHold < 0:
             totalValue *= 0.8
             
         #print(maxTimeInHold)
