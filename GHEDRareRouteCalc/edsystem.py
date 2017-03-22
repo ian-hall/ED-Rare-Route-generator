@@ -10,15 +10,15 @@ class EDSystem( object ):
         self.__Is_Initialized = False
 #------------------------------------------------------------------------------
     @classmethod
-    def Initialize_System(cls, alloc, system, permit, port, illeg, cost, dst, x, y, z, item, idx):
+    def Initialize_System(cls, item, idx, alloc, system, permit, port, illeg, cost, dst, x, y, z):
         
         if( (alloc is None) or (cost is None) or (item is None) or (dst is None) or
             (port is None) or (system is None) or (idx is None) or (permit is None) ):
             raise Exception("Values cannot be None") 
           
         newSystem = EDSystem()
-        newSystem.__Supply_Numbers = [float(alloc)]
-        newSystem.__Costs = [int(cost)]
+        newSystem.__Supply_Numbers = [float(alloc)] if alloc is not "" else [-1]
+        newSystem.__Costs = [int(cost)] if cost is not "" else [-1]
         newSystem.__Items = [item]
         newSystem.__Station_Distances = [float(dst)]
         newSystem.__Station_Names = [port]

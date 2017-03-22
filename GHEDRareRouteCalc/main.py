@@ -44,7 +44,8 @@ def __TryInt(val: str) -> bool:
         return False
 #------------------------------------------------------------------------------
 def ReadSystems(useLocal:bool) -> list:
-    #FIXIT: Getting error after Fujin system, maybe a problem with the json file
+    #TODO: Calculate distances between systems
+    #      Combine systems with multiple rare goods
     if not useLocal:
         file = 'http://http://edtools.ddns.net/rares.json'
     else:
@@ -54,10 +55,14 @@ def ReadSystems(useLocal:bool) -> list:
     allGoods = pd.read_json(file)
     idx = 1
     for good in allGoods:
-        tempSystem = EDSystem.Initialize_System(item=good, idx=idx, **allGoods[good])
+        tempArgs = allGoods[good]
+        if tempArgs['alloc'] is "" or tempArgs['cost'] is "":
+            continue
+        tempSystem = EDSystem.Initialize_System(item=good, idx=idx, **tempArgs)
         print(tempSystem)
         idx += 1
-
+        allSystems.append(tempSystem)
+    return allSystems
 #------------------------------------------------------------------------------
 def __ReadUserInput(systemsDict:dict) -> tuple:
     '''
@@ -211,7 +216,7 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 9
+        length = 8
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
