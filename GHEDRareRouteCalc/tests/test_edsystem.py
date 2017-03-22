@@ -35,7 +35,7 @@ class Test_EDSystem(unittest.TestCase):
         self.assertFalse(testSystem.Is_Initialized)
 
         with self.assertRaises(Exception,msg="missing args to constructor"):
-            testSystem = EDSystem.Initialize_FromArgs(avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)           
+            testSystem = EDSystem.Initialize_System(avgSupply,itemCost,itemName,distToStation,stationName,systemName,index,permitReq)           
                
         
         with self.assertRaises(Exception,msg="no Nones allowed"):
@@ -62,7 +62,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRaresItemNames(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -77,7 +77,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRaresItemCosts(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -92,7 +92,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRaresStationNames(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -107,7 +107,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRaresStationDistances(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -122,7 +122,7 @@ class Test_EDSystem(unittest.TestCase):
     def test_System_AddRaresTotalCost(self):
         squishedSystems = []
         for args in self.Test_Args:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if squishedSystems.count(newSystem) != 0:
                 for currentSystem in squishedSystems:
                     with self.subTest(currSystem=currentSystem):
@@ -139,8 +139,8 @@ class Test_EDSystem(unittest.TestCase):
         '''
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                expectedCosts = self.__PullValsForArg(self.Test_Args,"itemCost",system.System_Name)
-                expectedSupplyNums = self.__PullValsForArg(self.Test_Args,"supplyCap",system.System_Name)
+                expectedCosts = self.__PullValsForArg(self.Test_Args,"cost",system.System_Name)
+                expectedSupplyNums = self.__PullValsForArg(self.Test_Args,"alloc",system.System_Name)
                 self.assertEqual(len(expectedCosts),len(expectedSupplyNums))
                 expectedTotal = 0
                 for cost,supply in zip(expectedCosts,expectedSupplyNums):
@@ -153,7 +153,7 @@ class Test_EDSystem(unittest.TestCase):
         '''
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                expectedItemCosts = self.__PullValsForArg(self.Test_Args,"itemCost",system.System_Name)
+                expectedItemCosts = self.__PullValsForArg(self.Test_Args,"cost",system.System_Name)
                 self.assertListEqual(expectedItemCosts,system.Item_Costs)
 #------------------------------------------------------------------------------
     def test_System_ItemNames(self):
@@ -161,13 +161,13 @@ class Test_EDSystem(unittest.TestCase):
         #           Same item appeared twice in system list but only once in args list
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                expectedItemNames = self.__PullValsForArg(self.Test_Args,"itemName",system.System_Name)
+                expectedItemNames = self.__PullValsForArg(self.Test_Args,"item",system.System_Name)
                 self.assertListEqual(expectedItemNames,system.Item_Names)
 #------------------------------------------------------------------------------
     def test_System_ItemCounts(self):
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                expectedItemCounts = self.__PullValsForArg(self.Test_Args,"avgSupply",system.System_Name)
+                expectedItemCounts = self.__PullValsForArg(self.Test_Args,"alloc",system.System_Name)
                 self.assertListEqual(expectedItemCounts,system.Item_Supply_Counts)
 #------------------------------------------------------------------------------
     def test_System_Items(self):
@@ -176,16 +176,16 @@ class Test_EDSystem(unittest.TestCase):
         '''
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                sameSystems = [args for args in self.Test_Args if args["systemName"] == system.System_Name]
+                sameSystems = [args for args in self.Test_Args if args["system"] == system.System_Name]
                 for args in sameSystems:
-                    with self.subTest(i=args["systemIndex"]):
-                        itemInfo = (args["itemName"],args["itemCost"],args["avgSupply"],args["supplyCap"])
+                    with self.subTest(i=args["idx"]):
+                        itemInfo = (args["item"],args["cost"],args["alloc"])
                         self.assertIn(itemInfo,system.Items_Info)
 #------------------------------------------------------------------------------
     def test_System_TotalSupply(self):
         for system in self.Test_Systems:
             with self.subTest(sysName=system.System_Name):
-                expectedTotal = sum(self.__PullValsForArg(self.Test_Args,"supplyCap",system.System_Name))
+                expectedTotal = sum(self.__PullValsForArg(self.Test_Args,"alloc",system.System_Name))
                 self.assertAlmostEqual(expectedTotal,system.Max_Supply)
 #------------------------------------------------------------------------------
     def test_System_Permit(self):
@@ -204,7 +204,7 @@ class Test_EDSystem(unittest.TestCase):
         reverseArgs = self.Test_Args[::-1]
         
         for args in self.Test_Args:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if systemsForward.count(newSystem) != 0:
                 for currentSystem in systemsForward:
                     if currentSystem == newSystem:
@@ -213,7 +213,7 @@ class Test_EDSystem(unittest.TestCase):
                 systemsForward.append(newSystem)
 
         for args in reverseArgs:
-            newSystem = EDSystem.Initialize_FromArgs(**args)
+            newSystem = EDSystem.Initialize_System(**args)
             if systemsReverse.count(newSystem) != 0:
                 for currentSystem in systemsReverse:
                     if currentSystem == newSystem:
@@ -237,7 +237,7 @@ class Test_EDSystem(unittest.TestCase):
         Make sure distance from a to b is the same as b to a
         '''
         import main
-        systemsToCheck  = main.ReadSystems("RareGoods.csv")
+        systemsToCheck  = main.ReadSystems("rares.json")
         for system in systemsToCheck:
             randSystem = random.choice(systemsToCheck)
             sysToRand = system.GetDistanceTo(randSystem)
@@ -251,8 +251,8 @@ class Test_EDSystem(unittest.TestCase):
         for system in self.Test_Systems:
             with self.subTest(sysName = system.System_Name):
                 badSystemArgs = CreateTestArgsList(1)[0]
-                badSystemArgs["systemName"] = "Bad system name"
-                badSystem = EDSystem.Initialize_FromArgs(**badSystemArgs)
+                badSystemArgs["system"] = "Bad system name"
+                badSystem = EDSystem.Initialize_System(**badSystemArgs)
                 distToBad = system.GetDistanceTo(badSystem)
                 self.assertEqual(-1,distToBad)                     
 #------------------------------------------------------------------------------
@@ -300,44 +300,44 @@ class Test_EDSystem(unittest.TestCase):
             #Make sure we get the original list back with no elements actually changed
             self.assertListEqual(originalList,system.Item_Names)
 #------------------------------------------------------------------------------
-    def test_System_LocationSetter(self):
-        for system in self.Test_Systems:
-            with self.subTest(sysName=system.System_Name):
-                originalLocation = system.Location
-                badLocation = {'x':random.randrange(-200,200),
-                               'y':random.randrange(-200,200),
-                               'z':random.randrange(-200,200),
-                               'w':random.randrange(-200,200)}
-                with self.assertRaises(AttributeError):
-                    system.Location=badLocation
+    #def test_System_LocationSetter(self):
+    #    for system in self.Test_Systems:
+    #        with self.subTest(sysName=system.System_Name):
+    #            originalLocation = system.Location
+    #            badLocation = {'x':random.randrange(-200,200),
+    #                           'y':random.randrange(-200,200),
+    #                           'z':random.randrange(-200,200),
+    #                           'w':random.randrange(-200,200)}
+    #            with self.assertRaises(AttributeError):
+    #                system.Location=badLocation
             
-                badLocation = {'w':random.randrange(-200,200),
-                               'x':random.randrange(-200,200),
-                               'y':random.randrange(-200,200)}
-                with self.assertRaises(AttributeError):
-                    system.Location=badLocation
+    #            badLocation = {'w':random.randrange(-200,200),
+    #                           'x':random.randrange(-200,200),
+    #                           'y':random.randrange(-200,200)}
+    #            with self.assertRaises(AttributeError):
+    #                system.Location=badLocation
             
-                badLocation = {'x':"Not a number",
-                               'y':random.randrange(-200,200),
-                               'z':random.randrange(-200,200)}
-                with self.assertRaises(AttributeError):
-                    system.Location=badLocation
+    #            badLocation = {'x':"Not a number",
+    #                           'y':random.randrange(-200,200),
+    #                           'z':random.randrange(-200,200)}
+    #            with self.assertRaises(AttributeError):
+    #                system.Location=badLocation
                 
-                #Confirm the original is not changed    
-                self.assertDictEqual(originalLocation,system.Location)
+    #            #Confirm the original is not changed    
+    #            self.assertDictEqual(originalLocation,system.Location)
 
-                #Confirm that changing a value of system.Location does not change the value in the 
-                #system object
-                changedValues = system.Location
-                changedValues['x'] = -999999999
-                self.assertNotEqual(changedValues,system.Location);
+    #            #Confirm that changing a value of system.Location does not change the value in the 
+    #            #system object
+    #            changedValues = system.Location
+    #            changedValues['x'] = -999999999
+    #            self.assertNotEqual(changedValues,system.Location);
 
-                #Confirm that a valid location can be set
-                goodLocation = {'z':random.randrange(-200,200),
-                                'y':random.randrange(-200,200),
-                                'x':random.randrange(-200,200)}
-                system.Location=goodLocation
-                self.assertDictEqual(goodLocation,system.Location)
+    #            #Confirm that a valid location can be set
+    #            goodLocation = {'z':random.randrange(-200,200),
+    #                            'y':random.randrange(-200,200),
+    #                            'x':random.randrange(-200,200)}
+    #            system.Location=goodLocation
+    #            self.assertDictEqual(goodLocation,system.Location)
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
@@ -361,7 +361,7 @@ class Test_EDSystem(unittest.TestCase):
         '''
         Return a list of values representing the type of argToPull from all args for systems with systemName
         '''
-        return [args[argToPull] for args in argsDictList if args["systemName"] == systemName]
+        return [args[argToPull] for args in argsDictList if args["system"] == systemName]
 #------------------------------------------------------------------------------
 ###############################################################################
 #------------------------------------------------------------------------------
@@ -389,23 +389,29 @@ def CreateTestArgsList(numToCreate: int) -> list:
         itemName = ' '.join(random.choice(validItemNames) for _ in range(random.randint(2,3)))
         distToStation = random.randrange(10000)
         permitReq = (random.randrange(100)%10 == 0)
+        x = random.randrange(-100,100)
+        y = random.randrange(-100,100)
+        z = random.randrange(-100,100)
 
         #TODO: distances to other systems is no longer in the constructor, should add it to the CreateTestSystems function
 
         #Check for and remove/come up with another station name if a given name is already in a system
-        stationsForSystem = [args["stationName"] for args in argsDictList if args["systemName"] == systemName]
+        stationsForSystem = [args["system"] for args in argsDictList if args["system"] == systemName]
         while stationName in stationsForSystem:
             stationName = ' '.join(random.choice(validStationNames) for _ in range(2))
         
-        argsDict = {"supplyCap":supplyCap,
-                     "avgSupply":avgSupply,
-                     "itemCost":itemCost,
-                     "itemName":itemName,
-                     "distToStation":distToStation,
-                     "stationName":stationName,
-                     "systemName":systemName,
-                     "systemIndex":index,
-                     "permit":permitReq}
+        argsDict = {"alloc":supplyCap,
+                     "cost":itemCost,
+                     "item":itemName,
+                     "dst":distToStation,
+                     "port":stationName,
+                     "system":systemName,
+                     "idx":index,
+                     "permit":permitReq,
+                     "illeg":0,
+                     "x":x,
+                     "y":y,
+                     "z":z}
         argsDictList.append(argsDict)
     
     return argsDictList
@@ -416,7 +422,7 @@ def CreateTestSystems(argsList: list) -> list:
     '''
     generatedSystems = []
     for args in argsList:
-        currentSystem = EDSystem.Initialize_FromArgs(**args)
+        currentSystem = EDSystem.Initialize_System(**args)
         if generatedSystems.count(currentSystem) != 0:
             for system in generatedSystems:
                 if system == currentSystem:

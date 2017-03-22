@@ -97,22 +97,6 @@ class EDSystem( object ):
     def Location(self) -> dict:
         return dict(self.__Location)
 #------------------------------------------------------------------------------
-    @Location.setter
-    def Location(self,newLoc:dict):
-        '''
-        Sets the location of the system with the given value.
-        Only accepts dicts with keys of x, y, and z and values of
-        floats.
-        '''
-        if len(newLoc) != 3:
-            raise AttributeError
-        if set(newLoc.keys()) != set(['x','y','z']):
-            raise AttributeError
-        for _,value in newLoc.items():
-            if not TryFloat(value):
-                raise AttributeError            
-        self.__Location = dict(newLoc)
-#------------------------------------------------------------------------------
     @property
     def Needs_Permit(self) -> bool:
         return self.__Permit_Req
@@ -153,13 +137,11 @@ class EDSystem( object ):
                 self.__Items.append(other.__Items[i])
                 self.__Costs.append(other.__Costs[i])
                 self.__Supply_Numbers.append(other.__Supply_Numbers[i])
-                self.__Supply_Caps.append(other.__Supply_Caps[i])
                         
         for i in range(len(other.__Station_Names)):
             if other.__Station_Names[i] not in self.__Station_Names:
                 self.__Station_Names.append(other.__Station_Names[i])
                 self.__Station_Distances.append(other.__Station_Distances[i])
-
 #------------------------------------------------------------------------------
     def __str__(self):
         #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
@@ -221,17 +203,4 @@ def TryFloat(val: str) -> bool:
         return True
     except:
         return False
-#------------------------------------------------------------------------------
-def CleanSystemName(sysName):
-    '''
-    cleans the system name and returns a tuple of
-    (cleaned name,permit requirement)
-    '''
-    permit = False
-    normName = sysName.strip().replace("\\'","\'")
-    normName = normName.split('.')[0]
-    if normName.endswith('(permit)'):
-        permit = True
-        normName = normName.partition('(permit)')[0].strip()
-    return normName,permit
 #------------------------------------------------------------------------------

@@ -59,9 +59,14 @@ def ReadSystems(useLocal:bool) -> list:
         if tempArgs['alloc'] is "" or tempArgs['cost'] is "":
             continue
         tempSystem = EDSystem.Initialize_System(item=good, idx=idx, **tempArgs)
-        print(tempSystem)
+        #print(tempSystem)
+        if tempSystem in allSystems:
+            for system in allSystems:
+                if system == tempSystem:
+                    system.AddRares(tempSystem)
+        else:
+            allSystems.append(tempSystem)
         idx += 1
-        allSystems.append(tempSystem)
     return allSystems
 #------------------------------------------------------------------------------
 def __ReadUserInput(systemsDict:dict) -> tuple:
