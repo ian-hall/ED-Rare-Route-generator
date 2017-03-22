@@ -10,64 +10,25 @@ class EDSystem( object ):
         self.__Is_Initialized = False
 #------------------------------------------------------------------------------
     @classmethod
-    def Initialize_FromArgs(cls, supplyCap: float, avgSupply: float, itemCost: float, itemName: str, distToStation: float,
-                              stationName: str, systemName: str, systemIndex: int, permit: bool):
+    def Initialize_System(cls, alloc, system, permit, port, illeg, cost, dst, x, y, z, item, idx):
         
-        if( (supplyCap is None) or (avgSupply is None) or (itemCost is None) or (itemName is None) or (distToStation is None) or
-            (stationName is None) or (systemName is None) or (systemIndex is None) or (permit is None) ):
+        if( (alloc is None) or (cost is None) or (item is None) or (dst is None) or
+            (port is None) or (system is None) or (idx is None) or (permit is None) ):
             raise Exception("Values cannot be None") 
           
         newSystem = EDSystem()
-        newSystem.__Supply_Caps = [supplyCap] # Float
-        newSystem.__Supply_Numbers = [avgSupply] # Float
-        newSystem.__Costs = [itemCost] # Int
-        newSystem.__Items = [itemName] # String
-        newSystem.__Station_Distances = [distToStation] # Float
-        newSystem.__Station_Names = [stationName] # String
-        newSystem.__System_Name = systemName # String
-        newSystem.__Index = systemIndex # Int
-        newSystem.__Distances_Dict = defaultdict(lambda: -1)
+        newSystem.__Supply_Numbers = [float(alloc)]
+        newSystem.__Costs = [int(cost)]
+        newSystem.__Items = [item]
+        newSystem.__Station_Distances = [float(dst)]
+        newSystem.__Station_Names = [port]
+        newSystem.__System_Name = system
+        newSystem.__Index = int(idx)
         newSystem.__Permit_Req = permit 
-        newSystem.__Location = dict(x=0, y=0, z=0)  
+        newSystem.__Location = dict(x=float(x), y=float(y), z=float(z))  
+        newSystem.__Distances_Dict = defaultdict(lambda: -1)
         newSystem.__Is_Initialized = True
         return newSystem  
-#------------------------------------------------------------------------------
-    @classmethod
-    def Initialize_FromCSVLine(cls,tuple,idx):
-        '''
-        Creates ad EDSystem object from the given tuple. The tuple should consist of: 
-        supply cap, average supply, item cost, item name, distance to station, station name, system name
-        in that order.
-        Also passing in an index for ???
-        '''
-        supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName = tuple
-        itemName        = itemName.strip().replace("\\'","\'")
-        stationName     = stationName.strip().replace("\\'","\'")
-        systemName,permit = CleanSystemName(systemName)
-        distToStation = float(re.sub("[^0-9.]", "", distToStation))
-        
-        if supplyCap == 'ND':
-            supplyCap = 1
-        else:
-            tempMax = supplyCap.split('-')
-            for i in range(len(tempMax)):
-                tempMax[i] = int(re.sub("[^0-9]", "", tempMax[i]))
-            supplyCap = sum(tempMax)/len(tempMax)
-
-        if avgSupply == 'ND':
-            avgSupply = 1
-        else:
-            tempSupply = avgSupply.split('-')
-            for i in range(len(tempSupply)):
-                tempSupply[i] = float(re.sub("[^0-9]", "", tempSupply[i]))
-            avgSupply = sum(tempSupply)/len(tempSupply)
-
-        itemCost = int(re.sub("[^0-9]", "", itemCost))
-
-        if supplyCap == 1 or avgSupply == 1:
-            supplyCap = max([supplyCap,avgSupply])
-            avgSupply = supplyCap
-        return EDSystem.Initialize_FromArgs(supplyCap,avgSupply,itemCost,itemName,distToStation,stationName,systemName,idx,permit)
 #------------------------------------------------------------------------------
     @property
     def Total_Cost(self) -> float:
@@ -77,7 +38,7 @@ class EDSystem( object ):
         total = 0
         for i in range(len(self.__Items)):
             cost = self.__Costs[i]
-            supply = self.__Supply_Caps[i]
+            supply = self.__Supply_Numbers[i]
             total += (cost * supply)
         return total
 #------------------------------------------------------------------------------
@@ -87,14 +48,14 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     @property
     def Max_Supply(self) -> float:
-        return sum(self.__Supply_Caps)
+        return sum(self.__Supply_Numbers)
 #------------------------------------------------------------------------------
     @property
     def Items_Info(self) -> list:
         '''
-        Returns a list with elements (item name, item cost, item supply, supply cap)
+        Returns a list with elements (item name, item cost, item supply)
         '''
-        return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers, self.__Supply_Caps))
+        return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers))
 #------------------------------------------------------------------------------
     @property
     def Item_Names(self) -> list:

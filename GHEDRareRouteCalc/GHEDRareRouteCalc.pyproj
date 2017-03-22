@@ -45,7 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="items.txt" />
-    <Content Include="RareGoods.csv" />
+    <Content Include="RareGoods.csv.old" />
+    <Content Include="rares.json" />
     <Content Include="stations.txt" />
     <Content Include="systems.txt" />
   </ItemGroup>

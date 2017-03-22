@@ -43,42 +43,21 @@ def __TryInt(val: str) -> bool:
     except:
         return False
 #------------------------------------------------------------------------------
-def ReadSystems(file:str) -> list:
-    #TODO: This spreadsheet is way out of date and I should look in to updating it to use a different source.
-    #      Of course none of the other rares lists give ly distance between systems so lol@me
-    #      Probably use http://edtools.ddns.net/rares.php
-    #if file is None:
-    #    file = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
+def ReadSystems(useLocal:bool) -> list:
+    #FIXIT: Getting error after Fujin system, maybe a problem with the json file
+    if not useLocal:
+        file = 'http://http://edtools.ddns.net/rares.json'
+    else:
+        file = "rares.json"
+
     allSystems = []
-    colOffset = 7
-    mainCSV = pd.read_csv(file,header=15,skipfooter=14,engine='python')
-    distances = mainCSV.iloc[:,colOffset:-3]
-    coordinates = pd.read_csv(file,header=None,skiprows=10,chunksize=3)
-    for line in coordinates:
-        coordinates = line.iloc[:,colOffset:-3]
-        break
-    systemArgs = zip(mainCSV['MAX CAP'],mainCSV['SUPPLY RATE'],mainCSV['PRICE'],mainCSV['ITEM'],mainCSV['DIST(Ls)'],mainCSV['STATION'],mainCSV['SYSTEM'])
-    idx = 0
-    for row in systemArgs:
-        currentSystem = EDSystem.Initialize_FromCSVLine(row,idx)        
-        distanceDict = {}
-        for key in distances.columns:
-            cleanedSystem,_ = edsystem.CleanSystemName(key)
-            distanceDict[cleanedSystem] = distances[key][idx]
-        currentSystem.Distances_Dict = distanceDict
-        
-        x,y,z = coordinates[colOffset+idx][0],coordinates[colOffset+idx][1],coordinates[colOffset+idx][2]
-        currentSystem.Location = {'x':x,'y':y,'z':z}
-        
-        if currentSystem in allSystems:
-            for system in allSystems:
-                if system == currentSystem:
-                    system.AddRares(currentSystem)
-        else:
-            allSystems.append(currentSystem)
+    allGoods = pd.read_json(file)
+    idx = 1
+    for good in allGoods:
+        tempSystem = EDSystem.Initialize_System(item=good, idx=idx, **allGoods[good])
+        print(tempSystem)
         idx += 1
 
-    return allSystems
 #------------------------------------------------------------------------------
 def __ReadUserInput(systemsDict:dict) -> tuple:
     '''
@@ -251,7 +230,7 @@ def main(csvFile:str = None,prompt:bool = False):
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-    csvFile = "RareGoods.csv"
+    useLocal = True
     prompt = False
-    main(csvFile,prompt)
+    main(useLocal,prompt)
 #------------------------------------------------------------------------------
