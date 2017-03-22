@@ -43,12 +43,12 @@ def __TryInt(val: str) -> bool:
     except:
         return False
 #------------------------------------------------------------------------------
-def ReadSystems(file:str = None) -> list:
+def ReadSystems(file:str) -> list:
     #TODO: This spreadsheet is way out of date and I should look in to updating it to use a different source.
     #      Of course none of the other rares lists give ly distance between systems so lol@me
     #      Probably use http://edtools.ddns.net/rares.php
-    if file is None:
-        file = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
+    #if file is None:
+    #    file = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=17Zv55yEjVdHrNzkH7BPnTCtXRs8GDHqchYjo9Svkyh4&exportFormat=csv&gid=0'
     allSystems = []
     colOffset = 7
     mainCSV = pd.read_csv(file,header=15,skipfooter=14,engine='python')
@@ -233,7 +233,7 @@ def main(csvFile:str = None,prompt:bool = False):
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
         length = 9
-        fitType = FitnessType.EvenSplit
+        fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
         __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
