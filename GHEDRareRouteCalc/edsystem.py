@@ -26,7 +26,7 @@ class EDSystem( object ):
         newSystem.__Index = int(idx)
         newSystem.__Permit_Req = permit 
         newSystem.__Location = dict(x=float(x), y=float(y), z=float(z))  
-        newSystem.__Distances_Dict = defaultdict(lambda: -1)
+        #newSystem.__Distances_Dict = defaultdict(lambda: -1)
         newSystem.__Is_Initialized = True
         return newSystem  
 #------------------------------------------------------------------------------
@@ -85,13 +85,13 @@ class EDSystem( object ):
     def Station_Distances(self) -> list:
         return [dist for dist in self.__Station_Distances]
 #------------------------------------------------------------------------------
-    @property
-    def Distances_Dict(self) -> dict:
-        return dict(self.TestingDistances)
-#------------------------------------------------------------------------------
-    @Distances_Dict.setter
-    def Distances_Dict(self,distances:dict):
-        self.__Distances_Dict = dict(distances)
+#    @property
+#    def Distances_Dict(self) -> dict:
+#        return dict(self.TestingDistances)
+##------------------------------------------------------------------------------
+#    @Distances_Dict.setter
+#    def Distances_Dict(self,distances:dict):
+#        self.__Distances_Dict = dict(distances)
 #------------------------------------------------------------------------------
     @property
     def Location(self) -> dict:
@@ -117,13 +117,14 @@ class EDSystem( object ):
 #------------------------------------------------------------------------------
     def GetDistanceTo(self, other) -> float:
         '''
-        Get the distance from self to the other system. If the other system's index
-        is not in the system distances list return -1
+        Calculate the distance to another system based on the x,y,z values.
         '''
-        if other.System_Name not in self.__Distances_Dict:
-            return -1
-        else:
-            return self.__Distances_Dict[other.System_Name]
+        #TODO: Maybe have main calculate all distances when reading in the systems
+        #      There is noticeable slow down doing this, of course
+        import numpy as np
+        localValues = np.array([self.__Location['x'], self.__Location['y'], self.__Location['z']])
+        otherValues = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
+        return np.linalg.norm(localValues-otherValues)
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         '''
@@ -142,6 +143,15 @@ class EDSystem( object ):
             if other.__Station_Names[i] not in self.__Station_Names:
                 self.__Station_Names.append(other.__Station_Names[i])
                 self.__Station_Distances.append(other.__Station_Distances[i])
+#------------------------------------------------------------------------------
+    def CalculateDistances(self,systemList):
+        #TODO: Maybe have main call this to set all distances at once into a dict
+        import numpy as np
+        localValues = np.array([self.__Location['x'], self.__Location['y'], self.__Location['z']])
+        for other in systemList:
+            distanceTo = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
+            temp = np.linalg.norm(localValues-distanceTo)
+            #print("{0} to {1} -> {2}".format(self.__System_Name, other.__System_Name,temp))           
 #------------------------------------------------------------------------------
     def __str__(self):
         #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.

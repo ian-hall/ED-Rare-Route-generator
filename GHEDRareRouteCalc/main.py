@@ -45,7 +45,6 @@ def __TryInt(val: str) -> bool:
 #------------------------------------------------------------------------------
 def ReadSystems(useLocal:bool) -> list:
     #TODO: Calculate distances between systems
-    #      Combine systems with multiple rare goods
     if not useLocal:
         file = 'http://http://edtools.ddns.net/rares.json'
     else:
@@ -67,6 +66,7 @@ def ReadSystems(useLocal:bool) -> list:
         else:
             allSystems.append(tempSystem)
         idx += 1
+    allSystems[0].CalculateDistances(allSystems)
     return allSystems
 #------------------------------------------------------------------------------
 def __ReadUserInput(systemsDict:dict) -> tuple:
