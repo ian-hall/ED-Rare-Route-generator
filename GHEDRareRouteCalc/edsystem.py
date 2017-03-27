@@ -25,8 +25,8 @@ class EDSystem( object ):
         newSystem.__System_Name = system
         newSystem.__Index = int(idx)
         newSystem.__Permit_Req = permit 
-        newSystem.__Location = dict(x=float(x), y=float(y), z=float(z))  
-        #newSystem.__Distances_Dict = defaultdict(lambda: -1)
+        newSystem.__Location = dict(x=float(x), y=float(y), z=float(z))
+        newSystem.__System_Distances = defaultdict(int)
         newSystem.__Is_Initialized = True
         return newSystem  
 #------------------------------------------------------------------------------
@@ -85,14 +85,6 @@ class EDSystem( object ):
     def Station_Distances(self) -> list:
         return [dist for dist in self.__Station_Distances]
 #------------------------------------------------------------------------------
-#    @property
-#    def Distances_Dict(self) -> dict:
-#        return dict(self.TestingDistances)
-##------------------------------------------------------------------------------
-#    @Distances_Dict.setter
-#    def Distances_Dict(self,distances:dict):
-#        self.__Distances_Dict = dict(distances)
-#------------------------------------------------------------------------------
     @property
     def Location(self) -> dict:
         return dict(self.__Location)
@@ -119,12 +111,11 @@ class EDSystem( object ):
         '''
         Calculate the distance to another system based on the x,y,z values.
         '''
-        #TODO: Maybe have main calculate all distances when reading in the systems
-        #      There is noticeable slow down doing this, of course
-        import numpy as np
-        localValues = np.array([self.__Location['x'], self.__Location['y'], self.__Location['z']])
-        otherValues = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
-        return np.linalg.norm(localValues-otherValues)
+        #import numpy as np
+        #localValues = np.array([self.__Location['x'], self.__Location['y'], self.__Location['z']])
+        #otherValues = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
+        #return np.linalg.norm(localValues-otherValues)
+        return self.__System_Distances[other]
 #------------------------------------------------------------------------------
     def AddRares(self, other):
         '''
@@ -145,13 +136,12 @@ class EDSystem( object ):
                 self.__Station_Distances.append(other.__Station_Distances[i])
 #------------------------------------------------------------------------------
     def CalculateDistances(self,systemList):
-        #TODO: Maybe have main call this to set all distances at once into a dict
         import numpy as np
         localValues = np.array([self.__Location['x'], self.__Location['y'], self.__Location['z']])
         for other in systemList:
             distanceTo = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
             temp = np.linalg.norm(localValues-distanceTo)
-            #print("{0} to {1} -> {2}".format(self.__System_Name, other.__System_Name,temp))           
+            self.__System_Distances[other] = temp         
 #------------------------------------------------------------------------------
     def __str__(self):
         #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.

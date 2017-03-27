@@ -44,11 +44,10 @@ def __TryInt(val: str) -> bool:
         return False
 #------------------------------------------------------------------------------
 def ReadSystems(useLocal:bool) -> list:
-    #TODO: Calculate distances between systems
-    if not useLocal:
-        file = 'http://http://edtools.ddns.net/rares.json'
-    else:
+    if useLocal:
         file = "rares.json"
+    else:
+        file = 'http://edtools.ddns.net/rares.json'
 
     allSystems = []
     allGoods = pd.read_json(file)
@@ -58,7 +57,6 @@ def ReadSystems(useLocal:bool) -> list:
         if tempArgs['alloc'] is "" or tempArgs['cost'] is "":
             continue
         tempSystem = EDSystem.Initialize_System(item=good, idx=idx, **tempArgs)
-        #print(tempSystem)
         if tempSystem in allSystems:
             for system in allSystems:
                 if system == tempSystem:
@@ -66,7 +64,9 @@ def ReadSystems(useLocal:bool) -> list:
         else:
             allSystems.append(tempSystem)
         idx += 1
-    allSystems[0].CalculateDistances(allSystems)
+
+    for system in allSystems:
+        system.CalculateDistances(allSystems)
     return allSystems
 #------------------------------------------------------------------------------
 def __ReadUserInput(systemsDict:dict) -> tuple:
@@ -221,7 +221,7 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 8
+        length = 9
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
@@ -231,7 +231,7 @@ def main(csvFile:str = None,prompt:bool = False):
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.FirstOver)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)
