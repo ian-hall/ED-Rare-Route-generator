@@ -169,13 +169,13 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
     return (readyToRun,int(optionChoice),argsOrSystems)
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-def main(csvFile:str = None,prompt:bool = False):
+def main(useLocal,usePrompts):
     '''
-    Main whatever. Takes a string linked to a csv file and a bool to flag if user
-    should be prompted for input. Default value for csvFile is an online spreadsheet.
-    Default value for prompt is to not prompt.
+    Main whatever.
+    :param useLocal: use local rares file or not
+    :param usePrompts: prompt user or not
     '''
-    allSystems = ReadSystems(csvFile)
+    allSystems = ReadSystems(useLocal)
     systemsDict = {}
     for system in allSystems:
         systemsDict[system.System_Name] = system
@@ -221,7 +221,7 @@ def main(csvFile:str = None,prompt:bool = False):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 9
+        length = 6
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
