@@ -232,17 +232,11 @@ class Test_EDSystem(unittest.TestCase):
                 self.assertSystemsEqual(revSystem,system)
 #------------------------------------------------------------------------------
     def test_System_Distances(self):
-        '''
-        Going to use the spreadsheet for now until I get my factory working as intended
-        Make sure distance from a to b is the same as b to a
-        '''
-        import main
-        systemsToCheck  = main.ReadSystems("rares.json")
-        for system in systemsToCheck:
-            randSystem = random.choice(systemsToCheck)
-            sysToRand = system.GetDistanceTo(randSystem)
-            randToSys = randSystem.GetDistanceTo(system)
-            self.assertEqual(sysToRand,randToSys)
+        for system in self.Test_Systems:
+            randSystem = random.choice(self.Test_Systems)
+            aTob = system.GetDistanceTo(randSystem)
+            bToa = randSystem.GetDistanceTo(system)
+            self.assertEqual(aTob,bToa)
 #------------------------------------------------------------------------------
     #def test_System_DistancesFailure(self):
     #    '''
@@ -394,8 +388,6 @@ def CreateTestArgsList(numToCreate: int) -> list:
         y = random.randrange(-100,100)
         z = random.randrange(-100,100)
 
-        #TODO: distances to other systems is no longer in the constructor, should add it to the CreateTestSystems function
-
         #Check for and remove/come up with another station name if a given name is already in a system
         stationsForSystem = [args["system"] for args in argsDictList if args["system"] == systemName]
         while stationName in stationsForSystem:
@@ -430,6 +422,8 @@ def CreateTestSystems(argsList: list) -> list:
                     system.AddRares(currentSystem)
         else:
             generatedSystems.append(currentSystem)
+    for system in generatedSystems:
+        system.CalculateDistances(generatedSystems)
     return generatedSystems
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------

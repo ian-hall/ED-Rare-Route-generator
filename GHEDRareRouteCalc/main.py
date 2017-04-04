@@ -221,7 +221,7 @@ def main(useLocal,usePrompts):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 6
+        length = 11
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
