@@ -42,8 +42,8 @@ class EDRareRoute(object):
             raise Exception("Routes must be 3 or more systems")
         self.__Route = systemList
         self.__Route_Loop = (systemList + systemList)
-        self.__Sell_Distance_Min = 160
-        self.__Sell_Distance_Max = 180
+        self.__Sell_Distance_Min = 155
+        self.__Sell_Distance_Max = 210
         self.__Total_Distance = 0
         self.__Total_Cargo = sum((system.Max_Supply for system in self.__Route))
         self.__Sellers_Dict = None
@@ -137,7 +137,7 @@ class EDRareRoute(object):
 
             systemsBySeller[current] = set()
             for system in self.__Route:
-                if current.GetDistanceTo(system) >= self.__Sell_Distance_Min and current.GetDistanceTo(system) <= self.__Sell_Distance_Max:
+                if current.GetDistanceTo(system) >= self.__Sell_Distance_Min:# and current.GetDistanceTo(system) <= self.__Sell_Distance_Max:
                     systemsBySeller[current] |= {system}
         self.__Longest_Jump = currentLongestJump
 

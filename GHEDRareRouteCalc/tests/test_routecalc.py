@@ -12,7 +12,7 @@ class Test_RouteCalc(unittest.TestCase):
 #------------------------------------------------------------------------------
     @classmethod
     def setUpClass(cls):
-        cls.All_Systems = main.ReadSystems('RareGoods.csv')
+        cls.All_Systems = main.ReadSystems(useLocal=True)
 #------------------------------------------------------------------------------
     def setUp(self):
         self.Pop_Size = 300

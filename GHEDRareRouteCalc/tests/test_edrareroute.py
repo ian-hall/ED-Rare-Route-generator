@@ -13,7 +13,7 @@ class Test_EDRareRoute(unittest.TestCase):
     def setUpClass(cls):
         cls.Pop_Size = 500
         cls.Route_Length = 15
-        cls.All_Systems = main.ReadSystems("RareGoods.csv")
+        cls.All_Systems = main.ReadSystems(useLocal=True)
         cls.System_Lists = routecalc.GenerateSystemLists(cls.Pop_Size,cls.Route_Length,cls.All_Systems)
 #------------------------------------------------------------------------------
     def test_Route_NotEq(self):
