@@ -221,17 +221,17 @@ def main(useLocal,usePrompts):
     else:
         maxStationDistance = 4500
         systemsSubset = [system for system in allSystems if min(system.Station_Distances) <= maxStationDistance and not system.Needs_Permit]
-        length = 11
+        length = 8
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
-        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        #__RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)
@@ -240,7 +240,7 @@ def main(useLocal,usePrompts):
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
 if __name__ == '__main__':
-    useLocal = True
+    useLocal = False
     prompt = False
     main(useLocal,prompt)
 #------------------------------------------------------------------------------

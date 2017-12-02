@@ -10,7 +10,8 @@ class EDSystem( object ):
         self.__Is_Initialized = False
 #------------------------------------------------------------------------------
     @classmethod
-    def Initialize_System(cls, item, idx, alloc, system, permit, port, illeg, cost, dst, x, y, z):
+    #TODO: port_id is a new variable in the current remote json file i need to do something about
+    def Initialize_System(cls, item, idx, alloc, system, permit, port, illeg, cost, dst, x, y, z, port_id):
         
         if( (alloc is None) or (cost is None) or (item is None) or (dst is None) or
             (port is None) or (system is None) or (idx is None) or (permit is None) ):
