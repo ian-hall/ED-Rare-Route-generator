@@ -12,6 +12,7 @@ from fuzzywuzzy import fuzz
 import pandas as pd
 import numpy as np
 #------------------------------------------------------------------------------
+#TODO: find out why python-Levenshtein won't install
 def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
     runNum = 0
@@ -225,13 +226,13 @@ def main(useLocal,usePrompts):
         fitType = FitnessType.FirstOver
         silenceOutput = False
         stopShort = False
-        #__RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
+        __RunGenetic(systemsSubset,length,fitType,silenceOutput,stopShort)
 
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.EvenSplit)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.FirstOver)
         #PerformanceCalc.CheckPerformance(systemsSubset,fitType=FitnessType.Distance)
 
-        PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
+        #PerformanceCalc.CheckTestSystems(systemsDict,FitnessType.EvenSplit)
 
         #fullRoute = EDRareRoute(allSystems,FitnessType.EvenSplit)
         #print(fullRoute)
