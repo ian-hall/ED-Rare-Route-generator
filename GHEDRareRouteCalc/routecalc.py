@@ -4,9 +4,9 @@ import random
 import math
 import operator
 import bisect
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+
+
 class RouteCalc(object):
     '''
     Class for calculating rare trade routes
@@ -16,11 +16,11 @@ class RouteCalc(object):
     __Valid_Systems = []
     __Fit_Type = FitnessType.EvenSplit
     __Population_Sizes = [50,300,450,800,1250,1500,1950,2500,3000]
-#------------------------------------------------------------------------------
+
     @classmethod
     def GetSelectionMult(cls) -> float:
         return cls.__Selection_Mult
-#------------------------------------------------------------------------------
+
     @classmethod
     def StartGeneticSolver(cls, validSystems: list, routeLength: int, silent: bool, fitType: FitnessType) -> tuple:
         '''
@@ -50,7 +50,7 @@ class RouteCalc(object):
 
         population = [EDRareRoute(sysList, fitType) for sysList in GenerateSystemLists(popSize,routeLength,validSystems)]
         return cls.__GeneticSolver(population,silent)
-#------------------------------------------------------------------------------
+
     @classmethod
     def __GeneticSolver(cls,startingPopulation: list, silent: bool, optimize = True) -> tuple:
         '''
@@ -140,7 +140,7 @@ class RouteCalc(object):
         if optimize:
             bestRoute = cls.__StartOptimizer(bestRoute,silent)
         return (bestRoute,currentGeneration)
-#------------------------------------------------------------------------------
+
     @classmethod
     def __CalcRelativeFitness(cls, population: list) -> list:
         '''
@@ -158,7 +158,7 @@ class RouteCalc(object):
 
         
         return selectionValues
-#------------------------------------------------------------------------------
+
     @classmethod
     def __Reproduce(cls, population: list, selectionValues: list) -> tuple: 
         '''
@@ -218,7 +218,7 @@ class RouteCalc(object):
             i += 1
 
         return (child1,child2)
-#------------------------------------------------------------------------------
+
     @classmethod
     def __Mutate(cls,route: list) -> list:
         tempRoute = [system for system in route]
@@ -245,7 +245,7 @@ class RouteCalc(object):
                 tempRoute[systemToChange] = newSystem    
 
         return tempRoute
-#------------------------------------------------------------------------------
+
     @classmethod
     def __StartOptimizer(cls,route: EDRareRoute, silent: bool) -> EDRareRoute:
         '''
@@ -286,25 +286,25 @@ class RouteCalc(object):
         if not silent:
             print("No optimization found")
         return route
-#------------------------------------------------------------------------------
+
     @classmethod
     def SetValidSystems(cls,systems: list):
         cls.__Valid_Systems = systems
-#------------------------------------------------------------------------------
+
     @classmethod
     def Wrap_CalcRelativeFitness(cls,population: list) -> list:
         return cls.__CalcRelativeFitness(population);
-#------------------------------------------------------------------------------
+
     @classmethod
     def Wrap_Reproduce(cls,population: list, selectVals: list) -> tuple:
         return cls.__Reproduce(population,selectVals)
-#------------------------------------------------------------------------------
+
     @classmethod
     def Wrap_Mutate(cls,route: list) -> list:
         return cls.__Mutate(route)
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+
+
 def GenerateSystemLists(numToCreate: int, routeLength: int, validSystems: list) -> list:
     '''
     Generates lists of length routeLength made up of the systems in the validSystems list
@@ -317,4 +317,4 @@ def GenerateSystemLists(numToCreate: int, routeLength: int, validSystems: list) 
         tempSystemList = random.sample(validSystems,routeLength)
         generatedLists.append(tempSystemList)
     return generatedLists
-#------------------------------------------------------------------------------
+

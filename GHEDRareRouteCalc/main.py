@@ -11,7 +11,7 @@ from urllib import request
 from fuzzywuzzy import fuzz
 import pandas as pd
 import numpy as np
-#------------------------------------------------------------------------------
+
 #TODO: find out why python-Levenshtein won't install
 def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: bool, stopShort: bool):
     exitTestLoop = False
@@ -36,14 +36,14 @@ def __RunGenetic(systems: list, routeLength: int, fitType: FitnessType, silent: 
         #Eventually take this out once im satisfied with hold times
         for k,v in bestRoute.Hold_Times.items():
             print(k.System_Name, " -> ", v)
-#------------------------------------------------------------------------------
+
 def __TryInt(val: str) -> bool:
     try:
         int(val)
         return True
     except:
         return False
-#------------------------------------------------------------------------------
+
 def ReadSystems(useLocal:bool) -> list:
     if useLocal:
         file = "rares.json"
@@ -69,7 +69,7 @@ def ReadSystems(useLocal:bool) -> list:
     for system in allSystems:
         system.CalculateDistances(allSystems)
     return allSystems
-#------------------------------------------------------------------------------
+
 def __ReadUserInput(systemsDict:dict) -> tuple:
     '''
     Gets the user input for running the genetic. Tuple will have form (bool,int,list).
@@ -168,8 +168,8 @@ def __ReadUserInput(systemsDict:dict) -> tuple:
         print("Goodbye")
 
     return (readyToRun,int(optionChoice),argsOrSystems)
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
+
+
 def main(useLocal,usePrompts):
     '''
     Main whatever.
@@ -238,10 +238,9 @@ def main(useLocal,usePrompts):
         #print(fullRoute)
         #fullRoute.DisplayInConsole()
         #fullRoute.DrawRoute(showLines=False)           
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
+
+
 if __name__ == '__main__':
     useLocal = True
     prompt = False
     main(useLocal,prompt)
-#------------------------------------------------------------------------------

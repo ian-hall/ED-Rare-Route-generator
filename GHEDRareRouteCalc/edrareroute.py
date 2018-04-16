@@ -6,9 +6,7 @@ import tkinter
 import random
 import numpy as np
 from enum import Enum,unique
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
 @unique
 class RouteType(Enum):
     Other = 0
@@ -17,17 +15,13 @@ class RouteType(Enum):
     FirstOver = 3
     FirstOverLong = 4
     Distance = 5
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
 @unique
 class FitnessType(Enum):
     EvenSplit = 0
     FirstOver = 1
     Distance = 2
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
 #TODO:  
 #       Need to finish adjusting the weightedCost values in the fitness functions
 #           to better support routes of short lengths.
@@ -36,7 +30,7 @@ class EDRareRoute(object):
     MaxLen_Split = 15
     MinLen_Alt = 6
     MaxLen_Alt = 30
-#------------------------------------------------------------------------------
+
     def __init__(self,systemList: list, fType: FitnessType):
         if(len(systemList) < 3):
             raise Exception("Routes must be 3 or more systems")
@@ -62,39 +56,39 @@ class EDRareRoute(object):
             self.__Fitness_Value = self.__FitnessDistance()
         elif fType == FitnessType.EvenSplit:
             self.__Fitness_Value = self.__Fitness_EvenSplit()
-#------------------------------------------------------------------------------
+
     @property
     def Fitness_Type(self) -> FitnessType:
         return self.__Fit_Type
-#------------------------------------------------------------------------------
+
     @property
     def Fitness(self) -> float:
         return self.__Fitness_Value
-#------------------------------------------------------------------------------
+
     @property
     def Systems(self) -> list:
         return [system for system in self.__Route]     
-#------------------------------------------------------------------------------
+
     @property
     def Route_Type(self) -> RouteType:
         return self.__Route_Type
-#------------------------------------------------------------------------------
+
     @property
     def Total_Cargo(self) -> float:
         return self.__Total_Cargo
-#------------------------------------------------------------------------------
+
     @property
     def Total_Distance(self) -> float:
         return self.__Total_Distance
-#------------------------------------------------------------------------------
+
     @property
     def Length(self) -> int:
         return len(self.__Route)
-#------------------------------------------------------------------------------
+
     @property
     def Hold_Times(self) -> dict:
         return dict(self.__MaxHoldTime)
-#------------------------------------------------------------------------------
+
     def __Fitness_EvenSplit(self):
         #TODO: still broken (?)
         #   Also should adjust scaling to use the new __MaxHoldTime thing
@@ -241,7 +235,7 @@ class EDRareRoute(object):
             totalValue *= 0.8
 
         return totalValue
-#------------------------------------------------------------------------------
+
     def __Fitness_FirstOver(self):
         '''
         Alternative fitness value based on just accounting for all systems in a route without
@@ -350,7 +344,7 @@ class EDRareRoute(object):
             
         #print(maxTimeInHold)
         return totalValue
-#------------------------------------------------------------------------------
+
     def __FitnessDistance(self):
         self.__Route_Type = RouteType.Distance
         routeLength = self.Length
@@ -364,7 +358,7 @@ class EDRareRoute(object):
         maxGoodDistance = routeLength * 100
         weightedDistance = (maxGoodDistance/self.__Total_Distance)
         return weightedDistance * 11
-#------------------------------------------------------------------------------
+
     #TODO: Add a better way to represent large routes than first letter of system, too many duplicates
     def DisplayInConsole(self):
         '''
@@ -459,7 +453,7 @@ class EDRareRoute(object):
                     strList.append('-')
             strList.append('\n')
         print(''.join(strList))
-#------------------------------------------------------------------------------
+
     def DrawRoute(self,showLines:bool=True):
         '''
         Draws the route using tkinter
@@ -609,7 +603,7 @@ class EDRareRoute(object):
         
         root.wm_title("a route")
         root.mainloop()
-#------------------------------------------------------------------------------
+
     def __str__(self):
         totalCost = sum([system.Total_Cost for system in self.__Route])
         strList = []
@@ -648,18 +642,18 @@ class EDRareRoute(object):
         strList.append("\nType: {0}".format(self.__Route_Type.name))
 
         return ''.join(strList)
-#------------------------------------------------------------------------------
+
     def __key(self):
         return self.__Fitness_Value
-#------------------------------------------------------------------------------
+
     def __hash__(self):
         return hash(self.__Fitness_Value)
-#------------------------------------------------------------------------------
+
     def __eq__(self,other):
         return self.__key() == other.__key()
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+
+
 def CheckOverlappingPoints(points,ovalRad):
     '''
     Checks if there will be any overlapping ovals with the given points and oval radius

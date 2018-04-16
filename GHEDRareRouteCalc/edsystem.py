@@ -1,14 +1,14 @@
 ﻿__author__ = 'Ian'
 from collections import defaultdict
 import re
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+
+
 class EDSystem( object ):
-#------------------------------------------------------------------------------
+
     def __init__(self):
         self.__Is_Initialized = False
-#------------------------------------------------------------------------------
+
     @classmethod
     #TODO: port_id is a new variable in the current remote json file i need to do something about
     def Initialize_System(cls, item, idx, alloc, system, permit, port, illeg, cost, dst, x, y, z, port_id):
@@ -30,7 +30,7 @@ class EDSystem( object ):
         newSystem.__System_Distances = defaultdict(int)
         newSystem.__Is_Initialized = True
         return newSystem  
-#------------------------------------------------------------------------------
+
     @property
     def Total_Cost(self) -> float:
         '''
@@ -42,58 +42,58 @@ class EDSystem( object ):
             supply = self.__Supply_Numbers[i]
             total += (cost * supply)
         return total
-#------------------------------------------------------------------------------
+
     @property
     def Is_Initialized(self) -> bool:
         return self.__Is_Initialized
-#------------------------------------------------------------------------------
+
     @property
     def Max_Supply(self) -> float:
         return sum(self.__Supply_Numbers)
-#------------------------------------------------------------------------------
+
     @property
     def Items_Info(self) -> list:
         '''
         Returns a list with elements (item name, item cost, item supply)
         '''
         return list(zip(self.__Items,self.__Costs,self.__Supply_Numbers))
-#------------------------------------------------------------------------------
+
     @property
     def Item_Names(self) -> list:
         return [name for name in self.__Items]
-#------------------------------------------------------------------------------
+
     @property
     def Item_Costs(self) -> list:
         return [cost for cost in self.__Costs]
-#------------------------------------------------------------------------------
+
     @property
     def Item_Supply_Counts(self) -> list:
         return [supply for supply in self.__Supply_Numbers]
-#------------------------------------------------------------------------------
+
     @property
     def Station_Names(self) -> list:
         return [name for name in self.__Station_Names]
-#------------------------------------------------------------------------------
+
     @property
     def Index(self) -> int:
         return self.__Index
-#------------------------------------------------------------------------------
+
     @property
     def System_Name(self) -> str:
         return self.__System_Name
-#------------------------------------------------------------------------------
+
     @property
     def Station_Distances(self) -> list:
         return [dist for dist in self.__Station_Distances]
-#------------------------------------------------------------------------------
+
     @property
     def Location(self) -> dict:
         return dict(self.__Location)
-#------------------------------------------------------------------------------
+
     @property
     def Needs_Permit(self) -> bool:
         return self.__Permit_Req
-#------------------------------------------------------------------------------
+
     #Maybe not the best use of a property
     @property
     def Short_Str(self) -> str:
@@ -107,7 +107,7 @@ class EDSystem( object ):
                 strBuilder.append(", ")
         strBuilder.append(")")
         return "".join(strBuilder)
-#------------------------------------------------------------------------------
+
     def GetDistanceTo(self, other) -> float:
         '''
         Calculate the distance to another system based on the x,y,z values.
@@ -117,7 +117,7 @@ class EDSystem( object ):
         #otherValues = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
         #return np.linalg.norm(localValues-otherValues)
         return self.__System_Distances[other]
-#------------------------------------------------------------------------------
+
     def AddRares(self, other):
         '''
         Add rare goods to a system. This will add duplicates if the same item is in self and other.
@@ -135,7 +135,7 @@ class EDSystem( object ):
             if other.__Station_Names[i] not in self.__Station_Names:
                 self.__Station_Names.append(other.__Station_Names[i])
                 self.__Station_Distances.append(other.__Station_Distances[i])
-#------------------------------------------------------------------------------
+
     def CalculateDistances(self,systemList):
         import numpy as np
         localValues = np.array([self.__Location['x'], self.__Location['y'], self.__Location['z']])
@@ -143,7 +143,7 @@ class EDSystem( object ):
             distanceTo = np.array([other.__Location['x'], other.__Location['y'], other.__Location['z']])
             temp = np.linalg.norm(localValues-distanceTo)
             self.__System_Distances[other] = temp         
-#------------------------------------------------------------------------------
+
     def __str__(self):
         #TODO:  Mark stations/Items to identify where stuff is bought, or maybe group them together when printing.
         #           In game this doesn't matter much because rares are flagged in each station but for this it might be good
@@ -164,44 +164,43 @@ class EDSystem( object ):
         strBuilder.append("}} ({0}T)".format(self.Max_Supply))
 
         return ''.join(strBuilder)       
-#------------------------------------------------------------------------------
+
     def __key(self):
         '''
         All stations/rares in a system will count as one EDSystems
         '''
         return self.__System_Name
-#------------------------------------------------------------------------------  
+  
     def __hash__(self):
         return hash(self.__key())
-#------------------------------------------------------------------------------
+
     def __eq__(self, other):
         return self.__key() == other.__key()
-#------------------------------------------------------------------------------    
-###############################################################################
-#------------------------------------------------------------------------------
+    
+
+
 class DisplayLocation(object):
-#------------------------------------------------------------------------------
+
     def __init__(self, row, col, depth = 0, name = ""):
         self.Row = row
         self.Col = col
         self.Depth = depth
         self.System_Name = name
-#------------------------------------------------------------------------------
+
     def __str__(self):
         return "{0:>17}: (c{1},r{2})".format(self.System_Name,self.Col,self.Row)
-#------------------------------------------------------------------------------
+
     def __eq__(self, other):
         return (self.Col == other.Col) and (self.Row == other.Row) and (self.Depth == other.Depth)
-#------------------------------------------------------------------------------
+
     def __hash__(self):
         return hash((self.Col,self.Row))
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+
+
 def TryFloat(val: str) -> bool:
     try:
         float(val)
         return True
     except:
         return False
-#------------------------------------------------------------------------------

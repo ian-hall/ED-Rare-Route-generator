@@ -3,11 +3,9 @@ from edrareroute import EDRareRoute, RouteType, FitnessType
 from routecalc import RouteCalc
 import time
 from collections import Counter
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
 class PerformanceCalc(object):
-#------------------------------------------------------------------------------
+
     @classmethod
     def CheckPerformance(cls,systemsList: list,fitType: FitnessType):
         maxTests = 10
@@ -41,7 +39,7 @@ class PerformanceCalc(object):
                     stats.Gens.append(numGenerations)
 
                 print(stats)
-#------------------------------------------------------------------------------
+
     @classmethod
     def CheckTestSystems(cls,systemsDict: dict,fitType: FitnessType):
         
@@ -244,11 +242,11 @@ class PerformanceCalc(object):
         #bigRoute.DisplayInConsole()
         #bigRoute.DrawRoute()
         
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+
+
 class PerformanceMetrics(object):
-#------------------------------------------------------------------------------
+
     def __init__(self,length: int,popSize: int):
         self.Route_Length = length
         self.Pop_Size = popSize
@@ -257,7 +255,7 @@ class PerformanceMetrics(object):
         self.Gens = []
         self.Types = []
         self.Values = []
-#------------------------------------------------------------------------------
+
     def __str__(self):
         strList = []
 
@@ -299,6 +297,5 @@ class PerformanceMetrics(object):
             strList.append("\n\tAvg generations(fail): {0:.5f}".format(avgGensUnsolved))
 
         return ''.join(strList)
-#------------------------------------------------------------------------------
-###############################################################################
-#------------------------------------------------------------------------------
+
+

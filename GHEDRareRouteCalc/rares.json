@@ -9,7 +9,8 @@
     "alloc": "18",
     "cost": "915",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 400
   },
   "Onion Head": {
     "system": "Kappa Fornacis",
@@ -21,7 +22,8 @@
     "alloc": "17",
     "cost": "775",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 51
   },
   "Tauri Chimes": {
     "system": "39 Tauri",
@@ -33,7 +35,8 @@
     "alloc": "17",
     "cost": "838",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 39
   },
   "Jaradharre Puzzle Box": {
     "system": "Jaradharre",
@@ -45,7 +48,8 @@
     "alloc": "4",
     "cost": "12706",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2183
   },
   "V Herculis Body Rub": {
     "system": "V1090 Herculis",
@@ -57,7 +61,8 @@
     "alloc": "20",
     "cost": "160",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 954
   },
   "Centauri Mega Gin": {
     "system": "Alpha Centauri",
@@ -69,7 +74,8 @@
     "alloc": "7",
     "cost": "3319",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1662
   },
   "Altairian Skin": {
     "system": "Altair",
@@ -81,7 +87,8 @@
     "alloc": "26",
     "cost": "489",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 434
   },
   "Pantaa Prayer Sticks": {
     "system": "George Pantazis",
@@ -93,7 +100,8 @@
     "alloc": "13",
     "cost": "1827",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3526
   },
   "Rajukru Multi-Stoves": {
     "system": "Rajukru",
@@ -105,7 +113,8 @@
     "alloc": "27",
     "cost": "682",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3211
   },
   "The Hutton Mug": {
     "system": "Alpha Centauri",
@@ -117,7 +126,8 @@
     "alloc": "30",
     "cost": "125",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1662
   },
   "Ultra-Compact Processor": {
     "system": "17 Lyrae",
@@ -129,7 +139,8 @@
     "alloc": "1",
     "cost": "19350",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 17246
   },
   "Ophiuch Exino Artefacts": {
     "system": "36 Ophiuchi",
@@ -141,7 +152,8 @@
     "alloc": "10",
     "cost": "4356",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 10197
   },
   "Aepyornis Egg": {
     "system": "47 Ceti",
@@ -153,7 +165,8 @@
     "alloc": "12",
     "cost": "2654",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 5667
   },
   "Ceti Rabbits": {
     "system": "47 Ceti",
@@ -165,19 +178,21 @@
     "alloc": "12",
     "cost": "1675",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 5668
   },
   "Chateau De Aegaeon": {
     "system": "Aegaeon",
     "x": "46.90625",
     "y": "23.625",
     "z": "-59.75",
-    "port": "Schweikart Station",
+    "port": "Schweickart Station",
     "dst": "11600",
     "alloc": "14",
     "cost": "1283",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 5760
   },
   "Eden Apples Of Aerial": {
     "system": "Aerial",
@@ -189,7 +204,8 @@
     "alloc": "15",
     "cost": "621",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1323
   },
   "Aganippe Rush": {
     "system": "Aganippe",
@@ -201,7 +217,8 @@
     "alloc": "4",
     "cost": "8966",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1561
   },
   "Alacarakmo Skin Art": {
     "system": "Alacarakmo",
@@ -213,7 +230,8 @@
     "alloc": "14",
     "cost": "1421",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 854
   },
   "Alya Body Soap": {
     "system": "Alya",
@@ -225,7 +243,8 @@
     "alloc": "16",
     "cost": "454",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 4746
   },
   "Anduliga Fire Works": {
     "system": "Anduliga",
@@ -237,7 +256,8 @@
     "alloc": "16",
     "cost": "891",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 5883
   },
   "Any Na Coffee": {
     "system": "Any Na",
@@ -249,7 +269,8 @@
     "alloc": "11",
     "cost": "1790",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 933
   },
   "Arouca Conventual Sweets": {
     "system": "Arouca",
@@ -261,7 +282,8 @@
     "alloc": "12",
     "cost": "1191",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 928
   },
   "Az Cancri Formula 42": {
     "system": "AZ Cancri",
@@ -273,19 +295,21 @@
     "alloc": "8",
     "cost": "6442",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1255
   },
   "Baltah'sine Vacuum Krill": {
     "system": "Baltah'Sine",
     "x": "85.15625",
     "y": "-56.3125",
     "z": "40.34375",
-    "port": "Baltha'sine Station",
+    "port": "Baltha'Sine Station",
     "dst": "356",
     "alloc": "18",
     "cost": "825",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 420
   },
   "Banki Amphbious Leather": {
     "system": "Banki",
@@ -297,7 +321,8 @@
     "alloc": "18",
     "cost": "634",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 10845
   },
   "Bast Snake Gin": {
     "system": "Bast",
@@ -309,7 +334,8 @@
     "alloc": "10",
     "cost": "1080",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 513
   },
   "Belalans Ray Leather": {
     "system": "Belalans",
@@ -321,7 +347,8 @@
     "alloc": "11",
     "cost": "882",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2175
   },
   "Crystalline Spheres": {
     "system": "Bento",
@@ -333,7 +360,8 @@
     "alloc": "12",
     "cost": "6125",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 14722
   },
   "CD-75 Kitten Brand Coffee": {
     "system": "CD-75 661",
@@ -345,7 +373,8 @@
     "alloc": "12",
     "cost": "2373",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 423
   },
   "Cherbones Blood Crystals": {
     "system": "Cherbones",
@@ -357,19 +386,21 @@
     "alloc": "3",
     "cost": "12550",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3109
   },
   "Chi Eridani Marine Paste": {
     "system": "Chi Eridani",
     "x": "26.28125",
     "y": "-51.75",
     "z": "4.625",
-    "port": "Steve Masters Station",
+    "port": "Steve Masters",
     "dst": "2184",
     "alloc": "18",
     "cost": "784",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 394
   },
   "Coquim Spongiform Victuals": {
     "system": "Coquim",
@@ -381,7 +412,8 @@
     "alloc": "20",
     "cost": "255",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1771
   },
   "Damna Carapaces": {
     "system": "Damna",
@@ -393,19 +425,21 @@
     "alloc": "15",
     "cost": "315",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2695
   },
   "Motrona Experience Jelly": {
     "system": "Dea Motrona",
     "x": "-12.15625",
     "y": "62.625",
     "z": "29.71875",
-    "port": "Dea Motrona",
+    "port": "Pinzon Dock",
     "dst": "17000000",
     "alloc": "11",
     "cost": "7420",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 2284
   },
   "Pavonis Ear Grubs": {
     "system": "Delta Pavonis",
@@ -417,7 +451,8 @@
     "alloc": "24",
     "cost": "662",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 1257
   },
   "Delta Phoenicis Palms": {
     "system": "Delta Phoenicis",
@@ -429,7 +464,8 @@
     "alloc": "17",
     "cost": "412",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 491
   },
   "Deuringas Truffles": {
     "system": "Deuringas",
@@ -441,7 +477,8 @@
     "alloc": "7",
     "cost": "1892",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 940
   },
   "Diso Ma Corn": {
     "system": "Diso",
@@ -453,7 +490,8 @@
     "alloc": "15",
     "cost": "180",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 259
   },
   "Eleu Thermals": {
     "system": "Eleu",
@@ -465,7 +503,8 @@
     "alloc": "13",
     "cost": "873",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 367
   },
   "Indi Bourbon": {
     "system": "Epsilon Indi",
@@ -477,7 +516,8 @@
     "alloc": "8",
     "cost": "1288",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 31
   },
   "Eranin Pearl Whisky": {
     "system": "Eranin",
@@ -489,7 +529,8 @@
     "alloc": "8",
     "cost": "1620",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 92
   },
   "Eshu Umbrellas": {
     "system": "Eshu",
@@ -501,7 +542,8 @@
     "alloc": "9",
     "cost": "2050",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3766
   },
   "Esuseku Caviar": {
     "system": "Esuseku",
@@ -513,7 +555,8 @@
     "alloc": "10",
     "cost": "2450",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 314
   },
   "Ethgreze Tea Buds": {
     "system": "Ethgreze",
@@ -525,7 +568,8 @@
     "alloc": "7",
     "cost": "3261",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 503
   },
   "Fujin Tea": {
     "system": "Fujin",
@@ -537,7 +581,8 @@
     "alloc": "10",
     "cost": "1003",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 38
   },
   "Geawen Dance Dust": {
     "system": "Geawen",
@@ -549,7 +594,8 @@
     "alloc": "26",
     "cost": "1022",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 6704
   },
   "Gerasian Gueuze Beer": {
     "system": "Geras",
@@ -561,7 +607,8 @@
     "alloc": "29",
     "cost": "456",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2784
   },
   "Gilya Signature Weapons": {
     "system": "Gilya",
@@ -573,19 +620,8 @@
     "alloc": "12",
     "cost": "7290",
     "permit": 0,
-    "illeg": 0
-  },
-  "Jaques Queintian Still": {
-    "system": "Gliese 1269",
-    "x": "-167.4375",
-    "y": "-132.375",
-    "z": "36.8125",
-    "port": "Jaques Station",
-    "dst": "660",
-    "alloc": "18",
-    "cost": "8435",
-    "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 15488
   },
   "Goman Yaupon Coffee": {
     "system": "Goman",
@@ -597,7 +633,8 @@
     "alloc": "16",
     "cost": "1451",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 401
   },
   "Haidne Black Brew": {
     "system": "Haiden",
@@ -609,7 +646,8 @@
     "alloc": "14",
     "cost": "1347",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 4727
   },
   "Havasupai Dream Catcher": {
     "system": "Havasupai",
@@ -621,7 +659,8 @@
     "alloc": "2",
     "cost": "9636",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 6828
   },
   "Live Hecate Sea Worms": {
     "system": "Hecate",
@@ -633,7 +672,8 @@
     "alloc": "13",
     "cost": "1190",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1019
   },
   "Ceremonial Heike Tea": {
     "system": "Heike",
@@ -645,7 +685,8 @@
     "alloc": "8",
     "cost": "1920",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 921
   },
   "Helvetitj Pearls": {
     "system": "Helvetitj",
@@ -657,7 +698,8 @@
     "alloc": "6",
     "cost": "1810",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1052
   },
   "HIP 10175 Bush Meat": {
     "system": "HIP 10175",
@@ -669,7 +711,8 @@
     "alloc": "13",
     "cost": "2105",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 4294
   },
   "HIP Proto-Squid": {
     "system": "HIP 41181",
@@ -681,7 +724,8 @@
     "alloc": "5",
     "cost": "1488",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 5010
   },
   "Burnham Bile Distillate": {
     "system": "HIP 59533",
@@ -693,7 +737,8 @@
     "alloc": "4",
     "cost": "806",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 6961
   },
   "HIP Organophosphates": {
     "system": "HIP 80364",
@@ -705,7 +750,8 @@
     "alloc": "36",
     "cost": "385",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3243
   },
   "Holva Duelling Blades": {
     "system": "Holva",
@@ -717,7 +763,8 @@
     "alloc": "7",
     "cost": "6518",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2552
   },
   "HR 7221 Wheat": {
     "system": "HR 7221",
@@ -729,7 +776,8 @@
     "alloc": "16",
     "cost": "415",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 683
   },
   "Giant Irukama Snails": {
     "system": "Irukama",
@@ -741,19 +789,21 @@
     "alloc": "16",
     "cost": "1810",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 407
   },
   "Jaroua Rice": {
     "system": "Jaroua",
     "x": "157.53125",
     "y": "-110.53125",
     "z": "28.25",
-    "port": "Mccool City",
+    "port": "McCool City",
     "dst": "142",
     "alloc": "18",
     "cost": "385",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 408
   },
   "Jotun Mookah": {
     "system": "Jotun",
@@ -765,7 +815,8 @@
     "alloc": "32",
     "cost": "1252",
     "permit": 1,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 15112
   },
   "Kachirigin Filter Leeches": {
     "system": "Kachirigin",
@@ -777,7 +828,8 @@
     "alloc": "10",
     "cost": "473",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1581
   },
   "Kamitra Cigars": {
     "system": "Kamitra",
@@ -789,7 +841,8 @@
     "alloc": "6",
     "cost": "6218",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 903
   },
   "Kamorin Historic Weapons": {
     "system": "Kamorin",
@@ -801,7 +854,8 @@
     "alloc": "12",
     "cost": "2678",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 1619
   },
   "Karetii Couture": {
     "system": "Karetii",
@@ -813,7 +867,8 @@
     "alloc": "5",
     "cost": "5225",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1037
   },
   "Kinago Violins": {
     "system": "Kinago",
@@ -825,7 +880,8 @@
     "alloc": "3",
     "cost": "728",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3246
   },
   "Kongga Ale": {
     "system": "Kongga",
@@ -837,7 +893,8 @@
     "alloc": "16",
     "cost": "585",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 329
   },
   "Koro Kung Pellets": {
     "system": "Korro Kung",
@@ -849,7 +906,8 @@
     "alloc": "20",
     "cost": "220",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2794
   },
   "Lavian Brandy": {
     "system": "Lave",
@@ -861,7 +919,8 @@
     "alloc": "7",
     "cost": "3500",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 99
   },
   "Chameleon Cloth": {
     "system": "LDS 883",
@@ -873,7 +932,8 @@
     "alloc": "7",
     "cost": "1664",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3555
   },
   "Leestian Evil Juice": {
     "system": "Leesti",
@@ -885,7 +945,8 @@
     "alloc": "14",
     "cost": "334",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 15
   },
   "Azure Milk": {
     "system": "Leesti",
@@ -897,7 +958,8 @@
     "alloc": "7",
     "cost": "3010",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 15
   },
   "Void Extract Coffee": {
     "system": "LFT 1421",
@@ -909,7 +971,8 @@
     "alloc": "13",
     "cost": "2357",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 339
   },
   "Honesty Pills": {
     "system": "LP 375-25",
@@ -921,7 +984,8 @@
     "alloc": "13",
     "cost": "1365",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3134
   },
   "Non Euclidian Exotanks": {
     "system": "LTT 8517",
@@ -933,7 +997,8 @@
     "alloc": "16",
     "cost": "892",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 10404
   },
   "LTT Hypersweet": {
     "system": "LTT 9360",
@@ -945,7 +1010,8 @@
     "alloc": "19",
     "cost": "222",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 10419
   },
   "Mechucos High Tea": {
     "system": "Mechucos",
@@ -957,7 +1023,8 @@
     "alloc": "12",
     "cost": "1345",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 8035
   },
   "Medb Starlube": {
     "system": "Medb",
@@ -969,7 +1036,8 @@
     "alloc": "18",
     "cost": "416",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1159
   },
   "Mokojing Beast Feast": {
     "system": "Mokojing",
@@ -981,7 +1049,8 @@
     "alloc": "7",
     "cost": "2681",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3057
   },
   "Momus Bog Spaniel": {
     "system": "Momus Reach",
@@ -993,7 +1062,8 @@
     "alloc": "7",
     "cost": "1825",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 36
   },
   "Mukusubii Chitin-Os": {
     "system": "Mukusubii",
@@ -1005,7 +1075,8 @@
     "alloc": "15",
     "cost": "661",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 483
   },
   "Mulachi Giant Fungus": {
     "system": "Mulachi",
@@ -1017,7 +1088,8 @@
     "alloc": "22",
     "cost": "86",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 700
   },
   "Neritus Berries": {
     "system": "Neritus",
@@ -1029,7 +1101,8 @@
     "alloc": "13",
     "cost": "850",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 994
   },
   "Ngadandari Fire Opals": {
     "system": "Ngadandari",
@@ -1041,7 +1114,8 @@
     "alloc": "10",
     "cost": "16028",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 11130
   },
   "Nguna Modern Antiques": {
     "system": "Nguna",
@@ -1053,7 +1127,8 @@
     "alloc": "18",
     "cost": "930",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 536
   },
   "Soontill Relics": {
     "system": "Ngurii",
@@ -1065,7 +1140,8 @@
     "alloc": "5",
     "cost": "17000",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 10682
   },
   "Personal Gifts": {
     "system": "Njambalba",
@@ -1077,7 +1153,8 @@
     "alloc": "20",
     "cost": "12250",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 33908
   },
   "Njangari Saddles": {
     "system": "Njangari",
@@ -1089,19 +1166,21 @@
     "alloc": "13",
     "cost": "65",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 4070
   },
   "Master Chefs": {
     "system": "Noti",
     "x": "72.15625",
     "y": "42.8125",
     "z": "-31.4375",
-    "port": "Webber Gateway",
+    "port": "Weber Gateway",
     "dst": "73",
     "alloc": "13",
     "cost": "18000",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 11320
   },
   "Ochoeng Chillies": {
     "system": "Ochoeng",
@@ -1113,7 +1192,8 @@
     "alloc": "14",
     "cost": "998",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1031
   },
   "Orrerian Vicious Brew": {
     "system": "Orrere",
@@ -1125,7 +1205,8 @@
     "alloc": "16",
     "cost": "533",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 276
   },
   "Giant Verrix": {
     "system": "Phiagre",
@@ -1137,7 +1218,8 @@
     "alloc": "6",
     "cost": "6552",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 710
   },
   "Albino Quechua Mammoth Meat": {
     "system": "Quechua",
@@ -1149,7 +1231,8 @@
     "alloc": "10",
     "cost": "2538",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 579
   },
   "Rapa Bao Snake Skins": {
     "system": "Rapa Bao",
@@ -1161,7 +1244,8 @@
     "alloc": "11",
     "cost": "550",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 142
   },
   "Rusani Old Smokey": {
     "system": "Rusani",
@@ -1173,7 +1257,8 @@
     "alloc": "10",
     "cost": "5810",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 1214
   },
   "Sanuma Decorative Meat": {
     "system": "Sanuma",
@@ -1185,7 +1270,8 @@
     "alloc": "25",
     "cost": "860",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 4532
   },
   "Waters of Shintara": {
     "system": "Shinrarta Dezhra",
@@ -1197,7 +1283,8 @@
     "alloc": "6",
     "cost": "7495",
     "permit": 1,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 571
   },
   "Sothis Crystalline Gold": {
     "system": "Sothis",
@@ -1209,7 +1296,8 @@
     "alloc": "20",
     "cost": "15905",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 16095
   },
   "Lucan Onion Head": {
     "system": "Tanmark",
@@ -1221,7 +1309,8 @@
     "alloc": "9",
     "cost": "1814",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 50
   },
   "Tanmark Tranquil Tea": {
     "system": "Tanmark",
@@ -1233,7 +1322,8 @@
     "alloc": "12",
     "cost": "815",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 50
   },
   "Tarach Spice": {
     "system": "Tarach Tor",
@@ -1245,19 +1335,21 @@
     "alloc": "8",
     "cost": "1056",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 49
   },
   "Terra Mater Blood Bores": {
     "system": "Terra Mater",
     "x": "-49.75",
     "y": "-19.03125",
     "z": "-45",
-    "port": "Gr8minds",
+    "port": "GR8Minds",
     "dst": "504",
     "alloc": "24",
     "cost": "7824",
     "permit": 1,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 11541
   },
   "Thrutis Cream": {
     "system": "Thrutis",
@@ -1269,7 +1361,8 @@
     "alloc": "11",
     "cost": "925",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1026
   },
   "Tiolce Waste2Paste Units": {
     "system": "Tiolce",
@@ -1281,7 +1374,8 @@
     "alloc": "16",
     "cost": "1153",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 40
   },
   "Toxandji Virocide": {
     "system": "Toxandji",
@@ -1293,7 +1387,8 @@
     "alloc": "19",
     "cost": "535",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3030
   },
   "Uszaian Tree Grub": {
     "system": "Uszaa",
@@ -1305,7 +1400,8 @@
     "alloc": "14",
     "cost": "965",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 283
   },
   "Utgaroar Millennial Eggs": {
     "system": "Utgaroar",
@@ -1317,7 +1413,8 @@
     "alloc": "15",
     "cost": "1795",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3677
   },
   "Uzumoku Low-G Wings": {
     "system": "Uzumoku",
@@ -1329,7 +1426,8 @@
     "alloc": "8",
     "cost": "8496",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2685
   },
   "Vanayequi Ceratomorpha Fur": {
     "system": "Vanayequi",
@@ -1341,7 +1439,8 @@
     "alloc": "10",
     "cost": "615",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1129
   },
   "Vega Slimweed": {
     "system": "Vega",
@@ -1353,7 +1452,8 @@
     "alloc": "28",
     "cost": "2398",
     "permit": 1,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 1410
   },
   "Vidavantian Lace": {
     "system": "Vidavanta",
@@ -1365,7 +1465,8 @@
     "alloc": "5",
     "cost": "6771",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 2260
   },
   "Volkhab Bee Drones": {
     "system": "Volkhab",
@@ -1377,7 +1478,8 @@
     "alloc": "11",
     "cost": "3262",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3498
   },
   "Wheemete Wheat Cakes": {
     "system": "Wheemete",
@@ -1389,7 +1491,8 @@
     "alloc": "19",
     "cost": "262",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 768
   },
   "Witchhaul Kobe Beef": {
     "system": "Witchhaul",
@@ -1401,7 +1504,8 @@
     "alloc": "9",
     "cost": "4520",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 37
   },
   "Wolf Fesh": {
     "system": "Wolf 1301",
@@ -1413,7 +1517,8 @@
     "alloc": "13",
     "cost": "712",
     "permit": 0,
-    "illeg": 1
+    "illeg": 1,
+    "port_id": 1161
   },
   "Wulpa Hyperbore Systems": {
     "system": "Wulpa",
@@ -1425,7 +1530,8 @@
     "alloc": "10",
     "cost": "1175",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 3314
   },
   "Wuthielo Ku Froth": {
     "system": "Wuthielo Ku",
@@ -1437,7 +1543,8 @@
     "alloc": "17",
     "cost": "420",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 397
   },
   "Xihe Biomorphic Companions": {
     "system": "Xihe",
@@ -1449,7 +1556,8 @@
     "alloc": "7",
     "cost": "4482",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 626
   },
   "Yaso Kondi Leaf": {
     "system": "Yaso Kondi",
@@ -1461,7 +1569,8 @@
     "alloc": "5",
     "cost": "6060",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 384
   },
   "Leathery Eggs": {
     "system": "Zaonce",
@@ -1473,19 +1582,21 @@
     "alloc": "1",
     "cost": "23115",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 265
   },
   "Zeessze Ant Grub Glue": {
     "system": "Zeessze",
     "x": "-19.8125",
     "y": "-3.25",
     "z": "-14.28125",
-    "port": "Nicollier Hanger",
+    "port": "Nicollier Hangar",
     "dst": "489",
     "alloc": "18",
     "cost": "380",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 64367
   },
   "Onionhead Alpha Strain": {
     "system": "Xelabara",
@@ -1497,7 +1608,8 @@
     "alloc": "10",
     "cost": "765",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 9811
   },
   "Galactic Travel Guides": {
     "system": "LHS 3447",
@@ -1509,7 +1621,8 @@
     "alloc": "",
     "cost": "",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 63136
   },
   "Jaques Quinentian Still": {
     "system": "Colonia",
@@ -1521,6 +1634,7 @@
     "alloc": "27",
     "cost": "",
     "permit": 0,
-    "illeg": 0
+    "illeg": 0,
+    "port_id": 42041
   }
 }
